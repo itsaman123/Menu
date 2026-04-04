@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { Box, Button, TextField, Typography, Paper, Grid, Stack } from '@mui/material';
 import { Restaurant, Login as LoginIcon } from '@mui/icons-material';
 import api from '../api';
@@ -10,16 +11,20 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await api.post('/auth/login', { email, password });
+  const loginMutation = useMutation({
+    mutationFn: (credentials) => api.post('/auth/login', credentials),
+    onSuccess: (res) => {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data));
       navigate('/admin');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-    }
+    },
+    onError: (err) => setError(err.response?.data?.message || 'Login failed')
+  });
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setError('');
+    loginMutation.mutate({ email, password });
   };
 
   return (
@@ -58,8 +63,9 @@ const Login = () => {
                 value={password} onChange={(e) => setPassword(e.target.value)} />
               {error && <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>}
               <Button type="submit" fullWidth variant="contained" startIcon={<LoginIcon />}
+                disabled={loginMutation.isPending}
                 sx={{ mt: 4, mb: 2, py: 1.5, fontSize: '0.95rem' }}>
-                Sign In
+                {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
               </Button>
               <Box sx={{ textAlign: 'center', mt: 2 }}>
                 <Typography variant="body2">

@@ -7,6 +7,7 @@
 - [Technology Stack](#technology-stack)
 - [Design System](#design-system)
 - [Routing](#routing)
+
 - [State Management](#state-management)
 - [API Layer](#api-layer)
 - [Pages Reference](#pages-reference)

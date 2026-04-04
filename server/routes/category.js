@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Category = require('../models/Category');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, requireFeature } = require('../middleware/authMiddleware');
 
 // @route   GET /api/categories
 // @desc    Get all categories for the logged in admin's restaurant
 // @access  Private
-router.get('/', protect, async (req, res) => {
+router.get('/', protect, requireFeature('menu'), async (req, res) => {
   try {
     const categories = await Category.find({ restaurantId: req.admin.restaurantId }).sort('order');
     res.json(categories);
@@ -18,7 +18,7 @@ router.get('/', protect, async (req, res) => {
 // @route   POST /api/categories
 // @desc    Create a category
 // @access  Private
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, requireFeature('menu'), async (req, res) => {
   try {
     const { name, order } = req.body;
     const category = new Category({
@@ -36,7 +36,7 @@ router.post('/', protect, async (req, res) => {
 // @route   PUT /api/categories/:id
 // @desc    Update a category
 // @access  Private
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, requireFeature('menu'), async (req, res) => {
   try {
     const { name, order } = req.body;
     const category = await Category.findOne({ _id: req.params.id, restaurantId: req.admin.restaurantId });
@@ -58,7 +58,7 @@ router.put('/:id', protect, async (req, res) => {
 // @route   DELETE /api/categories/:id
 // @desc    Delete a category
 // @access  Private
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', protect, requireFeature('menu'), async (req, res) => {
   try {
     const category = await Category.findOne({ _id: req.params.id, restaurantId: req.admin.restaurantId });
 

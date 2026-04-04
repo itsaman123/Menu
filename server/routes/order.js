@@ -4,7 +4,7 @@ const Order = require('../models/Order');
 const MenuItem = require('../models/MenuItem');
 const Restaurant = require('../models/Restaurant');
 const { protectCustomer } = require('../middleware/customerAuth');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, requireFeature } = require('../middleware/authMiddleware');
 
 // @route   POST /api/orders/create
 // @desc    Create a new order (after OTP verification)
@@ -80,7 +80,7 @@ router.get('/my-orders', protectCustomer, async (req, res) => {
 // @route   GET /api/orders/restaurant
 // @desc    Get all orders for the admin's restaurant (scoped by restaurantId)
 // @access  Private (Admin)
-router.get('/restaurant', protect, async (req, res) => {
+router.get('/restaurant', protect, requireFeature('orders'), async (req, res) => {
   try {
     // req.admin.restaurantId comes from the JWT-decoded admin record
     // This ensures Restaurant A's admin can ONLY see Restaurant A's orders
@@ -94,7 +94,7 @@ router.get('/restaurant', protect, async (req, res) => {
 // @route   PUT /api/orders/:id/status
 // @desc    Update order status (Admin only, scoped to their restaurant)
 // @access  Private (Admin)
-router.put('/:id/status', protect, async (req, res) => {
+router.put('/:id/status', protect, requireFeature('orders'), async (req, res) => {
   try {
     const { status } = req.body;
     

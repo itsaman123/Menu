@@ -53,7 +53,7 @@ const SuperAdminDashboard = () => {
     updateMutation.mutate({ id, data: { isActive: !currentStatus }});
   };
 
-  const allFeatures = ['menu', 'orders', 'analytics', 'qr'];
+  const allFeatures = ['menu', 'orders', 'analytics', 'qr', 'reservations', 'themes'];
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'var(--cc-surface-container-low)' }}>
@@ -120,12 +120,12 @@ const SuperAdminDashboard = () => {
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Manage Features for {editAdmin?.restaurantId?.name}</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>Select features to DISABLE for this admin:</Typography>
+          <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>Toggle features on or off for this admin:</Typography>
           <FormGroup>
             {allFeatures.map(f => (
               <FormControlLabel 
                 key={f} 
-                control={<Checkbox checked={disabledFeats.includes(f)} onChange={() => toggleFeature(f)} />} 
+                control={<Switch checked={!disabledFeats.includes(f)} onChange={() => toggleFeature(f)} />} 
                 label={<Typography sx={{ textTransform: 'capitalize' }}>{f}</Typography>} 
               />
             ))}

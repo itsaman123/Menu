@@ -8,7 +8,8 @@ import {
 } from '@mui/material';
 import {
   Delete, Edit, QrCode2, Dashboard, RestaurantMenu, ReceiptLong,
-  Leaderboard, Settings, HelpOutline, Logout, Add, Notifications
+  Leaderboard, Settings, HelpOutline, Logout, Add, Notifications,
+  TableBar, Palette
 } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
 import { useNavigate } from 'react-router-dom';
@@ -41,6 +42,8 @@ const AdminDashboard = () => {
     { label: 'Menu', icon: <RestaurantMenu />, key: 'menu' },
     { label: 'Orders', icon: <ReceiptLong />, key: 'orders' },
     { label: 'Analytics', icon: <Leaderboard />, key: 'analytics' },
+    { label: 'Reservations', icon: <TableBar />, key: 'reservations' },
+    { label: 'Themes', icon: <Palette />, key: 'themes' },
     { label: 'QR Codes', icon: <QrCode2 />, key: 'qr' },
   ].filter(item => !disabledFeatures.includes(item.key));
 
@@ -327,6 +330,30 @@ const AdminDashboard = () => {
               <Leaderboard sx={{ fontSize: 60, color: 'var(--cc-outline-variant)', mb: 2 }} />
               <Typography variant="h6" color="text.secondary">Advanced analytics coming soon</Typography>
               <Typography variant="body2" color="text.secondary">Track peak hours, popular items, and revenue trends.</Typography>
+            </Paper>
+          </>
+        )}
+
+        {/* Reservations (placeholder) */}
+        {activeSection === 'reservations' && (
+          <>
+            <Typography variant="h4" fontWeight="800" sx={{ mb: 4 }}>Table Reservations</Typography>
+            <Paper elevation={0} sx={{ p: 6, textAlign: 'center', bgcolor: 'var(--cc-surface-container-lowest)' }}>
+              <TableBar sx={{ fontSize: 60, color: 'var(--cc-outline-variant)', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary">Reservations Module</Typography>
+              <Typography variant="body2" color="text.secondary">Allow customers to reserve tables in advance. Enable waiting lists and seating charts here.</Typography>
+            </Paper>
+          </>
+        )}
+
+        {/* Themes (placeholder) */}
+        {activeSection === 'themes' && (
+          <>
+            <Typography variant="h4" fontWeight="800" sx={{ mb: 4 }}>Brand Themes</Typography>
+            <Paper elevation={0} sx={{ p: 6, textAlign: 'center', bgcolor: 'var(--cc-surface-container-lowest)' }}>
+              <Palette sx={{ fontSize: 60, color: 'var(--cc-outline-variant)', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary">Customize Storefront</Typography>
+              <Typography variant="body2" color="text.secondary">Switch between dark modes, custom color palettes, and stunning new layout structures.</Typography>
             </Paper>
           </>
         )}

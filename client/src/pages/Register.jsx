@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { Box, Button, TextField, Typography, Paper, Grid, Stack } from '@mui/material';
 import { Restaurant, AppRegistration } from '@mui/icons-material';
 import api from '../api';
@@ -9,16 +10,20 @@ const Register = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await api.post('/auth/register', formData);
+  const registerMutation = useMutation({
+    mutationFn: (data) => api.post('/auth/register', data),
+    onSuccess: (res) => {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data));
       navigate('/admin');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
-    }
+    },
+    onError: (err) => setError(err.response?.data?.message || 'Registration failed')
+  });
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    setError('');
+    registerMutation.mutate(formData);
   };
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -73,8 +78,9 @@ const Register = () => {
               <TextField margin="dense" required fullWidth label="Password" name="password" type="password" value={formData.password} onChange={handleChange} />
               {error && <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>}
               <Button type="submit" fullWidth variant="contained" startIcon={<AppRegistration />}
+                disabled={registerMutation.isPending}
                 sx={{ mt: 4, mb: 2, py: 1.5, fontSize: '0.95rem' }}>
-                Create My Account
+                {registerMutation.isPending ? 'Creating...' : 'Create My Account'}
               </Button>
               <Box sx={{ textAlign: 'center', mt: 2 }}>
                 <Typography variant="body2">

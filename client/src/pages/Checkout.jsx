@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import {
   Box, Container, Typography, Paper, Divider, TextField, Button,
   CircularProgress, Alert, Stepper, Step, StepLabel, List, ListItem, ListItemText,
@@ -18,47 +19,46 @@ const Checkout = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const sendOtpMutation = useMutation({
+    mutationFn: (phoneNum) => api.post('/api/otp/send-otp', { phone: phoneNum }),
+    onSuccess: () => setActiveStep(1),
+    onError: (err) => setError(err.response?.data?.message || 'Failed to send OTP')
+  });
 
-  const handleSendOTP = async () => {
+  const placeOrderMutation = useMutation({
+    mutationFn: (token) => api.post('/api/orders/create',
+      { restaurantSlug: slug, items: cart, tableNumber },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ),
+    onSuccess: (res) => {
+      clearCart();
+      navigate(`/order-success/${res.data._id}`);
+    },
+    onError: (err) => setError(err.response?.data?.message || 'Failed to place order')
+  });
+
+  const verifyOtpMutation = useMutation({
+    mutationFn: (data) => api.post('/api/otp/verify-otp', data),
+    onSuccess: (res) => {
+      localStorage.setItem('customerToken', res.data.orderToken);
+      placeOrderMutation.mutate(res.data.orderToken);
+    },
+    onError: (err) => setError(err.response?.data?.message || 'Invalid OTP')
+  });
+
+  const handleSendOTP = () => {
     if (!phone) return setError('Phone number is required');
     if (isDemo) { setActiveStep(1); return; }
-    setLoading(true); setError('');
-    try {
-      await api.post('/api/otp/send-otp', { phone });
-      setActiveStep(1);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send OTP');
-    } finally { setLoading(false); }
+    setError('');
+    sendOtpMutation.mutate(phone);
   };
 
-  const handleVerifyOTP = async () => {
+  const handleVerifyOTP = () => {
     if (!otp) return setError('OTP is required');
     if (isDemo) { clearCart(); navigate(`/order-success/demo_order_id`); return; }
-    setLoading(true); setError('');
-    try {
-      const res = await api.post('/api/otp/verify-otp', { phone, otp });
-      localStorage.setItem('customerToken', res.data.orderToken);
-      handlePlaceOrder(res.data.orderToken);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Invalid OTP');
-      setLoading(false);
-    }
-  };
-
-  const handlePlaceOrder = async (token) => {
-    try {
-      const res = await api.post('/api/orders/create',
-        { restaurantSlug: slug, items: cart, tableNumber },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      clearCart();
-      localStorage.removeItem('customerToken');
-      navigate(`/order-success/${res.data._id}`);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to place order');
-    } finally { setLoading(false); }
+    setError('');
+    verifyOtpMutation.mutate({ phone, otp });
   };
 
   if (cart.length === 0) {
@@ -136,9 +136,9 @@ const Checkout = () => {
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>Enter your number to receive a secure OTP.</Typography>
             <TextField fullWidth placeholder="e.g. +919876543210" value={phone} onChange={(e) => setPhone(e.target.value)} sx={{ mb: 3 }} />
-            <Button fullWidth variant="contained" size="large" onClick={handleSendOTP} disabled={loading}
+            <Button fullWidth variant="contained" size="large" onClick={handleSendOTP} disabled={sendOtpMutation.isPending}
               sx={{ py: 1.8, fontSize: '0.95rem' }}>
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Send OTP'}
+              {sendOtpMutation.isPending ? <CircularProgress size={24} color="inherit" /> : 'Send OTP'}
             </Button>
           </Box>
         ) : (
@@ -149,9 +149,9 @@ const Checkout = () => {
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>Enter the 4-digit code sent to <strong>{phone}</strong></Typography>
             <TextField fullWidth placeholder="Enter OTP" label="OTP Code" value={otp} onChange={(e) => setOtp(e.target.value)} sx={{ mb: 3 }} />
-            <Button fullWidth variant="contained" size="large" onClick={handleVerifyOTP} disabled={loading}
+            <Button fullWidth variant="contained" size="large" onClick={handleVerifyOTP} disabled={verifyOtpMutation.isPending || placeOrderMutation.isPending}
               sx={{ py: 1.8, fontSize: '0.95rem' }}>
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Verify & Place Order'}
+              {verifyOtpMutation.isPending || placeOrderMutation.isPending ? <CircularProgress size={24} color="inherit" /> : 'Verify & Place Order'}
             </Button>
             <Button fullWidth variant="text" sx={{ mt: 2, color: 'var(--cc-on-surface-variant)' }} onClick={() => setActiveStep(0)}>
               Change Phone Number

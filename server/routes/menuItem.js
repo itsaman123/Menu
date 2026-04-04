@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const MenuItem = require('../models/MenuItem');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, requireFeature } = require('../middleware/authMiddleware');
 
 // @route   GET /api/menu-items
 // @desc    Get all menu items for the logged in admin's restaurant
 // @access  Private
-router.get('/', protect, async (req, res) => {
+router.get('/', protect, requireFeature('menu'), async (req, res) => {
   try {
     const items = await MenuItem.find({ restaurantId: req.admin.restaurantId });
     res.json(items);
@@ -18,7 +18,7 @@ router.get('/', protect, async (req, res) => {
 // @route   POST /api/menu-items
 // @desc    Create a menu item
 // @access  Private
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, requireFeature('menu'), async (req, res) => {
   try {
     const { name, description, price, image, categoryId, isAvailable } = req.body;
     
@@ -42,7 +42,7 @@ router.post('/', protect, async (req, res) => {
 // @route   PUT /api/menu-items/:id
 // @desc    Update a menu item
 // @access  Private
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, requireFeature('menu'), async (req, res) => {
   try {
     const { name, description, price, image, categoryId, isAvailable } = req.body;
     const item = await MenuItem.findOne({ _id: req.params.id, restaurantId: req.admin.restaurantId });
@@ -68,7 +68,7 @@ router.put('/:id', protect, async (req, res) => {
 // @route   DELETE /api/menu-items/:id
 // @desc    Delete a menu item
 // @access  Private
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', protect, requireFeature('menu'), async (req, res) => {
   try {
     const item = await MenuItem.findOne({ _id: req.params.id, restaurantId: req.admin.restaurantId });
 
