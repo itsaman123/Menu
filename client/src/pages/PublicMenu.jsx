@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Box, Container, Typography, Tabs, Tab, Card, CardContent, CardMedia,
@@ -13,6 +13,15 @@ import { DEMO_RESTAURANT, DEMO_MENU } from '../demoData';
 const PublicMenu = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const table = searchParams.get('table');
+
+  useEffect(() => {
+    if (table) {
+      sessionStorage.setItem(`table-${slug}`, table);
+    }
+  }, [table, slug]);
+
   const [activeTab, setActiveTab] = useState(0);
   const { cart, addToCart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
 

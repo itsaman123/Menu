@@ -11,7 +11,7 @@ const { protect } = require('../middleware/authMiddleware');
 // @access  Customer (OTP verified)
 router.post('/create', protectCustomer, async (req, res) => {
   try {
-    const { restaurantSlug, items } = req.body;
+    const { restaurantSlug, items, tableNumber } = req.body;
     
     if (!restaurantSlug || !items || items.length === 0) {
       return res.status(400).json({ message: 'Restaurant slug and items are required' });
@@ -52,6 +52,7 @@ router.post('/create', protectCustomer, async (req, res) => {
       restaurantId: restaurant._id,
       items: orderItems,
       totalAmount: finalAmount,
+      tableNumber: tableNumber,
       customerPhone: req.customer.phone
     });
 

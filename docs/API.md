@@ -108,6 +108,37 @@ Login as restaurant admin.
 
 ---
 
+## Super Admin
+
+> All endpoints require `SuperAdmin JWT` (`protectSuperAdmin`).
+
+### `POST /api/superadmin/login`
+
+Login as the global Super Admin.
+**Request Body:** `{"email": "superadmin@system.com", "password": "..."}`
+**Response (200):** Token + Role.
+
+### `GET /api/superadmin/admins`
+
+Get all registered Admins (populates the associated restaurant data).
+
+### `PUT /api/superadmin/admins/:id`
+
+Update an Admin's `isActive` flag (freeze account) or `disabledFeatures` array (lock out specific dashboard tools).
+**Request Body (optional fields):**
+```json
+{
+  "isActive": false,
+  "disabledFeatures": ["analytics", "qr"]
+}
+```
+
+### `DELETE /api/superadmin/admins/:id`
+
+Permanently delete an Admin.
+
+---
+
 ## Categories
 
 > All endpoints require Admin JWT. Data is scoped by `req.admin.restaurantId`.
@@ -251,6 +282,7 @@ Create a new order after OTP verification.
 ```json
 {
   "restaurantSlug": "the-bistro",
+  "tableNumber": "12",
   "items": [
     { "menuItemId": "665a1d4e...", "name": "Paneer Tikka", "quantity": 2 },
     { "menuItemId": "665a1d5f...", "name": "Butter Naan", "quantity": 4 }
@@ -270,6 +302,7 @@ Create a new order after OTP verification.
     { "menuItemId": "665a1d5f...", "name": "Butter Naan", "price": 60, "quantity": 4 }
   ],
   "totalAmount": 780.15,
+  "tableNumber": "12",
   "status": "pending",
   "customerPhone": "9876543210",
   "createdAt": "2026-04-04T10:15:00Z"
@@ -362,11 +395,12 @@ Send a 4-digit OTP to a phone number.
 **Response (200):**
 ```json
 {
-  "message": "OTP sent successfully (check backend console)"
+  "message": "OTP sent successfully"
 }
 ```
 
-> ⚠️ **Dev mode only:** OTP is logged to the backend console. Replace with Twilio/MSG91 for production.
+> **Note:** OTP is delivered via native SMS using **AWS SNS**. If AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) are omitted from `.env`, it safely falls back to logging the OTP to the backend console.
+> **Security Guard:** Strict rate limit of **3 OTP requests per 5 minutes per IP** to prevent SMS toll fraud.
 
 ---
 
@@ -394,6 +428,8 @@ Verify OTP and receive a 15-minute order token.
 | Code | Message |
 |------|---------|
 | 401 | `Invalid or expired OTP` |
+
+> **Security Guard:** Strict rate limit of **5 verification attempts per 5 minutes per IP** to prevent guess-bruteforcing.
 
 ---
 
@@ -478,9 +514,21 @@ Upload an image to Cloudinary.
 ### Admin
 ```
 {
+  email:            String (required, unique)
+  password:         String (required, bcrypt hashed)
+  restaurantId:     ObjectId → Restaurant (required)
+  isActive:         Boolean (default: true)
+  disabledFeatures: [String] (List of restricted features, e.g., 'menu', 'analytics')
+  createdAt:        Date
+  updatedAt:        Date
+}
+```
+
+### SuperAdmin
+```
+{
   email:        String (required, unique)
   password:     String (required, bcrypt hashed)
-  restaurantId: ObjectId → Restaurant (required)
   createdAt:    Date
   updatedAt:    Date
 }
@@ -523,6 +571,7 @@ Upload an image to Cloudinary.
     quantity:    Number (required, min: 1)
   }]
   totalAmount:   Number (required, includes 5% GST)
+  tableNumber:   String (optional)
   status:        String (enum: pending|confirmed|preparing|completed|cancelled)
   customerPhone: String (required)
   createdAt:     Date
@@ -546,15 +595,27 @@ Upload an image to Cloudinary.
 ### `protect` (authMiddleware.js)
 - Extracts JWT from `Authorization: Bearer <token>`
 - Looks up Admin by decoded `id`
+- Rejects access (403) if `admin.isActive === false`
 - Attaches `req.admin` (with `restaurantId`) to request
 - Validates `X-Restaurant-Id` header matches the admin's actual `restaurantId`
 - Returns 401 if token is missing/invalid, 403 if restaurant ID mismatches
+
+### `protectSuperAdmin` (authMiddleware.js)
+- Extracts JWT and finds the global `SuperAdmin` record.
+- Grants sweeping access to `/api/superadmin/*` routes.
 
 ### `protectCustomer` (customerAuth.js)
 - Extracts JWT from `Authorization: Bearer <token>`
 - Verifies decoded payload contains `phone`
 - Attaches `req.customer = { phone }` to request
 - Token is short-lived (15 minutes)
+
+### Standard Security & Rate Limiting (server.js)
+- **Helmet**: Sets 15+ HTTP security headers.
+- **Express-Mongo-Sanitize**: Prevents NoSQL character injection.
+- **HPP**: Protects against HTTP Parameter Pollution.
+- **Global API Limiter**: Max 100 requests every 15 minutes per IP.
+- **Payload Limiter**: `express.json` is capped at 10KB to prevent memory flood DoS.
 
 ---
 

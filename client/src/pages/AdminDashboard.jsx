@@ -16,25 +16,16 @@ import api from '../api';
 
 const DRAWER_WIDTH = 260;
 
-const navItems = [
-  { label: 'Dashboard', icon: <Dashboard />, key: 'dashboard' },
-  { label: 'Menu', icon: <RestaurantMenu />, key: 'menu' },
-  { label: 'Orders', icon: <ReceiptLong />, key: 'orders' },
-  { label: 'Analytics', icon: <Leaderboard />, key: 'analytics' },
-  { label: 'QR Codes', icon: <QrCode2 />, key: 'qr' },
-];
-
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [qrOpen, setQrOpen] = useState(false);
+  const [qrTable, setQrTable] = useState('');
   const audioRef = useRef(null);
 
-  // Category state
   const [catOpen, setCatOpen] = useState(false);
   const [editCat, setEditCat] = useState(null);
   const [catForm, setCatForm] = useState({ name: '', order: 0 });
 
-  // Menu item state
   const [itemOpen, setItemOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [itemForm, setItemForm] = useState({ name: '', description: '', price: 0, image: '', categoryId: '' });
@@ -43,6 +34,15 @@ const AdminDashboard = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
+  const disabledFeatures = user?.disabledFeatures || [];
+
+  const navItems = [
+    { label: 'Dashboard', icon: <Dashboard />, key: 'dashboard' },
+    { label: 'Menu', icon: <RestaurantMenu />, key: 'menu' },
+    { label: 'Orders', icon: <ReceiptLong />, key: 'orders' },
+    { label: 'Analytics', icon: <Leaderboard />, key: 'analytics' },
+    { label: 'QR Codes', icon: <QrCode2 />, key: 'qr' },
+  ].filter(item => !disabledFeatures.includes(item.key));
 
   useEffect(() => {
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
@@ -280,6 +280,11 @@ const AdminDashboard = () => {
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box>
                       <Typography variant="h6" fontWeight="800">#{order._id.slice(-6).toUpperCase()}</Typography>
+                      {order.tableNumber && (
+                        <Typography variant="subtitle2" sx={{ color: 'var(--cc-primary)', fontWeight: 'bold' }}>
+                          Table: {order.tableNumber}
+                        </Typography>
+                      )}
                       <Typography variant="body2" color="text.secondary">
                         {new Date(order.createdAt).toLocaleTimeString()} • {order.customerPhone}
                       </Typography>
@@ -371,8 +376,20 @@ const AdminDashboard = () => {
       <Dialog open={qrOpen} onClose={() => setQrOpen(false)} PaperProps={{ sx: { borderRadius: 'var(--radius-xl)', p: 2 } }}>
         <DialogTitle sx={{ fontWeight: 700 }}>Restaurant QR Code</DialogTitle>
         <DialogContent sx={{ textAlign: 'center', p: 4 }}>
-          <QRCodeSVG value={menuUrl} size={256} />
-          <Typography variant="body2" sx={{ mt: 2, color: 'var(--cc-on-surface-variant)' }}>{menuUrl}</Typography>
+          <TextField 
+            label="Table Number (Optional)" 
+            variant="outlined" 
+            size="small" 
+            sx={{ mb: 3 }} 
+            value={qrTable} 
+            onChange={(e) => setQrTable(e.target.value)} 
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <QRCodeSVG value={qrTable ? `${menuUrl}?table=${qrTable}` : menuUrl} size={256} />
+          </Box>
+          <Typography variant="body2" sx={{ mt: 2, color: 'var(--cc-on-surface-variant)' }}>
+            {qrTable ? `${menuUrl}?table=${qrTable}` : menuUrl}
+          </Typography>
         </DialogContent>
         <DialogActions><Button onClick={() => setQrOpen(false)}>Close</Button></DialogActions>
       </Dialog>

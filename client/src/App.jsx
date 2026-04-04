@@ -8,6 +8,9 @@ import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import LandingPage from './pages/LandingPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import SuperAdminLogin from './pages/SuperAdminLogin';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import SuperAdminRoute from './components/SuperAdminRoute';
 
 function App() {
   return (
@@ -20,11 +23,12 @@ function App() {
       <Route path="/order-success/:id" element={<OrderSuccess />} />
       <Route 
         path="/admin/*" 
-        element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } 
+        element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} 
+      />
+      <Route path="/superadmin-login" element={<SuperAdminLogin />} />
+      <Route 
+        path="/superadmin/*" 
+        element={<SuperAdminRoute><SuperAdminDashboard /></SuperAdminRoute>} 
       />
     </Routes>
   );

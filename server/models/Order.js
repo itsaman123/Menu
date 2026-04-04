@@ -11,6 +11,7 @@ const orderSchema = new mongoose.Schema({
   restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
   items: [orderItemSchema],
   totalAmount: { type: Number, required: true },
+  tableNumber: { type: String, required: false },
   status: { 
     type: String, 
     enum: ['pending', 'confirmed', 'preparing', 'completed', 'cancelled'], 

@@ -7,8 +7,12 @@ const api = axios.create({
 // Interceptor: Attach both Auth Token AND Restaurant ID on every request
 // This is critical for multi-tenant SaaS — every admin API call must be scoped to a restaurant
 api.interceptors.request.use((config) => {
+  const saToken = localStorage.getItem('saToken');
   const token = localStorage.getItem('token');
-  if (token) {
+  
+  if (config.url && config.url.includes('/superadmin') && saToken) {
+    config.headers.Authorization = `Bearer ${saToken}`;
+  } else if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 

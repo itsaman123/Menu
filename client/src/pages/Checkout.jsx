@@ -14,6 +14,7 @@ const Checkout = () => {
   const isDemo = slug === 'demo';
   const navigate = useNavigate();
   const { cart, cartTotal, clearCart } = useCart();
+  const tableNumber = sessionStorage.getItem(`table-${slug}`);
   const [activeStep, setActiveStep] = useState(0);
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
@@ -49,7 +50,7 @@ const Checkout = () => {
   const handlePlaceOrder = async (token) => {
     try {
       const res = await api.post('/api/orders/create',
-        { restaurantSlug: slug, items: cart },
+        { restaurantSlug: slug, items: cart, tableNumber },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       clearCart();
@@ -74,9 +75,16 @@ const Checkout = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 4, minHeight: '100vh' }} className="page-enter">
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}><ArrowBackIosNew /></IconButton>
-        <Typography variant="h5" fontWeight="800">Checkout {isDemo && <Typography component="span" variant="caption" sx={{ bgcolor: 'var(--cc-surface-container)', px: 1, py: 0.5, borderRadius: 'var(--radius-full)', ml: 1 }}>DEMO</Typography>}</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}><ArrowBackIosNew /></IconButton>
+          <Typography variant="h5" fontWeight="800">Checkout {isDemo && <Typography component="span" variant="caption" sx={{ bgcolor: 'var(--cc-surface-container)', px: 1, py: 0.5, borderRadius: 'var(--radius-full)', ml: 1 }}>DEMO</Typography>}</Typography>
+        </Box>
+        {tableNumber && (
+          <Typography variant="subtitle2" sx={{ bgcolor: 'var(--cc-primary)', color: 'white', px: 2, py: 0.5, borderRadius: 'var(--radius-full)' }}>
+            Table: {tableNumber}
+          </Typography>
+        )}
       </Box>
 
       {/* Bill */}
@@ -127,7 +135,7 @@ const Checkout = () => {
               <Typography variant="subtitle1" fontWeight="700">Mobile Verification</Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>Enter your number to receive a secure OTP.</Typography>
-            <TextField fullWidth placeholder="e.g. 9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} sx={{ mb: 3 }} />
+            <TextField fullWidth placeholder="e.g. +919876543210" value={phone} onChange={(e) => setPhone(e.target.value)} sx={{ mb: 3 }} />
             <Button fullWidth variant="contained" size="large" onClick={handleSendOTP} disabled={loading}
               sx={{ py: 1.8, fontSize: '0.95rem' }}>
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Send OTP'}

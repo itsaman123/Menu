@@ -50,6 +50,7 @@ router.post('/register', async (req, res) => {
       restaurantId: restaurant._id,
       restaurantName: restaurant.name,
       slug: restaurant.slug,
+      disabledFeatures: [],
       token: generateToken(admin._id, restaurant._id)
     });
   } catch (error) {
@@ -69,6 +70,10 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    if (admin.isActive === false) {
+      return res.status(403).json({ message: 'Account disabled. Please contact Super Admin.' });
+    }
+
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
@@ -80,6 +85,7 @@ router.post('/login', async (req, res) => {
       restaurantId: admin.restaurantId._id,
       restaurantName: admin.restaurantId.name,
       slug: admin.restaurantId.slug,
+      disabledFeatures: admin.disabledFeatures || [],
       token: generateToken(admin._id, admin.restaurantId._id)
     });
   } catch (error) {
