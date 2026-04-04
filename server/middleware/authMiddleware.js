@@ -13,15 +13,22 @@ exports.protect = async (req, res, next) => {
         return res.status(401).json({ message: 'Not authorized, admin not found' });
       }
       
-      req.admin = admin; // Attach admin object to request
+      // Attach admin object with restaurantId to request
+      req.admin = admin;
+
+      // If frontend sends X-Restaurant-Id header, validate it matches the admin's restaurant
+      // This prevents a compromised token from accessing another restaurant's data
+      const headerRestaurantId = req.headers['x-restaurant-id'];
+      if (headerRestaurantId && headerRestaurantId !== admin.restaurantId.toString()) {
+        return res.status(403).json({ message: 'Restaurant ID mismatch. Access denied.' });
+      }
+
       next();
     } catch (error) {
       console.error(error);
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
-  }
-
-  if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+  } else {
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };

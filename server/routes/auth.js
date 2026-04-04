@@ -5,14 +5,21 @@ const jwt = require('jsonwebtoken');
 const Restaurant = require('../models/Restaurant');
 const Admin = require('../models/Admin');
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+// Generate JWT with both admin ID and restaurantId embedded
+const generateToken = (id, restaurantId) => {
+  return jwt.sign({ id, restaurantId }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
 // @route POST /auth/register
+// @desc  Register a new restaurant + admin account
 router.post('/register', async (req, res) => {
   try {
     const { restaurantName, slug, email, password } = req.body;
+
+    // Validate required fields
+    if (!restaurantName || !slug || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
 
     const existingRestaurant = await Restaurant.findOne({ slug });
     if (existingRestaurant) {
@@ -24,8 +31,10 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Email already exists' });
     }
 
+    // Create restaurant
     const restaurant = await Restaurant.create({ name: restaurantName, slug });
 
+    // Create admin linked to restaurant
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -39,8 +48,9 @@ router.post('/register', async (req, res) => {
       _id: admin._id,
       email: admin.email,
       restaurantId: restaurant._id,
+      restaurantName: restaurant.name,
       slug: restaurant.slug,
-      token: generateToken(admin._id)
+      token: generateToken(admin._id, restaurant._id)
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -48,23 +58,30 @@ router.post('/register', async (req, res) => {
 });
 
 // @route POST /auth/login
+// @desc  Login admin and return token + restaurant context
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const admin = await Admin.findOne({ email }).populate('restaurantId');
 
-    if (admin && (await bcrypt.compare(password, admin.password))) {
-      res.json({
-        _id: admin._id,
-        email: admin.email,
-        restaurantId: admin.restaurantId._id,
-        slug: admin.restaurantId.slug,
-        token: generateToken(admin._id)
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+    if (!admin) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    res.json({
+      _id: admin._id,
+      email: admin.email,
+      restaurantId: admin.restaurantId._id,
+      restaurantName: admin.restaurantId.name,
+      slug: admin.restaurantId.slug,
+      token: generateToken(admin._id, admin.restaurantId._id)
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

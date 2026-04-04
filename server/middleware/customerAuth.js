@@ -15,11 +15,9 @@ exports.protectCustomer = (req, res, next) => {
       next();
     } catch (error) {
       console.error(error);
-      res.status(401).json({ message: 'Token failed, session expired. Please verify again.' });
+      return res.status(401).json({ message: 'Token failed, session expired. Please verify again.' });
     }
-  }
-
-  if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+  } else {
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };

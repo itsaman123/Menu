@@ -1,29 +1,187 @@
-/* Reset default vite margins */
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  background-color: #f5f5f5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ============================================
+   CulinaryCanvas Design System — Global Styles
+   Based on Stitch Project #5643472282066423814
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Primary */
+  --cc-primary: #5341cd;
+  --cc-primary-container: #6C5CE7;
+  --cc-primary-dim: #4029ba;
+  --cc-on-primary: #ffffff;
+  --cc-on-primary-container: #faf6ff;
+
+  /* Secondary */
+  --cc-secondary: #586062;
+  --cc-secondary-container: #dae1e3;
+
+  /* Tertiary */
+  --cc-tertiary: #884800;
+  --cc-tertiary-container: #ac5d00;
+
+  /* Surfaces (No-Border tonal nesting) */
+  --cc-background: #f7f9fb;
+  --cc-surface: #f7f9fb;
+  --cc-surface-bright: #f7f9fb;
+  --cc-surface-container: #eceef0;
+  --cc-surface-container-high: #e6e8ea;
+  --cc-surface-container-highest: #e0e3e5;
+  --cc-surface-container-low: #f2f4f6;
+  --cc-surface-container-lowest: #ffffff;
+  --cc-surface-dim: #d8dadc;
+
+  /* On-Surface */
+  --cc-on-background: #191c1e;
+  --cc-on-surface: #191c1e;
+  --cc-on-surface-variant: #474554;
+
+  /* Outline */
+  --cc-outline: #787586;
+  --cc-outline-variant: #c8c4d7;
+
+  /* Error */
+  --cc-error: #ba1a1a;
+  --cc-error-container: #ffdad6;
+
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Ambient Shadow */
+  --shadow-ambient: 0px 20px 50px rgba(25, 28, 30, 0.06);
+  --shadow-card: 0px 4px 20px rgba(25, 28, 30, 0.04);
+  --shadow-glow: 0 8px 24px rgba(108, 92, 231, 0.25);
+
+  /* Roundness */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
 }
 
 * {
   box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  background-color: var(--cc-background);
+  color: var(--cc-on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', 'Inter', sans-serif;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* Ghost Border utility */
+.ghost-border {
+  border: 1px solid rgba(200, 196, 215, 0.15);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Primary gradient for CTAs */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--cc-primary), var(--cc-primary-container));
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cc-surface-container-low);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cc-outline-variant);
+  border-radius: var(--radius-full);
+}
+
+/* Status badge glow system */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.status-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.status-pill.pending {
+  background: rgba(255, 152, 0, 0.1);
+  color: #e65100;
+}
+.status-pill.pending::before { background: #e65100; }
+.status-pill.confirmed {
+  background: rgba(33, 150, 243, 0.1);
+  color: #1565c0;
+}
+.status-pill.confirmed::before { background: #1565c0; }
+.status-pill.preparing {
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--cc-primary);
+}
+.status-pill.preparing::before { background: var(--cc-primary); }
+.status-pill.completed {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+}
+.status-pill.completed::before { background: #2e7d32; }
+.status-pill.cancelled {
+  background: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+}
+.status-pill.cancelled::before { background: #c62828; }
+
 /* Floating Bubbles Animation */
 @keyframes float {
-  0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
-  50% { transform: translateY(-20px) rotate(10deg); opacity: 0.5; }
-  100% { transform: translateY(-40px) rotate(20deg); opacity: 0; }
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+  50% { transform: translateY(-30px) rotate(8deg); opacity: 0.3; }
+  100% { transform: translateY(-60px) rotate(16deg); opacity: 0; }
 }
 
 .bubble {
   position: absolute;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(108, 92, 231, 0.08);
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Smooth page transition */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: fadeIn 0.4s ease-out;
 }

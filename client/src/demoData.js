@@ -1,58 +1,60 @@
-// DEMO ONLY: This file contains dummy data for pitching to customers.
-// REMOVE THIS LATER once real restaurants are onboarded.
+// ================================================
+// DEMO ONLY: Dummy data for pitching to customers.
+// REMOVE THIS LATER once real restaurants onboarded.
+// ================================================
 
 export const DEMO_RESTAURANT = {
-  name: "The Curry Leaf (Demo)",
+  name: "CulinaryCanvas Demo",
   slug: "demo",
 };
 
 export const DEMO_MENU = [
   {
     _id: "cat1",
-    name: "Tandoori Starters",
+    name: "Signature Dishes",
     items: [
       {
         _id: "item1",
-        name: "Paneer Tikka Mastani",
-        description: "Soft paneer cubes marinated in authentic Indian spices and grilled to perfection.",
-        price: 249,
-        image: "https://images.unsplash.com/photo-1599487488170-d11ec9c175f0?auto=format&fit=crop&w=500&q=80",
+        name: "Harvest Grain Bowl",
+        description: "Organic quinoa, roasted seasonal vegetables, and lemon-tahini dressing.",
+        price: 450,
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80",
         isAvailable: true
       },
       {
         _id: "item2",
-        name: "Hara Bhara Kebab",
-        description: "Classic green patties made with spinach, peas, and potatoes served with mint chutney.",
-        price: 180,
-        image: "https://images.unsplash.com/photo-1589187151003-0dd3c63ef53e?auto=format&fit=crop&w=500&q=80",
+        name: "Wild Mushroom Pizza",
+        description: "Truffle cream base, porcini mushrooms, and fresh buffalo mozzarella.",
+        price: 680,
+        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=500&q=80",
         isAvailable: true
       }
     ]
   },
   {
     _id: "cat2",
-    name: "Main Course",
+    name: "Desserts",
     items: [
       {
         _id: "item3",
-        name: "Dal Makhani (Classic)",
-        description: "Slow-cooked black lentils in creamy tomato gravy with a dollop of white butter.",
-        price: 320,
-        image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=80",
+        name: "Midnight Cocoa Fondant",
+        description: "70% Valrhona dark chocolate with a warm molten core.",
+        price: 380,
+        image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=500&q=80",
         isAvailable: true
       }
     ]
   },
   {
     _id: "cat3",
-    name: "Breads & Lassi",
+    name: "Cocktails",
     items: [
       {
         _id: "item4",
-        name: "Kulhad Lassi",
-        description: "Traditional thick yogurt drink served sweet with a thick layer of malai.",
-        price: 99,
-        image: "https://images.unsplash.com/photo-1549413203-0498b584090b?auto=format&fit=crop&w=500&q=80",
+        name: "Hibiscus Negroni",
+        description: "Gin infused with hibiscus flowers, campari, and orange bitters.",
+        price: 520,
+        image: "https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=500&q=80",
         isAvailable: true
       }
     ]
@@ -61,12 +63,12 @@ export const DEMO_MENU = [
 
 export const DEMO_ORDER = {
   _id: "demo_order_id_6789",
-  restaurantId: { name: "The Curry Leaf (Demo)", slug: "demo" },
+  restaurantId: { name: "CulinaryCanvas Demo", slug: "demo" },
   items: [
-    { name: "Paneer Tikka Mastani", price: 249, quantity: 1 },
-    { name: "Kulhad Lassi", price: 99, quantity: 2 }
+    { name: "Harvest Grain Bowl", price: 450, quantity: 1 },
+    { name: "Hibiscus Negroni", price: 520, quantity: 2 }
   ],
-  totalAmount: 469, // Approx calculation
+  totalAmount: 1564, // (450 + 1040) * 1.05
   status: "preparing",
   createdAt: new Date().toISOString()
 };
