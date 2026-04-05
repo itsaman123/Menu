@@ -58,3 +58,12 @@ exports.protectSuperAdmin = async (req, res, next) => {
     return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
+
+exports.requireFeature = (feature) => {
+  return (req, res, next) => {
+    if (req.admin && req.admin.disabledFeatures && req.admin.disabledFeatures.includes(feature)) {
+      return res.status(403).json({ message: `Access denied. Feature '${feature}' is currently disabled for your account.` });
+    }
+    next();
+  };
+};

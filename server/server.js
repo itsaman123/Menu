@@ -18,10 +18,18 @@ const superadminRoutes = require('./routes/superadmin');
 
 const app = express();
 
+// Standard Middleware
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5174','http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+app.use(express.json({ limit: '10kb' }));
+
 // Security Middlewares
-app.use(helmet());            // Set security HTTP headers
-app.use(mongoSanitize());     // Prevent NoSQL injection
-app.use(hpp());               // Prevent HTTP Parameter Pollution
+app.use(helmet({ crossOriginResourcePolicy: false })); // Allow cross-origin requests for resources
+// app.use(mongoSanitize());     // Removed: crashes Express 5 by reassigning req.query
+// app.use(hpp());               // Removed: crashes Express 5
 
 // Global Rate Limiting
 const apiLimiter = rateLimit({
@@ -32,8 +40,7 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 app.use('/auth/', apiLimiter);
 
-// Standard Middleware
-app.use(cors());
+
 app.use(express.json({ limit: '10kb' }));
 
 // Routes

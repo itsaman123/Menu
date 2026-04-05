@@ -8,6 +8,7 @@ const SuperAdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
   const loginMutation = useMutation({
     mutationFn: (data) => api.post('/api/superadmin/login', data),
     onSuccess: (res) => {

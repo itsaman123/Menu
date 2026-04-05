@@ -37,6 +37,14 @@ const AdminDashboard = () => {
   const user = JSON.parse(localStorage.getItem('user'));
   const disabledFeatures = user?.disabledFeatures || [];
 
+  const { data: liveProfile } = useQuery({
+    queryKey: ['adminProfile'],
+    queryFn: async () => (await api.get('/auth/me')).data,
+    refetchInterval: 5000 // Sync every 5 seconds to catch SuperAdmin changes
+  });
+
+  const activeFeatures = liveProfile?.disabledFeatures || disabledFeatures;
+
   const navItems = [
     { label: 'Dashboard', icon: <Dashboard />, key: 'dashboard' },
     { label: 'Menu', icon: <RestaurantMenu />, key: 'menu' },
@@ -45,7 +53,13 @@ const AdminDashboard = () => {
     { label: 'Reservations', icon: <TableBar />, key: 'reservations' },
     { label: 'Themes', icon: <Palette />, key: 'themes' },
     { label: 'QR Codes', icon: <QrCode2 />, key: 'qr' },
-  ].filter(item => !disabledFeatures.includes(item.key));
+  ].filter(item => !activeFeatures.includes(item.key));
+
+  useEffect(() => {
+    if (activeFeatures.includes(activeSection)) {
+      setActiveSection('dashboard');
+    }
+  }, [activeFeatures, activeSection]);
 
   useEffect(() => {
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');

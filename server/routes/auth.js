@@ -93,4 +93,26 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// @route GET /auth/me
+// @desc  Get current admin profile to sync disabledFeatures
+const { protect } = require('../middleware/authMiddleware');
+router.get('/me', protect, async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.admin._id).populate('restaurantId');
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    if (admin.isActive === false) return res.status(403).json({ message: 'Account disabled' });
+    
+    res.json({
+      _id: admin._id,
+      email: admin.email,
+      restaurantId: admin.restaurantId._id,
+      restaurantName: admin.restaurantId.name,
+      slug: admin.restaurantId.slug,
+      disabledFeatures: admin.disabledFeatures || [],
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
