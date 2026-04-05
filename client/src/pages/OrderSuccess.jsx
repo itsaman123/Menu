@@ -2,13 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Box, Container, Typography, Paper, Divider, Button,
-  CircularProgress, Alert, List, ListItem, ListItemText,
-  Card, CardContent, Stack
+  Box, Container, Typography, Divider, Button,
+  CircularProgress, Stack
 } from '@mui/material';
-import { CheckCircle, Timer, Restaurant as RestaurantIcon, Search, ShoppingBag, History } from '@mui/icons-material';
+import { Restaurant as RestaurantIcon, Search, ShoppingBag, History } from '@mui/icons-material';
 import api from '../api';
 import { DEMO_ORDER } from '../demoData';
+
+const T = {
+  bg: '#0f1117', surface: '#16191f', surfaceAlt: '#1d2129',
+  border: 'rgba(255,255,255,0.07)', accent: '#7c6ef0',
+  accentDim: 'rgba(124,110,240,0.12)',
+  green: '#22c55e', greenDim: 'rgba(34,197,94,0.12)',
+  orange: '#f97316', orangeDim: 'rgba(249,115,22,0.12)',
+  text: '#e8eaf0', textSub: '#8b8fa8', textMuted: '#4b5068',
+};
+
+const sxCard = {
+  background: T.surface, border: `1px solid ${T.border}`,
+  borderRadius: '16px', p: 3,
+};
 
 const OrderSuccess = () => {
   const { id } = useParams();
@@ -21,7 +34,7 @@ const OrderSuccess = () => {
     queryFn: async () => (await api.get(`/api/orders/${id}`)).data,
     refetchInterval: 5000,
     retry: 2,
-    enabled: !isDemo
+    enabled: !isDemo,
   });
 
   const order = isDemo ? DEMO_ORDER : data;
@@ -32,7 +45,6 @@ const OrderSuccess = () => {
       const orderDate = new Date(order.createdAt).getTime();
       const prepTime = 15 * 60 * 1000;
       const endTime = orderDate + prepTime;
-
       const interval = setInterval(() => {
         const diff = endTime - Date.now();
         setTimeLeft(diff <= 0 ? 0 : diff);
@@ -44,147 +56,168 @@ const OrderSuccess = () => {
 
   const formatTime = (ms) => {
     if (ms === null) return '--:--';
-    if (ms === 0) return 'Ready!';
+    if (ms === 0) return 'Ready! 🎉';
     const m = Math.floor(ms / 60000);
     const s = Math.floor((ms % 60000) / 1000);
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   const statusSteps = [
-    { key: 'pending', label: 'Order Received', icon: '🧾' },
-    { key: 'confirmed', label: 'Confirmed', icon: '✅' },
-    { key: 'preparing', label: 'Preparing', icon: '👨‍🍳' },
-    { key: 'completed', label: 'Ready', icon: '🎉' },
+    { key: 'pending', label: 'Order Received', icon: '🧾', color: T.orange, dim: T.orangeDim },
+    { key: 'confirmed', label: 'Confirmed', icon: '✅', color: '#3b82f6', dim: 'rgba(59,130,246,0.12)' },
+    { key: 'preparing', label: 'Preparing', icon: '👨‍🍳', color: T.accent, dim: T.accentDim },
+    { key: 'completed', label: 'Ready', icon: '🎉', color: T.green, dim: T.greenDim },
   ];
   const currentStep = order ? statusSteps.findIndex(s => s.key === order.status) : 0;
 
   if (finalLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <CircularProgress />
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: T.bg }}>
+        <CircularProgress sx={{ color: T.accent }} />
       </Box>
     );
   }
 
   if (!isDemo && (error || !order)) {
     return (
-      <Container sx={{ mt: 8 }}>
-        <Alert severity="error">Order not found. Please contact the restaurant.</Alert>
-      </Container>
+      <Box sx={{ background: T.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+        <Box sx={{ ...sxCard, textAlign: 'center', maxWidth: 400 }}>
+          <Typography sx={{ color: T.text, fontWeight: 700, mb: 1 }}>Order not found</Typography>
+          <Typography sx={{ color: T.textSub, fontSize: '0.85rem' }}>Please contact the restaurant staff.</Typography>
+        </Box>
+      </Box>
     );
   }
 
   return (
-    <Box sx={{ bgcolor: 'var(--cc-surface-container-low)', minHeight: '100vh', pb: 14 }} className="page-enter">
+    <Box sx={{ background: T.bg, minHeight: '100vh', pb: 16 }} className="page-enter">
       {/* Success Header */}
       <Box sx={{
-        background: 'linear-gradient(135deg, #5341cd, #6C5CE7)',
-        color: 'white', pt: 6, pb: 5, px: 3, textAlign: 'center',
-        borderBottomLeftRadius: 'var(--radius-2xl)', borderBottomRightRadius: 'var(--radius-2xl)',
+        background: 'linear-gradient(160deg, #1a1730 0%, #0f1117 100%)',
+        borderBottom: `1px solid ${T.border}`,
+        pt: { xs: 5, sm: 6 }, pb: 4, px: 3, textAlign: 'center',
+        position: 'relative', overflow: 'hidden',
+        '&::before': {
+          content: '""', position: 'absolute', top: '-40%', left: '-10%',
+          width: '60%', height: '200%',
+          background: 'radial-gradient(ellipse, rgba(34,197,94,0.12) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        },
       }}>
-        <Typography sx={{ fontSize: '3rem', mb: 1 }}>🎉</Typography>
-        <Typography variant="h4" fontWeight="800" gutterBottom>Order Placed Successfully</Typography>
-        <Typography variant="body1" sx={{ opacity: 0.85 }}>
-          Order ID: <strong>#{isDemo ? 'CC-DEMO' : id.slice(-6).toUpperCase()}</strong>
+        <Typography sx={{ fontSize: '2.8rem', mb: 1 }}>🎉</Typography>
+        <Typography sx={{ fontFamily: '"Manrope",sans-serif', fontWeight: 800, fontSize: { xs: '1.4rem', sm: '1.8rem' }, color: T.text, mb: 0.5 }}>
+          Order Placed Successfully!
+        </Typography>
+        <Typography sx={{ color: T.textSub, fontSize: '0.85rem' }}>
+          Order ID:{' '}
+          <Box component="span" sx={{ color: T.accent, fontWeight: 700, fontFamily: 'monospace' }}>
+            #{isDemo ? 'CC-DEMO' : id.slice(-6).toUpperCase()}
+          </Box>
         </Typography>
       </Box>
 
-      <Container maxWidth="sm" sx={{ mt: -3 }}>
+      <Container maxWidth="sm" sx={{ mt: 3, pb: 2 }}>
         {/* Timer */}
-        <Paper elevation={0} sx={{ p: 4, mb: 3, textAlign: 'center', bgcolor: 'var(--cc-surface-container-lowest)', boxShadow: 'var(--shadow-card)' }}>
-          <Typography variant="body2" sx={{ color: 'var(--cc-on-surface-variant)', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600, mb: 1 }}>
-            Estimated ready in
+        <Box sx={{ ...sxCard, textAlign: 'center', mb: 2 }}>
+          <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '1px', mb: 1 }}>
+            Estimated Ready In
           </Typography>
-          <Typography variant="h2" fontWeight="800" color="primary" sx={{ fontFamily: '"Manrope"', letterSpacing: -1 }}>
+          <Typography sx={{
+            fontFamily: '"Manrope",sans-serif', fontWeight: 800,
+            fontSize: timeLeft === 0 ? '1.8rem' : '3rem',
+            color: timeLeft === 0 ? T.green : T.accent,
+            letterSpacing: '-1px', lineHeight: 1,
+          }}>
             {formatTime(timeLeft)}
           </Typography>
-        </Paper>
+        </Box>
 
         {/* Status Timeline */}
-        <Paper elevation={0} sx={{ p: 4, mb: 3, bgcolor: 'var(--cc-surface-container-lowest)', boxShadow: 'var(--shadow-card)' }}>
+        <Box sx={{ ...sxCard, mb: 2 }}>
+          <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.9rem', mb: 2.5 }}>Order Status</Typography>
           <Stack spacing={0}>
-            {statusSteps.map((step, i) => (
-              <Box key={step.key} sx={{ display: 'flex', gap: 2, position: 'relative' }}>
-                {/* Vertical line */}
-                {i < statusSteps.length - 1 && (
-                  <Box sx={{
-                    position: 'absolute', left: 15, top: 36, width: 2, height: 'calc(100% - 16px)',
-                    bgcolor: i < currentStep ? 'var(--cc-primary)' : 'var(--cc-surface-container-high)',
-                  }} />
-                )}
-                {/* Dot */}
-                <Box sx={{
-                  width: 32, height: 32, minWidth: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  bgcolor: i <= currentStep ? 'var(--cc-primary)' : 'var(--cc-surface-container-high)',
-                  color: i <= currentStep ? 'white' : 'var(--cc-on-surface-variant)',
-                  fontSize: '0.9rem', fontWeight: 'bold', zIndex: 1,
-                }}>
-                  {i <= currentStep ? step.icon : (i + 1)}
-                </Box>
-                {/* Label */}
-                <Box sx={{ pb: 3 }}>
-                  <Typography variant="subtitle2" fontWeight={i <= currentStep ? 700 : 400}
-                    sx={{ color: i <= currentStep ? 'var(--cc-on-surface)' : 'var(--cc-on-surface-variant)' }}>
-                    {step.label}
-                  </Typography>
-                  {i === currentStep && (
-                    <Typography variant="caption" sx={{ color: 'var(--cc-primary)' }}>
-                      {step.key === 'preparing' ? 'Chef is adding the magic' : 'In progress...'}
-                    </Typography>
+            {statusSteps.map((step, i) => {
+              const isActive = i === currentStep;
+              const isDone = i < currentStep;
+              return (
+                <Box key={step.key} sx={{ display: 'flex', gap: 2, position: 'relative', pb: i < statusSteps.length - 1 ? 3 : 0 }}>
+                  {i < statusSteps.length - 1 && (
+                    <Box sx={{
+                      position: 'absolute', left: 15, top: 36, width: 2,
+                      height: 'calc(100% - 12px)',
+                      background: isDone ? T.accent : T.border,
+                      borderRadius: 1,
+                    }} />
                   )}
+                  <Box sx={{
+                    width: 32, height: 32, minWidth: 32, borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: (isDone || isActive) ? step.dim : T.surfaceAlt,
+                    border: `2px solid ${(isDone || isActive) ? step.color : T.border}`,
+                    fontSize: '0.85rem', zIndex: 1,
+                    boxShadow: isActive ? `0 0 12px ${step.color}40` : 'none',
+                  }}>
+                    {(isDone || isActive) ? step.icon : <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted }}>{i + 1}</Typography>}
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontWeight: isDone || isActive ? 700 : 500, fontSize: '0.88rem', color: isDone || isActive ? T.text : T.textMuted }}>
+                      {step.label}
+                    </Typography>
+                    {isActive && (
+                      <Typography sx={{ fontSize: '0.73rem', color: step.color, fontWeight: 600, mt: 0.2 }}>
+                        {step.key === 'preparing' ? 'Chef is adding the magic ✨' : 'In progress…'}
+                      </Typography>
+                    )}
+                  </Box>
                 </Box>
+              );
+            })}
+          </Stack>
+        </Box>
+
+        {/* Order Summary */}
+        <Box sx={{ ...sxCard }}>
+          <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.9rem', mb: 2 }}>Your Order</Typography>
+          <Stack spacing={0} divider={<Divider sx={{ borderColor: T.border }} />}>
+            {order.items.map((item, idx) => (
+              <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1.5 }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 600, color: T.text, fontSize: '0.88rem' }}>{item.name}</Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: T.textMuted }}>× {item.quantity}</Typography>
+                </Box>
+                <Typography sx={{ fontWeight: 600, color: T.textSub, fontSize: '0.88rem' }}>₹{(item.price * item.quantity).toFixed(0)}</Typography>
               </Box>
             ))}
           </Stack>
-        </Paper>
-
-        {/* Order Summary */}
-        <Paper elevation={0} sx={{ p: 4, mb: 3, bgcolor: 'var(--cc-surface-container-lowest)', boxShadow: 'var(--shadow-card)' }}>
-          <Typography variant="h6" fontWeight="700" gutterBottom>Order Summary</Typography>
-          <List disablePadding>
-            {order.items.map((item, idx) => (
-              <ListItem key={idx} sx={{ py: 1.5, px: 0 }}>
-                <ListItemText
-                  primary={<Typography fontWeight="600">{item.name}</Typography>}
-                  secondary={`${item.quantity}×`}
-                />
-                <Typography variant="body1" fontWeight="600">₹{(item.price * item.quantity).toFixed(0)}</Typography>
-              </ListItem>
-            ))}
-          </List>
-          <Box sx={{ mt: 2, pt: 2, bgcolor: 'var(--cc-surface-container-low)', borderRadius: 'var(--radius-md)', p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle1" fontWeight="700">Total (inc. GST)</Typography>
-            <Typography variant="h5" color="primary" fontWeight="800">₹{order.totalAmount.toFixed(0)}</Typography>
+          <Box sx={{ mt: 2, p: 2, background: T.surfaceAlt, borderRadius: '12px', border: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.9rem' }}>Total (incl. GST)</Typography>
+            <Typography sx={{ fontWeight: 800, fontSize: '1.2rem', color: T.accent }}>₹{order.totalAmount.toFixed(0)}</Typography>
           </Box>
-        </Paper>
+        </Box>
       </Container>
 
-      {/* Bottom Dock Navigation */}
+      {/* Bottom Nav Dock */}
       <Box sx={{
         position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)',
         width: 'calc(100% - 32px)', maxWidth: 420,
         display: 'flex', justifyContent: 'space-around', alignItems: 'center',
-        py: 1.5, px: 2.5, borderRadius: 'var(--radius-2xl)',
-        bgcolor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(40px)',
-        boxShadow: 'var(--shadow-ambient)', zIndex: 100,
+        py: 1.5, px: 2.5, borderRadius: '20px',
+        background: 'rgba(22,25,31,0.92)', backdropFilter: 'blur(40px)',
+        border: `1px solid ${T.border}`,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6)', zIndex: 100,
       }}>
-        <Stack alignItems="center" sx={{ cursor: 'pointer', color: 'var(--cc-on-surface-variant)' }}
-          onClick={() => navigate(`/menu/${order?.restaurantId?.slug || 'demo'}`)}>
-          <RestaurantIcon fontSize="small" />
-          <Typography variant="caption">Menu</Typography>
-        </Stack>
-        <Stack alignItems="center" sx={{ cursor: 'pointer', color: 'var(--cc-on-surface-variant)' }}>
-          <Search fontSize="small" />
-          <Typography variant="caption">Search</Typography>
-        </Stack>
-        <Stack alignItems="center" sx={{ cursor: 'pointer', color: 'var(--cc-on-surface-variant)' }}>
-          <ShoppingBag fontSize="small" />
-          <Typography variant="caption">Cart</Typography>
-        </Stack>
-        <Stack alignItems="center" sx={{ cursor: 'pointer', color: 'var(--cc-primary)' }}>
-          <History fontSize="small" />
-          <Typography variant="caption" fontWeight="600">Orders</Typography>
-        </Stack>
+        {[
+          { icon: <RestaurantIcon sx={{ fontSize: 20 }} />, label: 'Menu', action: () => navigate(`/menu/${order?.restaurantId?.slug || 'demo'}`) },
+          { icon: <Search sx={{ fontSize: 20 }} />, label: 'Search', action: () => {} },
+          { icon: <ShoppingBag sx={{ fontSize: 20 }} />, label: 'Cart', action: () => {} },
+          { icon: <History sx={{ fontSize: 20 }} />, label: 'Orders', active: true, action: () => {} },
+        ].map((item) => (
+          <Stack key={item.label} alignItems="center" onClick={item.action}
+            sx={{ cursor: 'pointer', color: item.active ? T.accent : T.textSub, gap: 0.3, '&:hover': { color: T.text } }}>
+            {item.icon}
+            <Typography sx={{ fontSize: '0.65rem', fontWeight: item.active ? 700 : 400 }}>{item.label}</Typography>
+          </Stack>
+        ))}
       </Box>
     </Box>
   );

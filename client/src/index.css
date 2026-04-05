@@ -1,49 +1,49 @@
 /* ============================================
    CulinaryCanvas Design System — Global Styles
-   Based on Stitch Project #5643472282066423814
+   Dark Theme — Unified across all pages
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Primary */
-  --cc-primary: #5341cd;
-  --cc-primary-container: #6C5CE7;
-  --cc-primary-dim: #4029ba;
+  --cc-primary: #7c6ef0;
+  --cc-primary-container: #a78bfa;
+  --cc-primary-dim: #5341cd;
   --cc-on-primary: #ffffff;
-  --cc-on-primary-container: #faf6ff;
+  --cc-on-primary-container: #f0eeff;
 
   /* Secondary */
-  --cc-secondary: #586062;
-  --cc-secondary-container: #dae1e3;
+  --cc-secondary: #8b8fa8;
+  --cc-secondary-container: #1d2129;
 
   /* Tertiary */
-  --cc-tertiary: #884800;
-  --cc-tertiary-container: #ac5d00;
+  --cc-tertiary: #f97316;
+  --cc-tertiary-container: rgba(249,115,22,0.15);
 
-  /* Surfaces (No-Border tonal nesting) */
-  --cc-background: #f7f9fb;
-  --cc-surface: #f7f9fb;
-  --cc-surface-bright: #f7f9fb;
-  --cc-surface-container: #eceef0;
-  --cc-surface-container-high: #e6e8ea;
-  --cc-surface-container-highest: #e0e3e5;
-  --cc-surface-container-low: #f2f4f6;
-  --cc-surface-container-lowest: #ffffff;
-  --cc-surface-dim: #d8dadc;
+  /* Surfaces — dark */
+  --cc-background: #0f1117;
+  --cc-surface: #16191f;
+  --cc-surface-bright: #1d2129;
+  --cc-surface-container: #1d2129;
+  --cc-surface-container-high: #252830;
+  --cc-surface-container-highest: #2c303a;
+  --cc-surface-container-low: #131619;
+  --cc-surface-container-lowest: #16191f;
+  --cc-surface-dim: #0c0e12;
 
   /* On-Surface */
-  --cc-on-background: #191c1e;
-  --cc-on-surface: #191c1e;
-  --cc-on-surface-variant: #474554;
+  --cc-on-background: #e8eaf0;
+  --cc-on-surface: #e8eaf0;
+  --cc-on-surface-variant: #8b8fa8;
 
   /* Outline */
-  --cc-outline: #787586;
-  --cc-outline-variant: #c8c4d7;
+  --cc-outline: #4b5068;
+  --cc-outline-variant: rgba(255,255,255,0.07);
 
   /* Error */
-  --cc-error: #ba1a1a;
-  --cc-error-container: #ffdad6;
+  --cc-error: #ef4444;
+  --cc-error-container: rgba(239,68,68,0.12);
 
   /* Spacing scale */
   --space-xs: 4px;
@@ -54,10 +54,10 @@
   --space-2xl: 48px;
   --space-3xl: 64px;
 
-  /* Ambient Shadow */
-  --shadow-ambient: 0px 20px 50px rgba(25, 28, 30, 0.06);
-  --shadow-card: 0px 4px 20px rgba(25, 28, 30, 0.04);
-  --shadow-glow: 0 8px 24px rgba(108, 92, 231, 0.25);
+  /* Shadows */
+  --shadow-ambient: 0px 20px 50px rgba(0,0,0,0.5);
+  --shadow-card: 0px 4px 24px rgba(0,0,0,0.3);
+  --shadow-glow: 0 8px 24px rgba(124,110,240,0.35);
 
   /* Roundness */
   --radius-sm: 4px;
@@ -68,6 +68,33 @@
   --radius-full: 9999px;
 }
 
+/* ─── Light Mode Overrides ─── */
+[data-theme="light"] {
+  --cc-primary: #6c5ce7;
+  --cc-primary-container: #8b80f0;
+  --cc-primary-dim: #4029ba;
+  --cc-on-primary: #ffffff;
+  --cc-background: #f4f5f7;
+  --cc-surface: #ffffff;
+  --cc-surface-bright: #ffffff;
+  --cc-surface-container: #f0f1f3;
+  --cc-surface-container-high: #e8eaed;
+  --cc-surface-container-highest: #dfe1e5;
+  --cc-surface-container-low: #f7f8fa;
+  --cc-surface-container-lowest: #ffffff;
+  --cc-surface-dim: #e0e2e6;
+  --cc-on-background: #1a1c23;
+  --cc-on-surface: #1a1c23;
+  --cc-on-surface-variant: #474554;
+  --cc-outline: #9299a6;
+  --cc-outline-variant: rgba(0,0,0,0.08);
+  --cc-error: #ba1a1a;
+  --cc-error-container: rgba(186,26,26,0.1);
+  --shadow-ambient: 0px 20px 50px rgba(0,0,0,0.1);
+  --shadow-card: 0px 4px 20px rgba(0,0,0,0.06);
+  --shadow-glow: 0 8px 24px rgba(108,92,231,0.25);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -76,8 +103,9 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  background-color: var(--cc-background);
-  color: var(--cc-on-surface);
+  background-color: #0f1117;
+  color: #e8eaf0;
+  transition: background-color 0.25s ease, color 0.25s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
@@ -96,8 +124,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glassmorphism utility */
 .glass {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(22, 25, 31, 0.85);
   backdrop-filter: blur(20px);
+
   -webkit-backdrop-filter: blur(20px);
 }
 
