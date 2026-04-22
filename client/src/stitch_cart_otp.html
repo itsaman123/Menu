@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Curated Canvas - Order Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#dee9fc",
+                      "on-tertiary-fixed-variant": "#6e3900",
+                      "on-primary-fixed-variant": "#4029ba",
+                      "tertiary-fixed-dim": "#ffb77d",
+                      "on-primary-container": "#faf6ff",
+                      "on-surface-variant": "#474554",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#787586",
+                      "surface": "#f8f9ff",
+                      "on-surface": "#121c2a",
+                      "on-tertiary-fixed": "#2f1500",
+                      "surface-variant": "#d9e3f6",
+                      "primary-fixed": "#e4dfff",
+                      "inverse-surface": "#27313f",
+                      "surface-tint": "#5847d2",
+                      "on-secondary-container": "#00714d",
+                      "error-container": "#ffdad6",
+                      "on-background": "#121c2a",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "inverse-primary": "#c6bfff",
+                      "tertiary-fixed": "#ffdcc3",
+                      "surface-bright": "#f8f9ff",
+                      "on-secondary-fixed-variant": "#005236",
+                      "secondary-container": "#6cf8bb",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-container": "#fff5f1",
+                      "on-secondary": "#ffffff",
+                      "surface-container-highest": "#d9e3f6",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#6ffbbe",
+                      "primary-container": "#6c5ce7",
+                      "background": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-fixed-dim": "#4edea3",
+                      "surface-container-lowest": "#ffffff",
+                      "primary": "#5341cd",
+                      "secondary": "#006c49",
+                      "primary-fixed-dim": "#c6bfff",
+                      "surface-dim": "#d0dbed",
+                      "tertiary-container": "#ac5d00",
+                      "outline-variant": "#c8c4d7",
+                      "tertiary": "#884800",
+                      "on-primary-fixed": "#160066",
+                      "surface-container": "#e6eeff",
+                      "on-secondary-fixed": "#002113"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Inter"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .otp-input:focus {
+            outline: none;
+            border-color: #5341cd;
+            box-shadow: 0 0 0 2px rgba(83, 65, 205, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-x-hidden">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-[0px_20px_40px_rgba(18,28,42,0.06)]">
+<div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">arrow_back</span>
+<h1 class="text-xl font-bold tracking-tighter text-on-surface">Your Order</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Table 12</span>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="pt-24 pb-40 px-6 max-w-lg mx-auto">
+<!-- Cart Items Section -->
+<section class="space-y-6 mb-12">
+<div class="flex flex-col gap-4">
+<!-- Cart Item 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center gap-4 transition-all duration-300 active:scale-95 group">
+<div class="w-20 h-20 rounded-DEFAULT overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close-up of a truffle-infused mushroom risotto with microgreens and shaved parmesan on a dark ceramic plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ-M3ygxvRr7iCnWMLAZPidf-h28MWszYcTmzOgEmE_0MaPpWCgaJFsGd3gihwV0T-5isdmjaY-WV1wdMa9mfAb4LdAiyUDN0NRkWIXNYyG5vwkB-L_dYgbPYyKIv-ksBhLGRNY4ZYYmr62xEN2t70m9bmsp8xSWELif0TiessQk9Tz6E7bSKhdXK1K5V7IE6gY_K2WbpvSguDw3WXrAG8itoNG8cPTCdzcWauEAgnYLNFY6LzrVm6ZyqilCF33qYYrwvh5oDOY98"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-on-surface">Truffle Risotto</h3>
+<span class="text-sm font-bold text-primary">₹650</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1 line-clamp-1">Wild mushrooms, truffle oil, micro-herbs.</p>
+<div class="flex items-center justify-between mt-3">
+<div class="flex items-center bg-surface-container-low rounded-full px-2 py-1">
+<button class="p-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">remove</span>
+</button>
+<span class="px-4 text-sm font-bold">1</span>
+<button class="p-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Cart Item 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center gap-4 transition-all duration-300 active:scale-95">
+<div class="w-20 h-20 rounded-DEFAULT overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Artisanal sourdough bruschetta with heirloom tomatoes, fresh basil, and balsamic glaze drizzle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuRi1eQr8e1PCWcpIj3J2_JFSUw-UavPnXIQVxOw0svdkFNfStIUN6AggAbRFTOLKQoBCPL--tUg291Ce7arhu0RMnphYzAUtOeTBmx01CMiiNGJma2zXr-Eqc-EDEZXKZ_jlqG3lU5w8jHu8cYHZbOe-lQsKt3iyCgMPPE2sWZ4nEk-jKpYmctaDcenOCxhuqr_88M5X-W-hQGNmRNPX_YCddKJUk4T9ZyrjmV4fy6BSiTYbYJ2ootOFzKNxIj1vnBfETvgHXeIU"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-on-surface">Tomato Bruschetta</h3>
+<span class="text-sm font-bold text-primary">₹320</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1 line-clamp-1">Heirloom tomatoes, balsamic glaze.</p>
+<div class="flex items-center justify-between mt-3">
+<div class="flex items-center bg-surface-container-low rounded-full px-2 py-1">
+<button class="p-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">remove</span>
+</button>
+<span class="px-4 text-sm font-bold">2</span>
+<button class="p-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bill Breakdown -->
+<section class="bg-surface-container-low p-6 rounded-lg space-y-4">
+<h2 class="text-xs font-bold tracking-widest uppercase text-on-surface-variant mb-2">Bill Details</h2>
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Subtotal</span>
+<span class="text-on-surface font-semibold">₹1290.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<div class="flex items-center gap-1">
+<span class="text-on-surface-variant">GST (18%)</span>
+<span class="material-symbols-outlined text-xs text-outline">info</span>
+</div>
+<span class="text-on-surface font-semibold">₹232.20</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Service Charge (5%)</span>
+<span class="text-on-surface font-semibold">₹64.50</span>
+</div>
+<div class="pt-4 mt-4 border-t border-outline-variant/20 flex justify-between items-end">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Total Payable</span>
+<p class="text-2xl font-black text-on-surface">₹1586.70</p>
+</div>
+<div class="bg-secondary-container px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="text-[10px] font-bold text-on-secondary-container uppercase">Zero Waste</span>
+</div>
+</div>
+</section>
+<!-- Placeholder for OTP State (Overlay Layer) -->
+<div class="mt-10 space-y-6">
+<div class="text-center">
+<h3 class="text-lg font-bold text-on-surface">Secure Checkout</h3>
+<p class="text-sm text-on-surface-variant mt-1">Enter your mobile number to confirm the order</p>
+</div>
+<div class="space-y-4">
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold text-sm">+91</span>
+<input class="w-full h-14 pl-14 pr-4 bg-surface-container-low border-none rounded-DEFAULT focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all duration-300 font-semibold tracking-wide" placeholder="Mobile Number" type="tel"/>
+</div>
+<button class="w-full h-14 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-DEFAULT shadow-lg active:scale-95 transition-all">
+                    Get Verification Code
+                </button>
+</div>
+</div>
+</main>
+<!-- OTP Verification Overlay (Visible State Simulation) -->
+<div class="fixed inset-0 z-[60] bg-surface/95 backdrop-blur-xl flex items-end md:items-center justify-center">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-t-xl md:rounded-xl p-8 shadow-2xl relative">
+<button class="absolute top-6 right-6 text-on-surface-variant">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="text-center mb-8">
+<div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center mx-auto mb-4">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<h2 class="text-2xl font-black text-on-surface tracking-tight">Verify Order</h2>
+<p class="text-on-surface-variant text-sm mt-2 px-8">We've sent a 4-digit code to <span class="font-bold text-on-surface">+91 98765 43210</span></p>
+</div>
+<div class="flex justify-between gap-3 mb-8 max-w-xs mx-auto">
+<input class="otp-input w-14 h-14 bg-surface-container-low border-none rounded-DEFAULT text-center text-xl font-bold text-on-surface focus:ring-2 focus:ring-primary/20" maxlength="1" type="text"/>
+<input class="otp-input w-14 h-14 bg-surface-container-low border-none rounded-DEFAULT text-center text-xl font-bold text-on-surface focus:ring-2 focus:ring-primary/20" maxlength="1" type="text"/>
+<input class="otp-input w-14 h-14 bg-surface-container-low border-none rounded-DEFAULT text-center text-xl font-bold text-on-surface focus:ring-2 focus:ring-primary/20" maxlength="1" type="text"/>
+<input class="otp-input w-14 h-14 bg-surface-container-low border-none rounded-DEFAULT text-center text-xl font-bold text-on-surface focus:ring-2 focus:ring-primary/20" maxlength="1" type="text"/>
+</div>
+<div class="space-y-4">
+<button class="w-full h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary-container font-bold rounded-DEFAULT shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Place Order • ₹1586.70
+                    <span class="material-symbols-outlined text-xl">arrow_forward</span>
+</button>
+<div class="text-center">
+<button class="text-xs font-bold text-primary uppercase tracking-widest hover:underline">Resend Code in 0:45</button>
+</div>
+</div>
+<p class="mt-8 text-[10px] text-center text-on-surface-variant px-12 leading-relaxed uppercase tracking-tighter">
+                By verifying, you agree to our Terms of Service &amp; Privacy Policy for a digital dining experience.
+            </p>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Shell) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-6 pb-6 pt-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl shadow-[0px_-10px_30px_rgba(18,28,42,0.08)] rounded-t-[32px]">
+<div class="flex flex-col items-center gap-1 text-on-surface-variant p-2 opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant p-2 opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Menu</span>
+</div>
+<div class="bg-gradient-to-br from-primary to-primary-container text-white rounded-full p-3 mb-2 scale-110 shadow-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant p-2 opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Profile</span>
+</div>
+</nav>
+</body></html>
