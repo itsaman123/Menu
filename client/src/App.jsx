@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { LightMode, DarkMode } from '@mui/icons-material';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,10 +13,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import SuperAdminRoute from './components/SuperAdminRoute';
-import { useAppTheme } from './ThemeContext';
+import { useAppTheme, useTokens } from './ThemeContext';
 
 const ThemeToggleButton = () => {
   const { isDark, toggle } = useAppTheme();
+  const T = useTokens();
   return (
     <Tooltip title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'} placement="left">
       <IconButton
@@ -28,21 +29,17 @@ const ThemeToggleButton = () => {
           zIndex: 9999,
           width: 46,
           height: 46,
-          borderRadius: '14px',
-          background: isDark
-            ? 'linear-gradient(135deg, #7c6ef0, #a78bfa)'
-            : 'linear-gradient(135deg, #6c5ce7, #8b80f0)',
+          borderRadius: '16px',
+          background: T.cartBg,
           color: '#fff',
-          boxShadow: isDark
-            ? '0 4px 20px rgba(124,110,240,0.5)'
-            : '0 4px 20px rgba(108,92,231,0.4)',
+          boxShadow: T.cartGlow,
           border: 'none',
-          transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+          transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
           '&:hover': {
             transform: 'scale(1.08) rotate(15deg)',
             boxShadow: isDark
-              ? '0 6px 28px rgba(124,110,240,0.7)'
-              : '0 6px 28px rgba(108,92,231,0.6)',
+              ? '0 6px 28px rgba(198,191,255,0.4)'
+              : '0 6px 28px rgba(83,65,205,0.35)',
           },
           '&:active': { transform: 'scale(0.96)' },
         }}

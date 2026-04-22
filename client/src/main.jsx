@@ -9,55 +9,76 @@ import './index.css';
 
 const queryClient = new QueryClient();
 
-// ─── Shared typography / shape ───
+// ─── Shared typography / shape — Inter editorial system ───
 const baseTheme = {
   typography: {
-    fontFamily: '"Inter", "Roboto", sans-serif',
-    h1: { fontFamily: '"Manrope", "Inter", sans-serif', fontWeight: 800 },
-    h2: { fontFamily: '"Manrope", "Inter", sans-serif', fontWeight: 800 },
-    h3: { fontFamily: '"Manrope", "Inter", sans-serif', fontWeight: 800 },
-    h4: { fontFamily: '"Manrope", "Inter", sans-serif', fontWeight: 700 },
-    h5: { fontFamily: '"Manrope", "Inter", sans-serif', fontWeight: 700 },
-    h6: { fontFamily: '"Manrope", "Inter", sans-serif', fontWeight: 700 },
+    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+    h1: { fontFamily: '"Inter", sans-serif', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15 },
+    h2: { fontFamily: '"Inter", sans-serif', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15 },
+    h3: { fontFamily: '"Inter", sans-serif', fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 },
+    h4: { fontFamily: '"Inter", sans-serif', fontWeight: 700, lineHeight: 1.25 },
+    h5: { fontFamily: '"Inter", sans-serif', fontWeight: 600, lineHeight: 1.3 },
+    h6: { fontFamily: '"Inter", sans-serif', fontWeight: 600, lineHeight: 1.3 },
     body1: { fontSize: '0.95rem', lineHeight: 1.7 },
     body2: { fontSize: '0.85rem', lineHeight: 1.6 },
     button: { fontFamily: '"Inter", sans-serif', fontWeight: 600, textTransform: 'none' },
   },
-  shape: { borderRadius: 8 },
+  shape: { borderRadius: 16 },
   components: {
     MuiButton: {
       styleOverrides: {
-        root: { borderRadius: 8, textTransform: 'none', fontWeight: 600, padding: '10px 24px', fontSize: '0.9rem' },
+        root: {
+          borderRadius: 16,
+          textTransform: 'none',
+          fontWeight: 600,
+          padding: '10px 24px',
+          fontSize: '0.9rem',
+        },
       },
     },
     MuiAppBar: { styleOverrides: { root: { boxShadow: 'none' } } },
-    MuiTab: { styleOverrides: { root: { fontFamily: '"Manrope", sans-serif', fontWeight: 600, textTransform: 'none' } } },
+    MuiTab: { styleOverrides: { root: { fontFamily: '"Inter", sans-serif', fontWeight: 600, textTransform: 'none' } } },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+      },
+    },
   },
 };
-
-const darkMuiTheme = createTheme({
-  ...baseTheme,
-  palette: {
-    mode: 'dark',
-    primary: { main: '#7c6ef0', light: '#a78bfa', dark: '#5341cd', contrastText: '#fff' },
-    secondary: { main: '#8b8fa8' },
-    error: { main: '#ef4444' },
-    background: { default: '#0f1117', paper: '#16191f' },
-    text: { primary: '#e8eaf0', secondary: '#8b8fa8' },
-    divider: 'rgba(255,255,255,0.07)',
-  },
-});
 
 const lightMuiTheme = createTheme({
   ...baseTheme,
   palette: {
     mode: 'light',
-    primary: { main: '#6c5ce7', light: '#a78bfa', dark: '#4029ba', contrastText: '#fff' },
-    secondary: { main: '#586062' },
+    primary: { main: '#5341cd', light: '#6c5ce7', dark: '#4029ba', contrastText: '#fff' },
+    secondary: { main: '#006c49' },
     error: { main: '#ba1a1a' },
-    background: { default: '#f4f5f7', paper: '#ffffff' },
-    text: { primary: '#1a1c23', secondary: '#474554' },
-    divider: 'rgba(0,0,0,0.08)',
+    background: { default: '#f8f9ff', paper: '#ffffff' },
+    text: { primary: '#121c2a', secondary: '#474554' },
+    divider: 'rgba(200,196,215,0.15)',
+  },
+});
+
+const darkMuiTheme = createTheme({
+  ...baseTheme,
+  palette: {
+    mode: 'dark',
+    primary: { main: '#c6bfff', light: '#e4dfff', dark: '#4029ba', contrastText: '#160066' },
+    secondary: { main: '#4edea3' },
+    error: { main: '#ffb4ab' },
+    background: { default: '#0f1117', paper: '#141720' },
+    text: { primary: '#e2e4ea', secondary: '#c8c4d7' },
+    divider: 'rgba(200,196,215,0.08)',
   },
 });
 
