@@ -64,7 +64,7 @@ export default function MenuManagementView() {
               <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#5341cd' }}>₹450</Typography>
             </Box>
             <Typography sx={{ color: T.textSub, fontSize: '0.875rem', mb: 3, lineHeight: 1.625 }}>Smashed organic avocado, quinoa, pickled radish, and lemon-tahini drizzle.</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 3, borderTop: \`1px solid \${T.border}\` }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 3, borderTop: `1px solid ${T.border}` }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>Available</Typography>
                 <Box sx={{ width: 48, height: 24, bgcolor: '#6cf8bb', borderRadius: '9999px', p: 0.5, cursor: 'pointer', position: 'relative' }}>
@@ -93,7 +93,7 @@ export default function MenuManagementView() {
               <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#5341cd' }}>₹680</Typography>
             </Box>
             <Typography sx={{ color: T.textSub, fontSize: '0.875rem', mb: 3, lineHeight: 1.625 }}>48-hour fermented sourdough, premium pepperoni, and buffalo mozzarella.</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 3, borderTop: \`1px solid \${T.border}\` }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 3, borderTop: `1px solid ${T.border}` }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>Available</Typography>
                 <Box sx={{ width: 48, height: 24, bgcolor: '#6cf8bb', borderRadius: '9999px', p: 0.5, cursor: 'pointer', position: 'relative' }}>
@@ -109,7 +109,7 @@ export default function MenuManagementView() {
         </Box>
 
         {/* Add New Placeholder */}
-        <Box sx={{ border: \`4px dashed \${T.border}\`, borderRadius: '0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', p: 5, cursor: 'pointer', transition: 'all 0.3s', '&:hover': { borderColor: 'rgba(83,65,205,0.4)', bgcolor: 'rgba(83,65,205,0.05)' } }}>
+        <Box sx={{ border: `4px dashed ${T.border}`, borderRadius: '0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', p: 5, cursor: 'pointer', transition: 'all 0.3s', '&:hover': { borderColor: 'rgba(83,65,205,0.4)', bgcolor: 'rgba(83,65,205,0.05)' } }}>
           <Box sx={{ width: 80, height: 80, bgcolor: T.surfaceAlt, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 36, color: T.textMuted }}>add_circle</span>
           </Box>

@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { fadeUp, scaleUp, staggerContainer, scrollViewport, slideLeft, slideRight } from '../hooks/useScrollAnimation';
+import MenuManagementView from './MenuManagementView';
+import LiveOrdersView from './LiveOrdersView';
 
 const M = motion.create(Box);
 const MTypo = motion.create(Typography);
@@ -101,7 +103,9 @@ export default function AdminDashboard() {
       </M>
 
       {/* ─── Main Content ─── */}
-      <Box component="main" sx={{ ml: { md: '256px' }, minHeight: '100vh', pb: { xs: 12, md: 6 }, px: 3, pt: 4, width: '100%', maxWidth: 1280 }}>
+      <Box component="main" sx={{ ml: { md: '256px' }, minHeight: '100vh', pb: { xs: 12, md: 6 }, px: { xs: 3, xl: 6 }, pt: 4, width: '100%', maxWidth: 1280 }}>
+        {activeNav === 'Dashboard' && (
+          <Box>
 
         {/* Header */}
         <M
@@ -265,7 +269,13 @@ export default function AdminDashboard() {
               <Box sx={{ position: 'absolute', right: -48, bottom: -48, width: 160, height: 160, bgcolor: 'rgba(83,65,205,0.1)', borderRadius: '50%', filter: 'blur(24px)' }} />
             </Box>
           </Box>
-        </Box>
+          </Box>
+          </Box>
+        )}
+        {activeNav === 'Menu Management' && <MenuManagementView />}
+        {activeNav === 'Live Orders' && <LiveOrdersView />}
+        {activeNav === 'QR Generator' && <Box sx={{ p: 4 }}><Typography variant="h4" sx={{color: T.text}}>QR Generator Coming Soon</Typography></Box>}
+        {activeNav === 'Analytics' && <Box sx={{ p: 4 }}><Typography variant="h4" sx={{color: T.text}}>Analytics Coming Soon</Typography></Box>}
       </Box>
 
       {/* ─── Mobile Bottom Nav ─── */}

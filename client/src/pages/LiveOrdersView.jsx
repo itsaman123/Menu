@@ -52,7 +52,7 @@ export default function LiveOrdersView() {
         
         {/* Order Card 1 */}
         <Box sx={{ bgcolor: T.surface, borderRadius: '0.5rem', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 40px rgba(18,28,42,0.04)', '&:hover': { transform: 'scale(1.02)' }, transition: 'all 0.3s' }}>
-          <Box sx={{ p: 3, borderBottom: \`1px solid \${T.border}\`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Box sx={{ p: 3, borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                 <Box component="span" sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', bgcolor: '#ffdcc3', color: '#2f1500', px: 1, py: 0.25, borderRadius: '4px' }}>Priority</Box>
@@ -74,7 +74,7 @@ export default function LiveOrdersView() {
               <Typography sx={{ color: T.text, fontWeight: 500 }}>1x Butter Naan Basket</Typography>
               <Typography sx={{ color: T.textSub, fontSize: '0.875rem', fontWeight: 700 }}>₹240</Typography>
             </Box>
-            <Box sx={{ pt: 2, mt: 'auto', borderTop: \`1px dashed rgba(200,196,215,0.3)\`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ pt: 2, mt: 'auto', borderTop: `1px dashed rgba(200,196,215,0.3)`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography sx={{ fontSize: '10px', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Total Amount</Typography>
               <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, color: T.text }}>₹1,470</Typography>
             </Box>

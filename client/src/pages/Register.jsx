@@ -114,13 +114,13 @@ export default function Register() {
               )}
 
               <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {/* Category */}
+                {/* Category name */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   <Typography component="label" sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>
-                    Restaurant Name
+                    Category name
                   </Typography>
-                  <Box component="input" type="text" value={form.restaurantName} onChange={handleChange('restaurantName')}
-                    placeholder="e.g. The Indigo Bistro"
+                  <Box component="input" type="text"
+                    placeholder="e.g. Signature Mains"
                     sx={{
                       width: '100%', height: 56, px: 3, borderRadius: '1rem',
                       bgcolor: T.surfaceAlt, border: 'none', color: T.text, outline: 'none',
@@ -131,14 +131,14 @@ export default function Register() {
                   />
                 </Box>
 
-                {/* Name + Email */}
+                {/* Item Name + Price */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     <Typography component="label" sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>
-                      Your Name
+                      Item name
                     </Typography>
-                    <Box component="input" type="text" value={form.name} onChange={handleChange('name')}
-                      placeholder="Full Name"
+                    <Box component="input" type="text"
+                      placeholder="Truffle Pasta"
                       sx={{
                         width: '100%', height: 56, px: 3, borderRadius: '1rem',
                         bgcolor: T.surfaceAlt, border: 'none', color: T.text, outline: 'none',
@@ -150,10 +150,10 @@ export default function Register() {
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     <Typography component="label" sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>
-                      Email
+                      Price (₹)
                     </Typography>
-                    <Box component="input" type="email" value={form.email} onChange={handleChange('email')}
-                      placeholder="name@company.com"
+                    <Box component="input" type="number"
+                      placeholder="450"
                       sx={{
                         width: '100%', height: 56, px: 3, borderRadius: '1rem',
                         bgcolor: T.surfaceAlt, border: 'none', color: T.text, outline: 'none',
@@ -163,39 +163,22 @@ export default function Register() {
                       }}
                     />
                   </Box>
-                </Box>
-
-                {/* Password */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                  <Typography component="label" sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>
-                    Password
-                  </Typography>
-                  <Box component="input" type="password" value={form.password} onChange={handleChange('password')}
-                    placeholder="••••••••"
-                    sx={{
-                      width: '100%', height: 56, px: 3, borderRadius: '1rem',
-                      bgcolor: T.surfaceAlt, border: 'none', color: T.text, outline: 'none',
-                      fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '0.875rem',
-                      '&:focus': { boxShadow: '0 0 0 2px rgba(83,65,205,0.2)', bgcolor: T.surface },
-                      '&::placeholder': { color: T.textMuted },
-                    }}
-                  />
                 </Box>
 
                 {/* Image Upload Area */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   <Typography component="label" sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>
-                    Restaurant Logo
+                    Item image
                   </Typography>
                   <Box sx={{
                     height: 192, borderRadius: '1rem', bgcolor: T.surfaceAlt,
                     border: `2px dashed rgba(200,196,215,0.3)`, display: 'flex',
-                    flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    flexDirection: 'column', alignItems: 'center', justifyItems: 'center', justifyContent: 'center',
                     cursor: 'pointer', transition: 'background-color 0.3s',
                     '&:hover': { bgcolor: T.surfaceHigh },
                   }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 36, color: T.accent, marginBottom: 8 }}>add_a_photo</span>
-                    <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: T.textSub }}>Tap to upload logo</Typography>
+                    <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: T.textSub }}>Tap to upload dish photo</Typography>
                     <Typography sx={{ fontSize: '10px', color: T.textMuted, mt: 0.5, textTransform: 'uppercase', letterSpacing: '0.05em' }}>High resolution JPG or PNG</Typography>
                   </Box>
                 </Box>
