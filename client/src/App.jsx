@@ -13,6 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import SuperAdminRoute from './components/SuperAdminRoute';
+import DemoMenu from './pages/DemoMenu';
 import { useAppTheme, useTokens } from './ThemeContext';
 
 const ThemeToggleButton = () => {
@@ -63,6 +64,7 @@ function App() {
         <Route path="/menu/:slug" element={<PublicMenu />} />
         <Route path="/checkout/:slug" element={<Checkout />} />
         <Route path="/order-success/:id" element={<OrderSuccess />} />
+        <Route path="/demo" element={<DemoMenu />} />
         <Route
           path="/admin/*"
           element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>}
