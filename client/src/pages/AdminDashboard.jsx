@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +39,158 @@ const STATUS_STYLE = {
 
 function getUser() {
   try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch { return {}; }
+}
+
+const GA_ID_RE = /^(G-|UA-|AW-)[A-Z0-9-]+$/i;
+
+function AnalyticsView() {
+  const T = useTokens();
+  const [otpStats, setOtpStats]     = useState(null);
+  const [gaId, setGaId]             = useState('');
+  const [gaInput, setGaInput]       = useState('');
+  const [loadingOtp, setLoadingOtp] = useState(true);
+  const [saving, setSaving]         = useState(false);
+  const [saveMsg, setSaveMsg]       = useState('');
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/api/otp/stats'),
+      api.get('/auth/restaurant-settings'),
+    ]).then(([otpRes, settingsRes]) => {
+      setOtpStats(otpRes.data);
+      setGaId(settingsRes.data.gaTrackingId || '');
+      setGaInput(settingsRes.data.gaTrackingId || '');
+    }).catch(() => {}).finally(() => setLoadingOtp(false));
+  }, []);
+
+  const saveGa = async () => {
+    if (gaInput && !GA_ID_RE.test(gaInput)) {
+      return setSaveMsg('Invalid ID format. Use G-XXXXXXXX, UA-XXXXX-X, or AW-XXXXXXXXX');
+    }
+    setSaving(true); setSaveMsg('');
+    try {
+      const { data } = await api.put('/auth/restaurant-settings', { gaTrackingId: gaInput.trim() });
+      setGaId(data.gaTrackingId);
+      setSaveMsg('Saved!');
+    } catch (err) {
+      setSaveMsg(err.response?.data?.message || 'Failed to save');
+    }
+    setSaving(false);
+  };
+
+  const OTP_CARDS = otpStats ? [
+    { label: 'Total OTPs Sent',      value: otpStats.totalSent,     icon: 'send',         color: '#5341cd' },
+    { label: 'Total Verified',        value: otpStats.totalVerified, icon: 'verified',     color: '#006c49' },
+    { label: 'Sent (Last 30 Days)',   value: otpStats.last30Days,    icon: 'calendar_month', color: '#884800' },
+    { label: 'Conversion Rate',
+      value: otpStats.totalSent > 0
+        ? `${Math.round(otpStats.totalVerified / otpStats.totalSent * 100)}%`
+        : '—',
+      icon: 'percent', color: '#00558b' },
+  ] : [];
+
+  return (
+    <Box>
+      {/* Header */}
+      <Box sx={{ mb: 5 }}>
+        <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' }, fontWeight: 900, letterSpacing: '-0.05em', color: T.text }}>
+          Analytics
+        </Typography>
+        <Typography sx={{ color: T.textSub, fontWeight: 500, mt: 0.5 }}>
+          OTP usage and Google Analytics configuration for your restaurant.
+        </Typography>
+      </Box>
+
+      {/* OTP Stats */}
+      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub, mb: 2 }}>
+        OTP Usage
+      </Typography>
+      {loadingOtp ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <CircularProgress sx={{ color: '#5341cd' }} />
+        </Box>
+      ) : (
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3, mb: 6 }}>
+          {OTP_CARDS.map(card => (
+            <Box key={card.label} sx={{
+              bgcolor: T.surface, p: 3, borderRadius: '0.75rem', boxShadow: T.shadowHov,
+              position: 'relative', overflow: 'hidden',
+            }}>
+              <Box sx={{ position: 'absolute', top: 8, right: 8, opacity: 0.08 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 64, color: card.color }}>{card.icon}</span>
+              </Box>
+              <span className="material-symbols-outlined" style={{ color: card.color, fontSize: 28, display: 'block', marginBottom: 12 }}>{card.icon}</span>
+              <Typography sx={{ color: T.textSub, fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 0.5 }}>
+                {card.label}
+              </Typography>
+              <Typography sx={{ fontSize: '2rem', fontWeight: 900, color: T.text, letterSpacing: '-0.05em' }}>
+                {card.value}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      {/* Google Analytics Config */}
+      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub, mb: 2 }}>
+        Google Analytics
+      </Typography>
+      <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 4, boxShadow: T.shadowHov, maxWidth: 560 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+          <span className="material-symbols-outlined" style={{ color: '#5341cd', fontSize: 28 }}>analytics</span>
+          <Box>
+            <Typography sx={{ fontWeight: 800, color: T.text }}>Measurement ID</Typography>
+            <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>Paste your GA4 Measurement ID to track menu traffic per restaurant.</Typography>
+          </Box>
+        </Box>
+
+        {gaId && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, px: 2, py: 1, bgcolor: '#e6f4ea', borderRadius: '9999px', width: 'fit-content' }}>
+            <span className="material-symbols-outlined" style={{ color: '#006c49', fontSize: 14 }}>check_circle</span>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#006c49' }}>Active: {gaId}</Typography>
+          </Box>
+        )}
+
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <Box component="input"
+            type="text"
+            value={gaInput}
+            onChange={e => { setGaInput(e.target.value); setSaveMsg(''); }}
+            placeholder="e.g. G-XXXXXXXXXX"
+            sx={{
+              flex: 1, minWidth: 200, height: 48, px: 3, borderRadius: '0.75rem',
+              bgcolor: T.surfaceAlt, border: `1px solid ${T.border}`, color: T.text, outline: 'none',
+              fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', fontWeight: 500,
+              '&:focus': { borderColor: '#5341cd', boxShadow: '0 0 0 2px rgba(83,65,205,0.15)' },
+              '&::placeholder': { color: T.textMuted },
+            }}
+          />
+          <Box component="button" onClick={saveGa} disabled={saving}
+            sx={{
+              height: 48, px: 3, background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)',
+              color: '#fff', fontWeight: 700, borderRadius: '0.75rem', border: 'none',
+              cursor: saving ? 'wait' : 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.875rem',
+              whiteSpace: 'nowrap', '&:hover': { opacity: 0.9 }, '&:disabled': { opacity: 0.6 },
+            }}>
+            {saving ? 'Saving…' : 'Save'}
+          </Box>
+        </Box>
+
+        {saveMsg && (
+          <Typography sx={{
+            mt: 1.5, fontSize: '0.8rem', fontWeight: 600,
+            color: saveMsg === 'Saved!' ? '#006c49' : '#ba1a1a',
+          }}>
+            {saveMsg}
+          </Typography>
+        )}
+
+        <Typography sx={{ mt: 2, fontSize: '0.75rem', color: T.textMuted, lineHeight: 1.6 }}>
+          The GA script is injected automatically in your public menu page when a valid ID is set. Leave blank to disable tracking.
+        </Typography>
+      </Box>
+    </Box>
+  );
 }
 
 export default function AdminDashboard() {
@@ -406,11 +558,7 @@ export default function AdminDashboard() {
         {activeNav === 'Live Orders'         && <LiveOrdersView />}
         {activeNav === 'Employee Management' && <EmployeeManagementView />}
         {activeNav === 'QR Generator' && <QRGeneratorView />}
-        {activeNav === 'Analytics' && (
-          <Box sx={{ p: 4 }}>
-            <Typography variant="h4" sx={{ color: T.text }}>Analytics — Coming Soon</Typography>
-          </Box>
-        )}
+        {activeNav === 'Analytics' && <AnalyticsView />}
       </Box>
 
       {/* ─── Mobile Bottom Nav ─── */}

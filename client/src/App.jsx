@@ -9,6 +9,11 @@ import PublicMenu from './pages/PublicMenu';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import LandingPage from './pages/LandingPage';
+import FeaturesPage from './pages/FeaturesPage';
+import PricingPage from './pages/PricingPage';
+import AboutPage from './pages/AboutPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import ContactPage from './pages/ContactPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
@@ -59,6 +64,11 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/menu/:slug" element={<PublicMenu />} />

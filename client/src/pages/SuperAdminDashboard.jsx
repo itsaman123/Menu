@@ -3,6 +3,9 @@ import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { motion } from 'framer-motion';
+
+const M = motion.create(Box);
 
 const SA_NAV = [
   { label: 'Dashboard', icon: 'dashboard', active: true },
@@ -25,6 +28,7 @@ export default function SuperAdminDashboard() {
 
   const [stats, setStats]           = useState(null);
   const [admins, setAdmins]         = useState([]);
+  const [otpStats, setOtpStats]     = useState([]);
   const [loading, setLoading]       = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
@@ -32,12 +36,14 @@ export default function SuperAdminDashboard() {
   const fetchAll = useCallback(async () => {
     try {
       setLoading(true);
-      const [statsRes, adminsRes] = await Promise.all([
+      const [statsRes, adminsRes, otpRes] = await Promise.all([
         api.get('/api/superadmin/stats'),
         api.get('/api/superadmin/admins'),
+        api.get('/api/superadmin/otp-stats'),
       ]);
       setStats(statsRes.data);
       setAdmins(adminsRes.data);
+      setOtpStats(otpRes.data);
     } catch {
       // silent
     } finally {
@@ -282,6 +288,60 @@ export default function SuperAdminDashboard() {
               <span className="material-symbols-outlined" style={{ fontSize: 120 }}>rocket_launch</span>
             </Box>
           </Box>
+        </Box>
+
+        {/* OTP Stats */}
+        <Box component="section" sx={{ mb: 5 }}>
+          <Typography variant="h3" sx={{ fontSize: '1.125rem', fontWeight: 700, color: T.text, mb: 3 }}>
+            OTP Usage Per Restaurant
+          </Typography>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress sx={{ color: '#5341cd' }} size={28} />
+            </Box>
+          ) : otpStats.length === 0 ? (
+            <Box sx={{ bgcolor: T.surface, p: 4, borderRadius: '0.5rem', textAlign: 'center' }}>
+              <Typography sx={{ color: T.textSub }}>No OTP data yet.</Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2,1fr)', lg: 'repeat(3,1fr)' }, gap: 3 }}>
+              {otpStats.map(row => {
+                const convRate = row.sent > 0 ? Math.round(row.verified / row.sent * 100) : 0;
+                return (
+                  <Box key={String(row.restaurantId)} sx={{
+                    bgcolor: T.surface, borderRadius: '0.5rem', p: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                    display: 'flex', flexDirection: 'column', gap: 1.5,
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Box sx={{
+                        width: 36, height: 36, borderRadius: 1, bgcolor: 'rgba(83,65,205,0.1)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 900, color: '#5341cd', fontSize: '0.875rem',
+                      }}>{(row.name || '?')[0].toUpperCase()}</Box>
+                      <Box>
+                        <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.875rem' }}>{row.name}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: T.textMuted }}>/{row.slug}</Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                      <Box sx={{ flex: 1, bgcolor: T.surfaceAlt, borderRadius: '0.5rem', p: 1.5, textAlign: 'center' }}>
+                        <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#5341cd' }}>{row.sent}</Typography>
+                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Sent</Typography>
+                      </Box>
+                      <Box sx={{ flex: 1, bgcolor: T.surfaceAlt, borderRadius: '0.5rem', p: 1.5, textAlign: 'center' }}>
+                        <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#006c49' }}>{row.verified}</Typography>
+                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Verified</Typography>
+                      </Box>
+                      <Box sx={{ flex: 1, bgcolor: T.surfaceAlt, borderRadius: '0.5rem', p: 1.5, textAlign: 'center' }}>
+                        <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#884800' }}>{convRate}%</Typography>
+                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Conv.</Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
         </Box>
 
         {/* Restaurants Table */}

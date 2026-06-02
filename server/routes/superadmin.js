@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const SuperAdmin = require('../models/SuperAdmin');
 const Admin = require('../models/Admin');
 const Order = require('../models/Order');
+const Restaurant = require('../models/Restaurant');
+const OtpLog = require('../models/OtpLog');
 const { protectSuperAdmin } = require('../middleware/authMiddleware');
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -80,6 +82,27 @@ router.delete('/admins/:id', protectSuperAdmin, async (req, res) => {
     await Admin.findByIdAndDelete(req.params.id);
     res.json({ message: 'Admin deleted successfully' });
   } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/superadmin/otp-stats
+// @desc    OTP sent/verified counts per restaurant (platform-wide)
+// @access  SuperAdmin
+router.get('/otp-stats', protectSuperAdmin, async (req, res) => {
+  try {
+    const restaurants = await Restaurant.find({}, 'name slug');
+    const stats = await Promise.all(
+      restaurants.map(async (r) => {
+        const [sent, verified] = await Promise.all([
+          OtpLog.countDocuments({ restaurantId: r._id, event: 'sent' }),
+          OtpLog.countDocuments({ restaurantId: r._id, event: 'verified' }),
+        ]);
+        return { restaurantId: r._id, name: r.name, slug: r.slug, sent, verified };
+      })
+    );
+    res.json(stats);
+  } catch {
     res.status(500).json({ message: 'Server error' });
   }
 });

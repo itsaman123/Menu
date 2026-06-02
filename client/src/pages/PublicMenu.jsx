@@ -26,12 +26,42 @@ const MOCK_MENU = [
 
 const CATEGORIES = ['All Items', 'Signature Starters', 'Main Canvas', 'Liquid Art', 'Sweet Finales'];
 
+const GA_ID_RE = /^(G-|UA-|AW-)[A-Z0-9-]+$/i;
+
 export default function PublicMenu() {
   const { slug } = useParams();
   const T = useTokens();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('All Items');
   const [cart, setCart] = useState({});
+
+  // Fetch restaurant GA tracking ID and inject GA4 script
+  useEffect(() => {
+    let script1, script2;
+    axios.get(`/public/menu/${slug}`).then(({ data }) => {
+      const gaId = data.restaurant?.gaTrackingId;
+      if (!gaId || !GA_ID_RE.test(gaId)) return;
+
+      script1 = document.createElement('script');
+      script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+      script1.async = true;
+      document.head.appendChild(script1);
+
+      script2 = document.createElement('script');
+      script2.text = [
+        'window.dataLayer = window.dataLayer || [];',
+        'function gtag(){dataLayer.push(arguments);}',
+        "gtag('js', new Date());",
+        `gtag('config', '${gaId}');`,
+      ].join('\n');
+      document.head.appendChild(script2);
+    }).catch(() => {});
+
+    return () => {
+      script1?.remove();
+      script2?.remove();
+    };
+  }, [slug]);
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
   const getItemPrice = () => {

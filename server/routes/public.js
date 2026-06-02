@@ -35,7 +35,8 @@ router.get('/menu/:slug', async (req, res) => {
     res.json({
       restaurant: {
         name: restaurant.name,
-        slug: restaurant.slug
+        slug: restaurant.slug,
+        gaTrackingId: restaurant.gaTrackingId || '',
       },
       menu: structuredMenu
     });

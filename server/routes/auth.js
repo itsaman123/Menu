@@ -115,4 +115,40 @@ router.get('/me', protect, async (req, res) => {
   }
 });
 
+// @route   GET /auth/restaurant-settings
+// @desc    Get restaurant's configurable settings (GA tracking ID)
+// @access  Protected
+router.get('/restaurant-settings', protect, async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findById(req.admin.restaurantId);
+    if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
+    res.json({ gaTrackingId: restaurant.gaTrackingId || '' });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GA Measurement ID pattern: G-XXXXXXXX, UA-XXXXX-X, AW-XXXXXXXXX
+const GA_ID_RE = /^(G-|UA-|AW-)[A-Z0-9-]+$/i;
+
+// @route   PUT /auth/restaurant-settings
+// @desc    Update restaurant's configurable settings
+// @access  Protected
+router.put('/restaurant-settings', protect, async (req, res) => {
+  try {
+    const { gaTrackingId } = req.body;
+    if (gaTrackingId && !GA_ID_RE.test(gaTrackingId)) {
+      return res.status(400).json({ message: 'Invalid Google Analytics ID. Expected format: G-XXXXXXXX' });
+    }
+    const restaurant = await Restaurant.findByIdAndUpdate(
+      req.admin.restaurantId,
+      { gaTrackingId: gaTrackingId || '' },
+      { new: true }
+    );
+    res.json({ gaTrackingId: restaurant.gaTrackingId });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
