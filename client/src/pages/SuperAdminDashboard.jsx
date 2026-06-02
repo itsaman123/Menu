@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 const SA_NAV = [
   { label: 'Dashboard', icon: 'dashboard', active: true },
@@ -13,33 +13,85 @@ const SA_NAV = [
   { label: 'Tickets', icon: 'support_agent' },
 ];
 
-const STATS = [
-  { label: 'Total Restaurants', value: '1,240', icon: 'storefront', trend: '+12% this month' },
-  { label: 'Total Orders', value: '45.2k', icon: 'shopping_bag', trend: '+8.4k new' },
-  { label: 'Platform Revenue', value: '₹12.5L', icon: 'payments', trend: '+18% vs last month' },
-  { label: 'Active Subs', value: '890', icon: 'verified_user', trend: '94% retention rate' },
-];
-
-const RESTAURANTS = [
-  { name: 'The Spice Route', owner: 'Rajesh Kumar', plan: 'Pro Plan', planIsPro: true, status: 'Active', statusIsActive: true, date: 'Oct 24, 2023', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD4xwN6eW0yPeq-h_wzoisDTYpoYFBHhEastk5GEYRCDxMTYUaX4F4ukezXnj9vtmHcUecKqXFQYOGF4dTDAXwOPC0RYBxv8YTmC7U2t6EsyNkdX412h6g3OBY_u0dcg0WHUqSXTlwyuH7Y0oSJIxAakUlUqp89f9yJ1iL6TtGoMIZkPbMYKBF-Eioj1-SAinGpJOiglJp1_KJNccN1GkOE9te-dh2jPmNDNp6InPtaBi0jlw_2dvE8NJ6W02KA12CO0dFKkD3cqRo' },
-  { name: 'Urban Brew Cafe', owner: 'Anita Sharma', plan: 'Starter', planIsPro: false, status: 'Active', statusIsActive: true, date: 'Oct 23, 2023', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDBxtF4cJllGZuavU36fDhgsnvOF6Mzn1svv3P4g0lVndLi2BqbGiMI0jz1kQ0WbRy_rMHreDm_Jax4m1TB65S2uZpw5kQvyyWR_bcRUcExNtMo40vaPnSB7fuo2FD2JW0gfUco0w2D9-Wv2QzsAaTHkUPUxHQ8FHxTI0kIuisVwpq-d9wn76NH54iM7lTezxsqRZy3uZCA5YQX1oPJJU0LMCy5dSj-dIkPvOAy1XfEDJ1hOpFvjQ5gJDTODp-uro3_884dkOQOlB8' },
-  { name: 'Sushi Sensation', owner: 'David Miller', plan: 'Pro Plan', planIsPro: true, status: 'Pending', statusIsActive: false, date: 'Oct 22, 2023', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1HmfSSVTIclrGAQCeNYEbplBSd883JUx-Gjq41bd_5PlbNmO_jVeN3k7P5FGbj7D76zq76l7mJe8SRwgYENglpguarrO8w6xxTq8C-PsJ0CgqpQXp2J3wCHp5oUosP5kIC2ZandwEZUgXmgf92O-GjlgJggF46_7da2HQFWpAvH38HrIlWUJ1MMA_Gfb2WfiEU8Z18qE_u-oSUIuCMs7ptmL1JpD2NQAleMWW-U6HF9YW7rvbLY7Gncv2qY2oMIsf22WyPCZg4xE' },
-  { name: 'Gourmet Garden', owner: 'Sanjay Patil', plan: 'Starter', planIsPro: false, status: 'Active', statusIsActive: true, date: 'Oct 21, 2023', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCyj_88X_nrKFMG4iHFyobr6-MKU91SvHgeRI6k-TBsI9-WVPftPu6mtA1QBnVYkqdWPeh4DY2fX6g2lxvAY7PIU7HXOxWRZPKuRSsFwH9Lt3SmM08dddl5eMYChGW_tR_igbD4Iv2z75M-Mwl8iCMHi65cFRibMDUGe_9DKIxZDKku8ctfynwydj6xF1LRP1CmvBhupWBiw_k1GDKJS9ebKN7hZ-i3tuGx1Q90Eua2_AkOWKCy_FM74N5fyC5hqwmak3LrUcjQd6I' },
-];
-
-const CHART_BARS = [
-  { label: 'JAN', h: 96 }, { label: 'FEB', h: 128 }, { label: 'MAR', h: 160 },
-  { label: 'APR', h: 192, primary: true }, { label: 'MAY', h: 208 }, { label: 'JUN', h: 240 },
-];
+function formatRevenue(n) {
+  if (n >= 10_00_000) return `₹${(n / 10_00_000).toFixed(1)}L`;
+  if (n >= 1_000)    return `₹${(n / 1_000).toFixed(1)}k`;
+  return `₹${n.toFixed(0)}`;
+}
 
 export default function SuperAdminDashboard() {
   const T = useTokens();
   const navigate = useNavigate();
 
+  const [stats, setStats]           = useState(null);
+  const [admins, setAdmins]         = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
+
+  const fetchAll = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [statsRes, adminsRes] = await Promise.all([
+        api.get('/api/superadmin/stats'),
+        api.get('/api/superadmin/admins'),
+      ]);
+      setStats(statsRes.data);
+      setAdmins(adminsRes.data);
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  async function handleDelete(id) {
+    if (!window.confirm('Delete this admin and restaurant permanently?')) return;
+    setDeletingId(id);
+    try {
+      await api.delete(`/api/superadmin/admins/${id}`);
+      setAdmins(prev => prev.filter(a => a._id !== id));
+    } catch {
+      // silent
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  async function handleToggleActive(admin) {
+    setTogglingId(admin._id);
+    try {
+      const { data } = await api.put(`/api/superadmin/admins/${admin._id}`, { isActive: !admin.isActive });
+      setAdmins(prev => prev.map(a => a._id === data._id ? data : a));
+    } catch {
+      // silent
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
   const handleLogout = () => {
-    localStorage.removeItem('superAdminToken');
+    localStorage.removeItem('saToken');
     navigate('/superadmin-login');
   };
+  const CHART_BARS = [
+    { label: 'Jan', h: '40%', primary: true },
+    { label: 'Feb', h: '28%' },
+    { label: 'Mar', h: '35%' },
+    { label: 'Apr', h: '50%' },
+    { label: 'May', h: '42%' },
+    { label: 'Jun', h: '60%' },
+  ];
+  
+
+  const STAT_CARDS = stats ? [
+    { label: 'Total Restaurants', value: String(stats.totalAdmins), icon: 'storefront',    sub: `${stats.activeAdmins} active` },
+    { label: 'Total Orders',      value: stats.totalOrders >= 1000 ? `${(stats.totalOrders/1000).toFixed(1)}k` : String(stats.totalOrders), icon: 'shopping_bag', sub: 'all time' },
+    { label: 'Platform Revenue',  value: formatRevenue(stats.totalRevenue), icon: 'payments',      sub: 'all time' },
+    { label: 'Active Accounts',   value: String(stats.activeAdmins), icon: 'verified_user', sub: `${stats.totalAdmins > 0 ? Math.round(stats.activeAdmins/stats.totalAdmins*100) : 0}% retention` },
+  ] : [];
 
   return (
     <Box sx={{ display: 'flex', bgcolor: T.bg, minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: T.text }}>
@@ -147,12 +199,18 @@ export default function SuperAdminDashboard() {
         {/* Header */}
         <Box component="header" sx={{ mb: 5 }}>
           <Typography variant="h1" sx={{ fontSize: '1.875rem', fontWeight: 900, color: T.text, mb: 0.5, letterSpacing: '-0.025em' }}>Platform Overview</Typography>
-          <Typography sx={{ color: T.textSub, fontWeight: 500 }}>Monitoring growth across 1,240 partner locations.</Typography>
+          <Typography sx={{ color: T.textSub, fontWeight: 500 }}>
+            {loading ? 'Loading platform data…' : `Monitoring growth across ${stats?.totalAdmins ?? 0} partner locations.`}
+          </Typography>
         </Box>
 
         {/* Stats Grid */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, gap: 3, mb: 5 }}>
-          {STATS.map(stat => (
+          {loading ? (
+            <Box sx={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', py: 6 }}>
+              <CircularProgress sx={{ color: '#5341cd' }} />
+            </Box>
+          ) : STAT_CARDS.map(stat => (
             <Box key={stat.label} sx={{
               bgcolor: T.surface, p: 3, borderRadius: '0.5rem', position: 'relative',
               overflow: 'hidden', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.02)' },
@@ -163,8 +221,8 @@ export default function SuperAdminDashboard() {
               <Typography sx={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub, fontWeight: 700, mb: 1 }}>{stat.label}</Typography>
               <Typography sx={{ fontSize: '2.25rem', fontWeight: 900, color: T.text }}>{stat.value}</Typography>
               <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', color: '#006c49', fontSize: '0.875rem', fontWeight: 700 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 14, marginRight: 4 }}>trending_up</span>
-                {stat.trend}
+                <span className="material-symbols-outlined" style={{ fontSize: 14, marginRight: 4 }}>info</span>
+                {stat.sub}
               </Box>
             </Box>
           ))}
@@ -239,59 +297,101 @@ export default function SuperAdminDashboard() {
               <span className="material-symbols-outlined" style={{ fontSize: 14, marginLeft: 4 }}>arrow_forward</span>
             </Box>
           </Box>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ bgcolor: T.surfaceAlt }}>
-                  {['Restaurant Name', 'Owner', 'Plan', 'Status', 'Date Joined', 'Actions'].map((h, i) => (
-                    <TableCell key={h} align={i === 5 ? 'center' : 'left'} sx={{
-                      py: 2, px: 4, color: T.textSub, fontSize: '10px', textTransform: 'uppercase',
-                      letterSpacing: '0.1em', fontWeight: 700, borderBottom: 'none',
-                    }}>{h}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {RESTAURANTS.map(row => (
-                  <TableRow key={row.name} sx={{ '&:hover': { bgcolor: 'rgba(239,244,255,0.5)' }, transition: 'background-color 0.2s' }}>
-                    <TableCell sx={{ px: 4, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Box sx={{ width: 40, height: 40, borderRadius: 1, bgcolor: T.surfaceContainer, overflow: 'hidden' }}>
-                          <Box component="img" src={row.img} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </Box>
-                        <Typography sx={{ fontWeight: 700, color: T.text }}>{row.name}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell sx={{ px: 4, py: 2.5, borderBottom: `1px solid ${T.border}`, color: T.textSub, fontWeight: 500 }}>{row.owner}</TableCell>
-                    <TableCell sx={{ px: 4, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
-                      <Box component="span" sx={{
-                        bgcolor: row.planIsPro ? 'rgba(83,65,205,0.1)' : '#dee9fc',
-                        color: row.planIsPro ? '#5341cd' : T.textSub,
-                        fontSize: '10px', fontWeight: 900, px: 1.5, py: 0.5, borderRadius: '9999px',
-                        textTransform: 'uppercase', letterSpacing: '-0.025em',
-                      }}>{row.plan}</Box>
-                    </TableCell>
-                    <TableCell sx={{ px: 4, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: row.statusIsActive ? '#006c49' : '#884800' }} />
-                        <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: row.statusIsActive ? '#006c49' : '#884800' }}>{row.status}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell sx={{ px: 4, py: 2.5, borderBottom: `1px solid ${T.border}`, color: T.textSub, fontWeight: 500, fontSize: '0.875rem' }}>{row.date}</TableCell>
-                    <TableCell align="center" sx={{ px: 4, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
-                      <Box component="button" sx={{
-                        p: 1, color: T.textMuted, background: 'none', border: 'none', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto',
-                        '&:hover': { color: '#5341cd' },
-                      }}>
-                        <span className="material-symbols-outlined">more_vert</span>
-                      </Box>
-                    </TableCell>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress sx={{ color: '#5341cd' }} />
+            </Box>
+          ) : admins.length === 0 ? (
+            <Box sx={{ p: 8, textAlign: 'center' }}>
+              <Typography sx={{ color: T.textSub }}>No restaurants registered yet.</Typography>
+            </Box>
+          ) : (
+            <TableContainer sx={{ overflowX: 'auto' }}>
+              <Table sx={{ minWidth: 700 }}>
+                <TableHead>
+                  <TableRow sx={{ bgcolor: T.surfaceAlt }}>
+                    {['Restaurant', 'Admin Email', 'Status', 'Joined', 'Actions'].map((h, i) => (
+                      <TableCell key={h} align={i === 4 ? 'center' : 'left'} sx={{
+                        py: 2, px: { xs: 2, md: 4 }, color: T.textSub, fontSize: '10px',
+                        textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, borderBottom: 'none',
+                      }}>{h}</TableCell>
+                    ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {admins.map(row => {
+                    const restaurant = row.restaurantId;
+                    const isActive   = row.isActive !== false;
+                    const initials   = (restaurant?.name || row.email || '?')[0].toUpperCase();
+                    const joinedDate = new Date(row.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const isDeleting = deletingId === row._id;
+                    const isToggling = togglingId === row._id;
+                    return (
+                      <TableRow key={row._id} sx={{ '&:hover': { bgcolor: 'rgba(239,244,255,0.5)' }, transition: 'background-color 0.2s' }}>
+                        {/* Restaurant */}
+                        <TableCell sx={{ px: { xs: 2, md: 4 }, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Box sx={{
+                              width: 40, height: 40, borderRadius: 1, bgcolor: T.accentDim, flexShrink: 0,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontWeight: 900, color: '#5341cd', fontSize: '1rem',
+                            }}>
+                              {initials}
+                            </Box>
+                            <Box>
+                              <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.875rem' }}>
+                                {restaurant?.name || '—'}
+                              </Typography>
+                              {restaurant?.slug && (
+                                <Typography sx={{ fontSize: '0.7rem', color: T.textMuted }}>/{restaurant.slug}</Typography>
+                              )}
+                            </Box>
+                          </Box>
+                        </TableCell>
+
+                        {/* Admin email */}
+                        <TableCell sx={{ px: { xs: 2, md: 4 }, py: 2.5, borderBottom: `1px solid ${T.border}`, color: T.textSub, fontWeight: 500, fontSize: '0.875rem' }}>
+                          {row.email}
+                        </TableCell>
+
+                        {/* Status + toggle */}
+                        <TableCell sx={{ px: { xs: 2, md: 4 }, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
+                          <Box
+                            sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
+                            onClick={() => !isToggling && handleToggleActive(row)}
+                          >
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: isActive ? '#006c49' : '#884800', flexShrink: 0 }} />
+                            <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: isActive ? '#006c49' : '#884800' }}>
+                              {isToggling ? '…' : (isActive ? 'Active' : 'Disabled')}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+
+                        {/* Date */}
+                        <TableCell sx={{ px: { xs: 2, md: 4 }, py: 2.5, borderBottom: `1px solid ${T.border}`, color: T.textSub, fontWeight: 500, fontSize: '0.875rem' }}>
+                          {joinedDate}
+                        </TableCell>
+
+                        {/* Actions */}
+                        <TableCell align="center" sx={{ px: { xs: 2, md: 4 }, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
+                          <Box component="button" onClick={() => !isDeleting && handleDelete(row._id)} sx={{
+                            p: 1, color: isDeleting ? T.textMuted : T.textMuted, background: 'none', border: 'none',
+                            cursor: isDeleting ? 'not-allowed' : 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto',
+                            '&:hover': { color: '#ba1a1a' }, transition: 'color 0.15s',
+                          }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                              {isDeleting ? 'hourglass_empty' : 'delete'}
+                            </span>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </Box>
       </Box>
     </Box>

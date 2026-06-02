@@ -15,6 +15,8 @@ const uploadRoutes = require('./routes/upload');
 const otpRoutes = require('./routes/otp');
 const orderRoutes = require('./routes/order');
 const superadminRoutes = require('./routes/superadmin');
+const employeeRoutes = require('./routes/employee');
+const attendanceRoutes = require('./routes/attendance');
 
 const app = express();
 
@@ -51,6 +53,8 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/otp', otpRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/superadmin', superadminRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/attendance', attendanceRoutes);
 app.use('/public', publicRoutes);
 
 // Health check

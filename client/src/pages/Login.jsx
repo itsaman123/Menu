@@ -19,9 +19,15 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post('/auth/login', { email, password });
-      localStorage.setItem('adminToken', data.token);
-      localStorage.setItem('restaurantId', data.restaurantId);
+      const { data } = await axios.post('http://localhost:5000/auth/login', { email, password });
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({
+        _id: data._id,
+        email: data.email,
+        restaurantId: data.restaurantId,
+        restaurantName: data.restaurantName,
+        slug: data.slug,
+      }));
       navigate('/admin');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');

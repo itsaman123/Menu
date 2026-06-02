@@ -14,8 +14,8 @@ export default function SuperAdminLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post('/api/superadmin/login', { email, password });
-      localStorage.setItem('superAdminToken', data.token);
+      const { data } = await axios.post('http://localhost:5000/api/superadmin/login', { email, password });
+      localStorage.setItem('saToken', data.token);
       navigate('/superadmin');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');

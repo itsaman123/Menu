@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const SuperAdmin = require('../models/SuperAdmin');
 const Admin = require('../models/Admin');
+const Order = require('../models/Order');
 const { protectSuperAdmin } = require('../middleware/authMiddleware');
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -21,6 +22,25 @@ router.post('/login', async (req, res) => {
     
     res.json({ _id: sa._id, email: sa.email, token: generateToken(sa._id), role: 'superadmin' });
   } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/superadmin/stats
+// @desc    Platform-wide statistics for the super admin dashboard
+router.get('/stats', protectSuperAdmin, async (req, res) => {
+  try {
+    const [totalAdmins, activeAdmins, allOrders] = await Promise.all([
+      Admin.countDocuments(),
+      Admin.countDocuments({ isActive: true }),
+      Order.find({}, 'totalAmount createdAt'),
+    ]);
+
+    const totalOrders = allOrders.length;
+    const totalRevenue = allOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+    res.json({ totalAdmins, activeAdmins, totalOrders, totalRevenue });
+  } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
