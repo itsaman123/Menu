@@ -1,9 +1,8 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { IconButton, Tooltip } from '@mui/material';
 import { LightMode, DarkMode } from '@mui/icons-material';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import PublicMenu from './pages/PublicMenu';
 import Checkout from './pages/Checkout';
@@ -70,7 +69,7 @@ function App() {
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Navigate to="/login" replace />} />
         <Route path="/menu/:slug" element={<PublicMenu />} />
         <Route path="/checkout/:slug" element={<Checkout />} />
         <Route path="/order-success/:id" element={<OrderSuccess />} />

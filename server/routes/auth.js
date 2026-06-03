@@ -11,51 +11,9 @@ const generateToken = (id, restaurantId) => {
 };
 
 // @route POST /auth/register
-// @desc  Register a new restaurant + admin account
-router.post('/register', async (req, res) => {
-  try {
-    const { restaurantName, slug, email, password } = req.body;
-
-    // Validate required fields
-    if (!restaurantName || !slug || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    const existingRestaurant = await Restaurant.findOne({ slug });
-    if (existingRestaurant) {
-      return res.status(400).json({ message: 'Restaurant slug already exists' });
-    }
-
-    const existingAdmin = await Admin.findOne({ email });
-    if (existingAdmin) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-
-    // Create restaurant
-    const restaurant = await Restaurant.create({ name: restaurantName, slug });
-
-    // Create admin linked to restaurant
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const admin = await Admin.create({
-      email,
-      password: hashedPassword,
-      restaurantId: restaurant._id
-    });
-
-    res.status(201).json({
-      _id: admin._id,
-      email: admin.email,
-      restaurantId: restaurant._id,
-      restaurantName: restaurant.name,
-      slug: restaurant.slug,
-      disabledFeatures: [],
-      token: generateToken(admin._id, restaurant._id)
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
+// @desc  Disabled — restaurant onboarding is managed by the Super Admin
+router.post('/register', (_req, res) => {
+  res.status(403).json({ message: 'Self-registration is disabled. Restaurants are onboarded by the Super Admin.' });
 });
 
 // @route POST /auth/login

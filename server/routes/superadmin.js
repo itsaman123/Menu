@@ -8,6 +8,7 @@ const Order = require('../models/Order');
 const Restaurant = require('../models/Restaurant');
 const OtpLog = require('../models/OtpLog');
 const { protectSuperAdmin } = require('../middleware/authMiddleware');
+const { sendOnboardingEmail } = require('../utils/mailer');
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
@@ -83,6 +84,84 @@ router.delete('/admins/:id', protectSuperAdmin, async (req, res) => {
     res.json({ message: 'Admin deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/superadmin/restaurants
+// @desc    Onboard a new restaurant + admin account (super admin only)
+router.post('/restaurants', protectSuperAdmin, async (req, res) => {
+  const { restaurantName, slug, email, password, subscriptionStatus } = req.body;
+
+  if (!restaurantName || !slug || !email || !password) {
+    return res.status(400).json({ message: 'Restaurant name, slug, admin email and password are required' });
+  }
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    return res.status(400).json({ message: 'Slug may only contain lowercase letters, numbers and hyphens' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters' });
+  }
+
+  try {
+    const [existingRestaurant, existingAdmin] = await Promise.all([
+      Restaurant.findOne({ slug }),
+      Admin.findOne({ email: email.toLowerCase() }),
+    ]);
+    if (existingRestaurant) return res.status(400).json({ message: 'Slug is already in use' });
+    if (existingAdmin)     return res.status(400).json({ message: 'Admin email is already registered' });
+
+    const restaurant = await Restaurant.create({
+      name: restaurantName.trim(),
+      slug: slug.trim(),
+      subscriptionStatus: subscriptionStatus || 'trial',
+    });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const admin = await Admin.create({
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+      restaurantId: restaurant._id,
+    });
+
+    res.status(201).json({
+      restaurant: {
+        _id: restaurant._id,
+        name: restaurant.name,
+        slug: restaurant.slug,
+        subscriptionStatus: restaurant.subscriptionStatus,
+        createdAt: restaurant.createdAt,
+      },
+      admin: {
+        _id: admin._id,
+        email: admin.email,
+        restaurantId: restaurant._id,
+        isActive: admin.isActive,
+        createdAt: admin.createdAt,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// @route   POST /api/superadmin/send-credentials
+// @desc    Email onboarding credentials to a restaurant admin
+router.post('/send-credentials', protectSuperAdmin, async (req, res) => {
+  const { to, restaurantName, slug, restaurantId, email, password, subscription, appBaseUrl } = req.body;
+
+  if (!to || !restaurantName || !slug || !email || !password) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  const base = (appBaseUrl || 'http://localhost:5173').replace(/\/$/, '');
+  const loginUrl = `${base}/login`;
+  const menuUrl  = `${base}/menu/${slug}`;
+
+  try {
+    await sendOnboardingEmail({ to, restaurantName, slug, restaurantId, email, password, subscription, loginUrl, menuUrl });
+    res.json({ message: 'Credentials email sent successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to send email', error: err.message });
   }
 });
 
