@@ -186,4 +186,62 @@ router.get('/otp-stats', protectSuperAdmin, async (req, res) => {
   }
 });
 
+// @route   PUT /api/superadmin/restaurants/:id
+// @desc    Update restaurant name / subscriptionStatus
+// @access  SuperAdmin
+router.put('/restaurants/:id', protectSuperAdmin, async (req, res) => {
+  try {
+    const { name, subscriptionStatus } = req.body;
+    const update = {};
+    if (name !== undefined) update.name = name.trim();
+    if (subscriptionStatus !== undefined) update.subscriptionStatus = subscriptionStatus;
+
+    const restaurant = await Restaurant.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
+    res.json(restaurant);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// @route   POST /api/superadmin/admins/:id/reset-password
+// @desc    Reset an admin's password
+// @access  SuperAdmin
+router.post('/admins/:id/reset-password', protectSuperAdmin, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+    const hashed = await bcrypt.hash(newPassword, 12);
+    const admin = await Admin.findByIdAndUpdate(req.params.id, { password: hashed }, { new: true }).select('-password');
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    res.json({ message: 'Password reset successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/superadmin/restaurant-stats
+// @desc    Per-restaurant order count and revenue
+// @access  SuperAdmin
+router.get('/restaurant-stats', protectSuperAdmin, async (req, res) => {
+  try {
+    const restaurants = await Restaurant.find({}, 'name slug subscriptionStatus');
+    const stats = await Promise.all(
+      restaurants.map(async (r) => {
+        const orders = await Order.find({ restaurantId: r._id }, 'totalAmount createdAt status');
+        const totalOrders  = orders.length;
+        const totalRevenue = orders.reduce((s, o) => s + (o.totalAmount || 0), 0);
+        const last30       = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const recentOrders = orders.filter(o => new Date(o.createdAt) >= last30).length;
+        return { restaurantId: r._id, name: r.name, slug: r.slug, subscriptionStatus: r.subscriptionStatus, totalOrders, totalRevenue, recentOrders };
+      })
+    );
+    res.json(stats);
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

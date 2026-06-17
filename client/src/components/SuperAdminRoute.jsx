@@ -1,13 +1,22 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-const SuperAdminRoute = ({ children }) => {
-  const token = localStorage.getItem('saToken');
+function isTokenValid(key) {
+  const token = localStorage.getItem(key);
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+}
 
-  if (!token) {
+const SuperAdminRoute = ({ children }) => {
+  if (!isTokenValid('saToken')) {
+    localStorage.removeItem('saToken');
     return <Navigate to="/superadmin-login" replace />;
   }
-
   return children;
 };
 

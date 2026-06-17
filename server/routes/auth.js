@@ -109,4 +109,24 @@ router.put('/restaurant-settings', protect, async (req, res) => {
   }
 });
 
+// @route   PUT /auth/change-password
+// @desc    Change logged-in admin's own password
+// @access  Protected
+router.put('/change-password', protect, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword || newPassword.length < 6) {
+    return res.status(400).json({ message: 'Current password and a new password (min 6 chars) are required' });
+  }
+  try {
+    const admin = await Admin.findById(req.admin._id);
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
+    if (!isMatch) return res.status(401).json({ message: 'Current password is incorrect' });
+    admin.password = await bcrypt.hash(newPassword, 12);
+    await admin.save();
+    res.json({ message: 'Password changed successfully' });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

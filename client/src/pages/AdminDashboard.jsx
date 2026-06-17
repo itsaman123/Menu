@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { label: 'Employee Management', icon: 'badge' },
   { label: 'QR Generator',        icon: 'qr_code' },
   { label: 'Analytics',           icon: 'insights' },
+  { label: 'Settings',            icon: 'settings' },
 ];
 
 // Maps mobile bottom-nav buttons to sidebar nav labels
@@ -193,15 +194,137 @@ function AnalyticsView() {
   );
 }
 
+function SettingsView({ adminEmail, restaurantName, slug }) {
+  const T = useTokens();
+  const navigate = useNavigate();
+  const [gaId, setGaId]         = useState('');
+  const [gaInput, setGaInput]   = useState('');
+  const [gaMsg, setGaMsg]       = useState('');
+  const [gaSaving, setGaSaving] = useState(false);
+  const [pw, setPw]             = useState({ current: '', next: '', confirm: '' });
+  const [pwMsg, setPwMsg]       = useState('');
+  const [pwSaving, setPwSaving] = useState(false);
+
+  useEffect(() => {
+    api.get('/auth/restaurant-settings').then(r => {
+      setGaId(r.data.gaTrackingId || '');
+      setGaInput(r.data.gaTrackingId || '');
+    }).catch(() => {});
+  }, []);
+
+  const saveGa = async () => {
+    if (gaInput && !GA_ID_RE.test(gaInput)) return setGaMsg('Invalid format — use G-XXXXXXXX, UA-XXXXX-X or AW-XXXXXXXXX');
+    setGaSaving(true); setGaMsg('');
+    try {
+      const { data } = await api.put('/auth/restaurant-settings', { gaTrackingId: gaInput.trim() });
+      setGaId(data.gaTrackingId); setGaMsg('Saved!');
+    } catch (err) { setGaMsg(err.response?.data?.message || 'Failed to save'); }
+    finally { setGaSaving(false); }
+  };
+
+  const changePw = async () => {
+    if (!pw.current) return setPwMsg('Enter your current password');
+    if (pw.next.length < 6) return setPwMsg('New password must be at least 6 characters');
+    if (pw.next !== pw.confirm) return setPwMsg('Passwords do not match');
+    setPwSaving(true); setPwMsg('');
+    try {
+      await api.put('/auth/change-password', { currentPassword: pw.current, newPassword: pw.next });
+      setPwMsg('Password changed! Please log in again.');
+      setTimeout(() => { localStorage.removeItem('token'); localStorage.removeItem('user'); navigate('/login'); }, 1800);
+    } catch (err) { setPwMsg(err.response?.data?.message || 'Failed to change password'); }
+    finally { setPwSaving(false); }
+  };
+
+  return (
+    <Box>
+      <Box sx={{ mb: 5 }}>
+        <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' }, fontWeight: 900, letterSpacing: '-0.05em', color: T.text }}>Settings</Typography>
+        <Typography sx={{ color: T.textSub, fontWeight: 500, mt: 0.5 }}>Manage your restaurant account and integrations.</Typography>
+      </Box>
+
+      {/* Restaurant Info */}
+      <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 4, mb: 4, boxShadow: T.shadow }}>
+        <Typography sx={{ fontWeight: 800, color: T.text, mb: 3, fontSize: '1rem' }}>Restaurant Info</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {[{ label: 'Restaurant Name', value: restaurantName }, { label: 'Admin Email', value: adminEmail }, { label: 'Menu URL', value: slug ? `${window.location.origin}/menu/${slug}` : '—' }].map(row => (
+            <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1.5, borderBottom: `1px solid ${T.surfaceHigh}` }}>
+              <Typography sx={{ fontSize: '0.875rem', color: T.textSub, fontWeight: 600 }}>{row.label}</Typography>
+              <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: T.text, fontFamily: row.label === 'Menu URL' ? 'monospace' : 'inherit' }}>{row.value}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      {/* Change Password */}
+      <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 4, mb: 4, boxShadow: T.shadow, maxWidth: 520 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <span className="material-symbols-outlined" style={{ color: '#5341cd', fontSize: 24 }}>lock</span>
+          <Box>
+            <Typography sx={{ fontWeight: 800, color: T.text }}>Change Password</Typography>
+            <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>You will be logged out after changing.</Typography>
+          </Box>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {[{ key: 'current', label: 'Current Password' }, { key: 'next', label: 'New Password' }, { key: 'confirm', label: 'Confirm New Password' }].map(f => (
+            <Box key={f.key}>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textSub, mb: 0.75, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{f.label}</Typography>
+              <Box component="input" type="password" value={pw[f.key]} onChange={e => setPw(p => ({ ...p, [f.key]: e.target.value }))} sx={{ width: '100%', px: 2, py: 1.5, bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text, outline: 'none', boxSizing: 'border-box', '&:focus': { borderColor: '#5341cd' } }} />
+            </Box>
+          ))}
+          {pwMsg && <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: pwMsg.includes('changed') ? '#006c49' : '#ba1a1a' }}>{pwMsg}</Typography>}
+          <Box component="button" onClick={changePw} disabled={pwSaving} sx={{ py: 1.5, px: 3, border: 'none', background: 'linear-gradient(135deg,#5341cd,#6c5ce7)', color: '#fff', borderRadius: '0.5rem', cursor: pwSaving ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', opacity: pwSaving ? 0.7 : 1, alignSelf: 'flex-start' }}>
+            {pwSaving ? 'Changing…' : 'Change Password'}
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Google Analytics */}
+      <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 4, boxShadow: T.shadow, maxWidth: 520 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+          <span className="material-symbols-outlined" style={{ color: '#5341cd', fontSize: 24 }}>analytics</span>
+          <Box>
+            <Typography sx={{ fontWeight: 800, color: T.text }}>Google Analytics</Typography>
+            <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>Track your menu page visitors with GA4.</Typography>
+          </Box>
+        </Box>
+        {gaId && <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, mb: 2, px: 2, py: 0.75, bgcolor: 'rgba(0,108,73,0.1)', borderRadius: '9999px' }}><span className="material-symbols-outlined" style={{ color: '#006c49', fontSize: 14 }}>check_circle</span><Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#006c49' }}>Active: {gaId}</Typography></Box>}
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <Box component="input" type="text" value={gaInput} onChange={e => { setGaInput(e.target.value); setGaMsg(''); }} placeholder="e.g. G-XXXXXXXXXX" sx={{ flex: 1, minWidth: 200, height: 48, px: 3, borderRadius: '0.75rem', bgcolor: T.surfaceAlt, border: `1px solid ${T.border}`, color: T.text, outline: 'none', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', '&:focus': { borderColor: '#5341cd' }, '&::placeholder': { color: T.textMuted } }} />
+          <Box component="button" onClick={saveGa} disabled={gaSaving} sx={{ height: 48, px: 3, background: 'linear-gradient(to bottom right,#5341CD,#6C5CE7)', color: '#fff', fontWeight: 700, borderRadius: '0.75rem', border: 'none', cursor: gaSaving ? 'wait' : 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', opacity: gaSaving ? 0.6 : 1 }}>{gaSaving ? 'Saving…' : 'Save'}</Box>
+        </Box>
+        {gaMsg && <Typography sx={{ mt: 1.5, fontSize: '0.8rem', fontWeight: 600, color: gaMsg === 'Saved!' ? '#006c49' : '#ba1a1a' }}>{gaMsg}</Typography>}
+      </Box>
+    </Box>
+  );
+}
+
 export default function AdminDashboard() {
   const T = useTokens();
   const navigate = useNavigate();
   const [activeNav, setActiveNav] = useState('Dashboard');
+  const [adminInfo, setAdminInfo] = useState(getUser());
 
-  const user = getUser();
-  const restaurantName = user.restaurantName || 'Your Restaurant';
-  const adminEmail     = user.email || '';
-  const menuUrl        = user.slug ? `${window.location.origin}/menu/${user.slug}` : null;
+  // Verify token + isActive on mount — disabled admins get kicked out immediately
+  useEffect(() => {
+    api.get('/auth/me').then(r => {
+      setAdminInfo(r.data);
+      localStorage.setItem('user', JSON.stringify(r.data));
+    }).catch(() => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login', { replace: true });
+    });
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login', { replace: true });
+  };
+
+  const restaurantName = adminInfo.restaurantName || 'Your Restaurant';
+  const adminEmail     = adminInfo.email || '';
+  const menuUrl        = adminInfo.slug ? `${window.location.origin}/menu/${adminInfo.slug}` : null;
 
   /* ── Dashboard stats ── */
   const [orders, setOrders]     = useState([]);
@@ -299,20 +422,19 @@ export default function AdminDashboard() {
           </Box>
         </Box>
 
-        {/* Bottom Nav */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-          {[{ label: 'Settings', icon: 'settings' }, { label: 'Support', icon: 'contact_support' }].map(item => (
-            <Box component="a" href="#" key={item.label} sx={{
-              display: 'flex', alignItems: 'center', gap: 1.5, py: 1, px: 2,
-              borderRadius: '9999px', textDecoration: 'none', color: T.textSub, mx: 1,
-              transition: 'all 0.2s', '&:hover': { bgcolor: 'rgba(255,255,255,0.5)' },
-            }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>{item.icon}</span>
-              <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {item.label}
-              </Typography>
-            </Box>
-          ))}
+        {/* Logout */}
+        <Box sx={{ px: 2, pb: 2 }}>
+          <Box component="button" onClick={handleLogout} sx={{
+            display: 'flex', alignItems: 'center', gap: 1.5, py: 1, px: 2, width: '100%',
+            borderRadius: '9999px', border: 'none', bgcolor: 'transparent', cursor: 'pointer',
+            color: T.textSub, fontFamily: 'Inter, sans-serif', transition: 'all 0.2s',
+            '&:hover': { color: '#ba1a1a', bgcolor: 'rgba(186,26,26,0.06)' },
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
+            <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Logout
+            </Typography>
+          </Box>
         </Box>
       </M>
 
@@ -389,14 +511,12 @@ export default function AdminDashboard() {
                   <span className="material-symbols-outlined">notifications</span>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: T.surfaceAlt, pl: 1, pr: 2, py: 1, borderRadius: '9999px' }}>
-                  <Box component="img"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuARMnDDGIci2Z-DpOdicFT0DeNYUdJh5iS-ptQee2T1Y57f8CoQSPM6b8xkAi0PEMxZ4OAmqMgaOgOcJ6gyDc7LA3PVunuieyI27y9dICvEFrQr8doBJLLjLks65w6-1QnQS1IIMy7eTSoBGKAU_78by1Hox3-o5QnhvJuoqAaU-6D7wuUZpoWcL7fNJp3aKm03HrIeNh8O1cT2tjpAig286m1R1wuP2-BS35llvXVdAOXiNtif2X-7CjJlVeWjub8UmaRvEOtmaUA"
-                    alt="Admin"
-                    sx={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
-                  />
+                  <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#5341cd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900, fontSize: '1rem', flexShrink: 0 }}>
+                    {adminEmail ? adminEmail[0].toUpperCase() : 'A'}
+                  </Box>
                   <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: T.text, lineHeight: 1 }}>Rajesh K.</Typography>
-                    <Typography sx={{ fontSize: '10px', color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Owner</Typography>
+                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: T.text, lineHeight: 1 }}>{adminEmail}</Typography>
+                    <Typography sx={{ fontSize: '10px', color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Admin</Typography>
                   </Box>
                 </Box>
               </Box>
@@ -557,8 +677,9 @@ export default function AdminDashboard() {
         {activeNav === 'Menu Management'     && <MenuManagementView />}
         {activeNav === 'Live Orders'         && <LiveOrdersView />}
         {activeNav === 'Employee Management' && <EmployeeManagementView />}
-        {activeNav === 'QR Generator' && <QRGeneratorView />}
-        {activeNav === 'Analytics' && <AnalyticsView />}
+        {activeNav === 'QR Generator'        && <QRGeneratorView />}
+        {activeNav === 'Analytics'           && <AnalyticsView />}
+        {activeNav === 'Settings'            && <SettingsView adminEmail={adminEmail} restaurantName={restaurantName} slug={adminInfo.slug} />}
       </Box>
 
       {/* ─── Mobile Bottom Nav ─── */}

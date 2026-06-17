@@ -31,6 +31,11 @@ export default function Checkout() {
   const recaptchaRef = useRef(null);
   const inputRefs = useRef([]);
 
+  // Read cart saved by PublicMenu before navigating here
+  const pendingCart = JSON.parse(localStorage.getItem('pendingCart') || '{"items":[]}');
+  const cartItems = pendingCart.items || [];
+  const cartTotal = cartItems.reduce((sum, i) => sum + (i.price || 0) * i.quantity, 0);
+
   useEffect(() => {
     recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-anchor', { size: 'invisible' });
     return () => { recaptchaRef.current?.clear(); };
@@ -70,10 +75,23 @@ export default function Checkout() {
         phone: `+91${phone.replace(/\D/g, '')}`,
         slug,
       });
-      localStorage.setItem('orderToken', data.orderToken);
-      navigate(`/order-success/${slug}`);
+      const orderToken = data.orderToken;
+      localStorage.setItem('orderToken', orderToken);
+
+      // Create the order using the verified OTP token
+      const cart = JSON.parse(localStorage.getItem('pendingCart') || '{"items":[]}');
+      const { data: order } = await axios.post('/api/orders/create', {
+        restaurantSlug: cart.restaurantSlug || slug,
+        items: (cart.items || []).map(i => ({ menuItemId: i.menuItemId, name: i.name, quantity: i.quantity })),
+        tableNumber: cart.tableNumber || '',
+      }, {
+        headers: { Authorization: `Bearer ${orderToken}` },
+      });
+      localStorage.removeItem('pendingCart');
+      navigate(`/order-success/${order._id}`);
     } catch (err) {
-      setError(firebaseErrorMsg(err.code) || 'Verification failed. Please try again.');
+      const msg = err.response?.data?.message;
+      setError(msg || firebaseErrorMsg(err.code) || 'Verification failed. Please try again.');
     }
     setLoading(false);
   };
@@ -119,23 +137,26 @@ export default function Checkout() {
         <Box sx={{ bgcolor: T.surface, borderRadius: '1rem', p: 4, boxShadow: T.shadowHov, mb: 4 }}>
           <Typography variant="h2" sx={{ fontSize: '1.5rem', fontWeight: 800, color: T.text, mb: 3, letterSpacing: '-0.025em' }}>Your Order</Typography>
 
-          {[
-            { name: 'Truffle Infused Dumplings', qty: 1, price: 520 },
-            { name: 'Burrata & Heirloom Art',     qty: 2, price: 900 },
-          ].map(item => (
-            <Box key={item.name} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2, borderBottom: `1px solid ${T.border}` }}>
+          {cartItems.length === 0 ? (
+            <Typography sx={{ color: T.textSub, textAlign: 'center', py: 3 }}>No items in cart.</Typography>
+          ) : cartItems.map(item => (
+            <Box key={item.menuItemId} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2, borderBottom: `1px solid ${T.border}` }}>
               <Box>
                 <Typography sx={{ fontWeight: 700, color: T.text }}>{item.name}</Typography>
-                <Typography sx={{ fontSize: '0.75rem', color: T.textSub }}>Qty: {item.qty}</Typography>
+                <Typography sx={{ fontSize: '0.75rem', color: T.textSub }}>Qty: {item.quantity}</Typography>
               </Box>
-              <Typography sx={{ fontWeight: 900, color: T.text }}>₹{item.price}</Typography>
+              {item.price != null && (
+                <Typography sx={{ fontWeight: 900, color: T.text }}>₹{(item.price * item.quantity).toFixed(0)}</Typography>
+              )}
             </Box>
           ))}
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 3 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: '1.125rem', color: T.text }}>Total</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '1.5rem', color: T.accent }}>₹1,420</Typography>
-          </Box>
+          {cartTotal > 0 && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 3 }}>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.125rem', color: T.text }}>Total (incl. 5% GST)</Typography>
+              <Typography sx={{ fontWeight: 900, fontSize: '1.5rem', color: T.accent }}>₹{(cartTotal * 1.05).toFixed(0)}</Typography>
+            </Box>
+          )}
         </Box>
 
         {/* OTP Verification Card */}
