@@ -3,7 +3,6 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const OtpLog = require('../models/OtpLog');
 const Restaurant = require('../models/Restaurant');
-const admin = require('../firebaseAdmin');
 const { protect } = require('../middleware/authMiddleware');
 const rateLimit = require('express-rate-limit');
 
@@ -38,41 +37,29 @@ router.post('/log-send', logSendLimiter, async (req, res) => {
 });
 
 // @route   POST /api/otp/verify-firebase
-// @desc    Verify Firebase ID token, log verified event, issue orderToken
+// @desc    Log verified event and issue orderToken (Firebase OTP verified client-side)
 // @access  Public
 router.post('/verify-firebase', verifyLimiter, async (req, res) => {
-  const { idToken, phone, slug } = req.body;
-  if (!idToken) return res.status(400).json({ message: 'Firebase ID token required' });
+  const { phone, slug } = req.body;
+  if (!phone) return res.status(400).json({ message: 'Phone number required' });
 
   try {
-    const decoded = await admin.auth().verifyIdToken(idToken);
-
-    const tokenPhone = decoded.phone_number;
-    const providedPhone = phone?.replace(/\s/g, '');
-    if (tokenPhone && providedPhone && tokenPhone !== providedPhone) {
-      return res.status(401).json({ message: 'Phone number mismatch' });
-    }
-
     if (slug) {
       const restaurant = await Restaurant.findOne({ slug });
       if (restaurant) {
-        await OtpLog.create({
-          restaurantId: restaurant._id,
-          phone: tokenPhone || providedPhone,
-          event: 'verified',
-        });
+        await OtpLog.create({ restaurantId: restaurant._id, phone, event: 'verified' });
       }
     }
 
     const orderToken = jwt.sign(
-      { phone: tokenPhone || providedPhone },
+      { phone },
       process.env.JWT_SECRET,
       { expiresIn: '15m' }
     );
     res.json({ message: 'OTP verified successfully', orderToken });
   } catch (err) {
-    console.error('[Firebase verify]', err.code || err.message);
-    res.status(401).json({ message: 'Invalid or expired token' });
+    console.error('[OTP verify]', err.message);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

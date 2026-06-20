@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -7,40 +7,29 @@ import MenuFlowFooter from './menuflow/MenuFlowFooter';
 import { MF, glass } from './menuflow/mfTheme';
 
 const M = motion.create(Box);
-const reveal = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } };
+const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+const fadeUp  = { hidden: { opacity: 0, y: 36 }, visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] } } };
 
 const STEPS = [
-  { n: '01', title: 'Quick Signup',       desc: 'Join the MenuFlow ecosystem in seconds. No credit card required. Just your restaurant name and basic details.',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC09UE7TRgNlKGWGLnCDeqtwv-_uIcCQ4obA10zGhL1FWxq_EAbhK7pd7RFqV2IAXMC1sS7SAFzpwbpPXAo5A9JosGxr5pTYVZLssH9ulwQpLXzCUEjefwHAeoAwXkE9NvhoZK16QnQp2kBIBzYxB30_jAyAYSP1qzs2nvUEeO1S0CbKNv80HOlXn0gO2cr-N3uQPhZNFtOcyQPAq01VY4T3EnI7ow8rypbfz6jjgo-GhfLENYSmNJDESTDMEKiqHXqaVvmEUMdD2LT',
-    accent: MF.primary },
-  { n: '02', title: 'Setup Your Menu',    desc: 'Use our intuitive drag-and-drop editor to build your menu. Upload high-res imagery, set dynamic pricing, and organize items.',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBFA0q0AHje19zFzzR0gN_WkMbp6DaMG-wwtcpUBCxDPKq__LE6ZuPsTA3wROGpoG6XqB6xQ7JaplN0223Fy77hUH-CAGRdJBvVAlE-5QzCSq-aiyuuB9CN0EtcaWAEGiW1bXfhhuCAm5ZDrKjG6IzLEO5pKnluS7dpvdoZAWjzoGQksLT3mnEPoTv-WjDpdMT7outogOyxTNNr_RsaUd9RQNM9qqXK-IWwaSrrAzx1LndVeMm6bmYVe7xlKtv8UtQwSzH2iOac9y70',
-    accent: MF.secondary },
-  { n: '03', title: 'Generate Smart QR',  desc: 'Instant generation of high-resolution QR codes tailored to your brand. Each code is dynamic—update your menu without reprinting.',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDol1lByfRD7S59_2SGdguSUMSVtKh4ORyHFCaMWWg2BnLud75fDTQPf6NUL4BtAw2MJyx8QmFgiIf9ZEF4xo5dl3c6ptUVP2RiP31T1rQsry-6_3OC93Inm2PKtG1zt3GXs7cecq3wOjJ3WTavq7p75_IRjt1lGt0KJNWKQbTivb2QRbzF7OZFQbzr2efl3A-gzF8BH0mhgOoliPmILMY9NJdO0i1N2yWhxXP_KJh0_EThCEdwVY5dfj7iLV1eWNtvWHYfW9_Rt',
-    accent: MF.primary },
-  { n: '04', title: 'The Magic Scan',     desc: "Guests scan the QR with their own device. No apps to download, no friction. The menu opens instantly in a lightning-fast browser experience.",
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBY8CFblRDNkr6sc5RY7r8k2MUGMOTmytCfLmDsrwAlVHqMt2KmbtNwRsumEMlgJNMuJhfWo47bzt1Ev2p4SeK-9iYQ6GOz3k7WFrOnVngYJ5WqszXRWD_uYSGif3_XIoj2jA6b6JXc2TWPnRmB4irCyM7o61m86kh4e8Ka2nYoqYu56X3mtnnmxN5-S5uP3eztuhH7d3XYrzEhIHsVo59AN2GqKfON-s6THWUWNMdUOipa6V0wlyOdBxPcAPH8lqyN8GPaNQVkx5Tr',
-    accent: MF.secondary },
-  { n: '05', title: 'Seamless Ordering',  desc: 'Customers order directly from their phone. With integrated payments and real-time cart management, the order goes straight to your kitchen.',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCT3TOH1CUI2on7nugEPRBlY2i0JypLe1owYE8mKikbDALTTH0aGyw16wpxaP1_x_led90KtV-6byps-NPDHYITsA0FlluDbetP29XvytjaZGQhpYWtGP7kzui7hmpywPQfcrTZITeFzvhrTUW48CwP_z03GYpsYOvbucRp5NdA23P7SyWWCr8aeVCQyXN1d3kGjR4beIV7k20U__WkifkrCmkH_l45Ie_biFiyOR3d9TKhIhoVFduLrcQs0eWrGG1Sxab435LvNo3h',
-    accent: MF.primary },
-  { n: '06', title: 'Insights & Tracking',desc: 'Monitor performance in real-time. See which dishes are trending, track table turnover, and use data-driven insights to optimize your menu.',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBJUczHkURGTtYGd87542HIAuMm9I1uQJ8alAI-ypWZ0NwsbsBkGFS8xWN9rQoGeYJJvU--JeGJU95d5uuNl2s5srEczcQ0dQZ1TnfhRst1SrV64hoU0cfmrH64LcXB2MZdu6SHRCR7F8nGwyTpy7R6-Q6SLe-R3xfbMWr5MCejlCTNOkUTor57T2xKYVa5mxxXK8zLxD71-9VJa5kjunOV41_CMki_t2bfu2SHBFkbQwW-gx1v5nemAolBMS-_ALDx_EI7hTT5Wt8g',
-    accent: MF.secondary },
+  { n: '01', title: 'Quick Signup',        desc: 'Join the MenuFlow ecosystem in seconds. No credit card required. Just your restaurant name and basic details.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC09UE7TRgNlKGWGLnCDeqtwv-_uIcCQ4obA10zGhL1FWxq_EAbhK7pd7RFqV2IAXMC1sS7SAFzpwbpPXAo5A9JosGxr5pTYVZLssH9ulwQpLXzCUEjefwHAeoAwXkE9NvhoZK16QnQp2kBIBzYxB30_jAyAYSP1qzs2nvUEeO1S0CbKNv80HOlXn0gO2cr-N3uQPhZNFtOcyQPAq01VY4T3EnI7ow8rypbfz6jjgo-GhfLENYSmNJDESTDMEKiqHXqaVvmEUMdD2LT', color: MF.primary },
+  { n: '02', title: 'Build Your Menu',     desc: 'Use our intuitive drag-and-drop editor. Upload high-res imagery, set dynamic pricing, and organize items exactly how you want.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBFA0q0AHje19zFzzR0gN_WkMbp6DaMG-wwtcpUBCxDPKq__LE6ZuPsTA3wROGpoG6XqB6xQ7JaplN0223Fy77hUH-CAGRdJBvVAlE-5QzCSq-aiyuuB9CN0EtcaWAEGiW1bXfhhuCAm5ZDrKjG6IzLEO5pKnluS7dpvdoZAWjzoGQksLT3mnEPoTv-WjDpdMT7outogOyxTNNr_RsaUd9RQNM9qqXK-IWwaSrrAzx1LndVeMm6bmYVe7xlKtv8UtQwSzH2iOac9y70', color: '#7c3aed' },
+  { n: '03', title: 'Generate Smart QR',   desc: 'Instant generation of high-resolution QR codes tailored to your brand. Each code is dynamic — update your menu without reprinting.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDol1lByfRD7S59_2SGdguSUMSVtKh4ORyHFCaMWWg2BnLud75fDTQPf6NUL4BtAw2MJyx8QmFgiIf9ZEF4xo5dl3c6ptUVP2RiP31T1rQsry-6_3OC93Inm2PKtG1zt3GXs7cecq3wOjJ3WTavq7p75_IRjt1lGt0KJNWKQbTivb2QRbzF7OZFQbzr2efl3A-gzF8BH0mhgOoliPmILMY9NJdO0i1N2yWhxXP_KJh0_EThCEdwVY5dfj7iLV1eWNtvWHYfW9_Rt', color: MF.primary },
+  { n: '04', title: 'The Magic Scan',      desc: 'Guests scan the QR with their own device. No apps to download, no friction. The menu opens instantly in a lightning-fast browser experience.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBY8CFblRDNkr6sc5RY7r8k2MUGMOTmytCfLmDsrwAlVHqMt2KmbtNwRsumEMlgJNMuJhfWo47bzt1Ev2p4SeK-9iYQ6GOz3k7WFrOnVngYJ5WqszXRWD_uYSGif3_XIoj2jA6b6JXc2TWPnRmB4irCyM7o61m86kh4e8Ka2nYoqYu56X3mtnnmxN5-S5uP3eztuhH7d3XYrzEhIHsVo59AN2GqKfON-s6THWUWNMdUOipa6V0wlyOdBxPcAPH8lqyN8GPaNQVkx5Tr', color: '#059669' },
+  { n: '05', title: 'Seamless Ordering',   desc: 'Customers order directly from their phone. Integrated payments and real-time cart management send orders straight to your kitchen.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCT3TOH1CUI2on7nugEPRBlY2i0JypLe1owYE8mKikbDALTTH0aGyw16wpxaP1_x_led90KtV-6byps-NPDHYITsA0FlluDbetP29XvytjaZGQhpYWtGP7kzui7hmpywPQfcrTZITeFzvhrTUW48CwP_z03GYpsYOvbucRp5NdA23P7SyWWCr8aeVCQyXN1d3kGjR4beIV7k20U__WkifkrCmkH_l45Ie_biFiyOR3d9TKhIhoVFduLrcQs0eWrGG1Sxab435LvNo3h', color: '#d97706' },
+  { n: '06', title: 'Insights & Growth',   desc: 'Monitor performance in real-time. See which dishes trend, track table turnover, and use data-driven insights to optimize your menu and staff.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBJUczHkURGTtYGd87542HIAuMm9I1uQJ8alAI-ypWZ0NwsbsBkGFS8xWN9rQoGeYJJvU--JeGJU95d5uuNl2s5srEczcQ0dQZ1TnfhRst1SrV64hoU0cfmrH64LcXB2MZdu6SHRCR7F8nGwyTpy7R6-Q6SLe-R3xfbMWr5MCejlCTNOkUTor57T2xKYVa5mxxXK8zLxD71-9VJa5kjunOV41_CMki_t2bfu2SHBFkbQwW-gx1v5nemAolBMS-_ALDx_EI7hTT5Wt8g', color: '#0891b2' },
 ];
 
 export default function HowItWorksPage() {
   const navigate = useNavigate();
-  const indicatorRef = useRef(null);
+  const lineRef  = useRef(null);
 
   useEffect(() => {
     const onScroll = () => {
       const section = document.getElementById('journey-section');
-      if (!section || !indicatorRef.current) return;
-      const rect = section.getBoundingClientRect();
+      if (!section || !lineRef.current) return;
+      const rect     = section.getBoundingClientRect();
       const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (rect.height + window.innerHeight)));
-      indicatorRef.current.style.height = `${progress * 100}%`;
+      lineRef.current.style.height = `${progress * 100}%`;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -49,94 +38,161 @@ export default function HowItWorksPage() {
   return (
     <Box sx={{ bgcolor: MF.bg, minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: MF.text, overflowX: 'hidden' }}>
       <MenuFlowNav />
-      <Box component="main" sx={{ pt: '72px' }}>
 
-        {/* Hero */}
-        <Box component="section" sx={{ position: 'relative', py: 10, bgcolor: MF.surfaceLowest, overflow: 'hidden' }}>
-          <Box sx={{ maxWidth: 1280, mx: 'auto', px: 6, textAlign: 'center', position: 'relative', zIndex: 1 }}>
-            <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: MF.primary, mb: 2 }}>The Process</Typography>
-            <Typography variant="h1" sx={{ fontSize: { xs: 40, md: 64 }, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1.1, mb: 3, maxWidth: 800, mx: 'auto' }}>
-              Launch your digital menu in minutes.
-            </Typography>
-            <Typography sx={{ fontSize: 18, color: MF.textSub, maxWidth: 560, mx: 'auto', mb: 5, lineHeight: 1.65 }}>
-              Experience the future of dining with a platform built for speed, precision, and elegance. From setup to scale, we've streamlined every second.
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Box component="button" onClick={() => navigate('/register')} sx={{
-                bgcolor: MF.primary, color: '#fff', px: 5, py: 1.75, borderRadius: '12px',
-                fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
-                fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 1,
-                boxShadow: `0 8px 24px ${MF.primary}4D`, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.02)' },
-              }}>
-                Get Started <span className="material-symbols-outlined">arrow_forward</span>
+      {/* ── Hero ── */}
+      <Box component="section" sx={{ position: 'relative', minHeight: '68vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'linear-gradient(135deg, #fff7ed 0%, #fffaf6 55%, #fff7ed 100%)', pt: '72px' }}>
+        {[
+          { top: '-10%', left: '-5%', w: 560, color: `${MF.primary}18`, dur: 20 },
+          { bottom: '-8%', right: '-4%', w: 440, color: '#fb923c14', dur: 24, delay: 6 },
+          { top: '30%', right: '25%', w: 300, color: '#ea580c12', dur: 16, delay: 9 },
+        ].map((o, i) => (
+          <M key={i} animate={{ x: [0, 50, 0], y: [0, -40, 0] }} transition={{ duration: o.dur, repeat: Infinity, ease: 'easeInOut', delay: o.delay || 0 }}
+            sx={{ position: 'absolute', ...o, width: o.w, height: o.w, borderRadius: '50%', background: `radial-gradient(circle, ${o.color} 0%, transparent 70%)`, pointerEvents: 'none' }} />
+        ))}
+        <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(249,115,22,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(249,115,22,0.04) 1px, transparent 1px)', backgroundSize: '64px 64px', pointerEvents: 'none' }} />
+
+        <Box sx={{ maxWidth: 1280, mx: 'auto', px: { xs: 3, md: 6 }, width: '100%', zIndex: 1, textAlign: 'center', py: 14 }}>
+          <M initial="hidden" animate="visible" variants={stagger}>
+            <M variants={fadeUp}>
+              <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MF.primary, mb: 2 }}>The Process</Typography>
+            </M>
+            <M variants={fadeUp}>
+              <Typography sx={{ fontSize: { xs: 38, md: 60, lg: 72 }, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.07, mb: 3, color: MF.text, fontFamily: 'Manrope, Inter, sans-serif', maxWidth: 860, mx: 'auto' }}>
+                Launch your digital menu{' '}
+                <Box component="span" sx={{ background: 'linear-gradient(135deg, #f97316, #ea580c)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                  in minutes.
+                </Box>
+              </Typography>
+            </M>
+            <M variants={fadeUp}>
+              <Typography sx={{ fontSize: { xs: 16, md: 18 }, color: MF.textSub, mb: 6, maxWidth: 580, mx: 'auto', lineHeight: 1.75 }}>
+                Experience the future of dining with a platform built for speed, precision, and elegance — from setup to scale, every second streamlined.
+              </Typography>
+            </M>
+            <M variants={fadeUp}>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <motion.button whileHover={{ scale: 1.04, boxShadow: '0 16px 48px rgba(249,115,22,0.5)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/register')}
+                  style={{ background: 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff', padding: '15px 34px', borderRadius: 14, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 10px 30px rgba(249,115,22,0.4)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  Get Started <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_forward</span>
+                </motion.button>
+                <motion.button whileHover={{ scale: 1.03, background: MF.surfaceLow }} whileTap={{ scale: 0.97 }}
+                  style={{ background: '#fff', color: MF.text, border: `1px solid rgba(249,115,22,0.2)`, padding: '15px 34px', borderRadius: 14, fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                  ▶ Watch Demo
+                </motion.button>
               </Box>
-              <Box component="button" sx={{ bgcolor: MF.surface, color: MF.text, border: `1px solid ${MF.outlineVar}`, px: 5, py: 1.75, borderRadius: '12px', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s', '&:hover': { bgcolor: MF.surfaceHigh } }}>
-                Watch Demo
-              </Box>
-            </Box>
-          </Box>
-          <Box sx={{ position: 'absolute', top: 0, right: 0, width: 500, height: 500, bgcolor: `${MF.primary}08`, borderRadius: '50%', filter: 'blur(80px)', transform: 'translate(30%,-30%)' }} />
-          <Box sx={{ position: 'absolute', bottom: 0, left: 0, width: 500, height: 500, bgcolor: `${MF.secondary}08`, borderRadius: '50%', filter: 'blur(80px)', transform: 'translate(-30%,30%)' }} />
+            </M>
+          </M>
         </Box>
 
-        {/* Journey */}
-        <Box id="journey-section" component="section" sx={{ position: 'relative', py: 10 }}>
-          {/* Journey line */}
-          <Box sx={{ display: { xs: 'none', lg: 'block' }, position: 'absolute', left: '50%', top: 0, bottom: 0, width: 2, transform: 'translateX(-50%)' }}>
-            <Box sx={{ height: '100%', width: '100%', background: `linear-gradient(to bottom, ${MF.primary}, ${MF.secondary})`, opacity: 0.15 }} />
-            <Box ref={indicatorRef} sx={{ position: 'absolute', top: 0, left: 0, width: '100%', background: `linear-gradient(to bottom, ${MF.primary}, ${MF.secondary})`, boxShadow: `0 0 15px ${MF.primary}4D`, transition: 'height 0.1s', height: '0%' }} />
-          </Box>
+        <M animate={{ y: [0, 10, 0] }} transition={{ duration: 2.2, repeat: Infinity }}
+          sx={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+          <Typography sx={{ fontSize: 10, color: MF.outlineVar, letterSpacing: '0.15em' }}>SCROLL</Typography>
+          <Box sx={{ width: 1.5, height: 44, background: `linear-gradient(to bottom, ${MF.primary}80, transparent)`, borderRadius: 1 }} />
+        </M>
+      </Box>
 
-          <Box sx={{ maxWidth: 1280, mx: 'auto', px: 6, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {STEPS.map(({ n, title, desc, img, accent }, i) => {
-              const isLeft = i % 2 === 0;
-              return (
-                <M key={n} initial={{ opacity: 0.4 }} whileInView={{ opacity: 1 }} viewport={{ once: false, amount: 0.3 }} transition={{ duration: 0.5 }}>
-                  <Box sx={{ position: 'relative', display: 'flex', flexDirection: { xs: 'column', lg: isLeft ? 'row' : 'row-reverse' }, alignItems: 'center', gap: 10 }}>
-                    {/* Text */}
-                    <Box sx={{ flex: 1, textAlign: { xs: 'left', lg: isLeft ? 'right' : 'left' }, display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', lg: isLeft ? 'flex-end' : 'flex-start' } }}>
-                      <Typography sx={{ fontSize: 64, fontWeight: 900, color: `${accent}33`, lineHeight: 1, mb: 0.5 }}>{n}</Typography>
-                      <Typography variant="h2" sx={{ fontSize: 32, fontWeight: 600, letterSpacing: '-0.02em', mb: 1.5 }}>{title}</Typography>
-                      <Typography sx={{ fontSize: 17, color: MF.textSub, lineHeight: 1.65, maxWidth: 400 }}>{desc}</Typography>
-                    </Box>
-                    {/* Center dot */}
-                    <Box sx={{ display: { xs: 'none', lg: 'flex' }, width: 32, height: 32, borderRadius: '50%', bgcolor: MF.surfaceLowest, border: `4px solid ${accent}`, zIndex: 10, alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: accent }} />
-                    </Box>
-                    {/* Image */}
-                    <Box sx={{ flex: 1 }}>
-                      <Box sx={{ ...glass, p: 3, borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', overflow: 'hidden', position: 'relative', '&:hover .hover-overlay': { opacity: 1 } }}>
-                        <Box sx={{ borderRadius: '12px', overflow: 'hidden', aspectRatio: '16/9', border: `1px solid ${MF.outlineVar}33`, bgcolor: '#f5f5f5', position: 'relative' }}>
-                          <Box component="img" src={img} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          <Box className="hover-overlay" sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${accent}33, transparent)`, opacity: 0, transition: 'opacity 0.3s' }} />
+      {/* ── Journey ── */}
+      <Box id="journey-section" component="section" sx={{ position: 'relative', py: { xs: 10, md: 14 }, px: { xs: 3, md: 6 } }}>
+        {/* Scroll-driven center line */}
+        <Box sx={{ display: { xs: 'none', lg: 'block' }, position: 'absolute', left: '50%', top: 0, bottom: 0, width: 2, transform: 'translateX(-50%)', bgcolor: `${MF.primary}12` }}>
+          <Box ref={lineRef} sx={{ width: '100%', background: `linear-gradient(to bottom, ${MF.primary}, #7c3aed)`, boxShadow: `0 0 20px ${MF.primary}60`, transition: 'height 0.1s', height: '0%', position: 'absolute', top: 0 }} />
+        </Box>
+
+        <Box sx={{ maxWidth: 1280, mx: 'auto', display: 'flex', flexDirection: 'column', gap: { xs: 6, md: 10 } }}>
+          {STEPS.map(({ n, title, desc, img, color }, i) => {
+            const isLeft = i % 2 === 0;
+            return (
+              <motion.div key={n}
+                initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+                viewport={{ once: true, amount: 0.25 }}
+              >
+                <Box sx={{ position: 'relative', display: 'flex', flexDirection: { xs: 'column', lg: isLeft ? 'row' : 'row-reverse' }, alignItems: 'center', gap: { xs: 5, lg: 10 } }}>
+                  {/* Text */}
+                  <Box sx={{ flex: 1, textAlign: { xs: 'left', lg: isLeft ? 'right' : 'left' }, display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', lg: isLeft ? 'flex-end' : 'flex-start' } }}>
+                    <Typography sx={{ fontSize: 72, fontWeight: 900, color: `${color}25`, lineHeight: 1, mb: 0.5, letterSpacing: '-0.04em', fontFamily: 'Manrope, Inter, sans-serif' }}>{n}</Typography>
+                    <Typography sx={{ fontSize: 13, fontWeight: 700, color: color, letterSpacing: '0.06em', textTransform: 'uppercase', mb: 1.5 }}>Step {n}</Typography>
+                    <Typography sx={{ fontSize: { xs: 26, md: 34 }, fontWeight: 900, letterSpacing: '-0.025em', mb: 2, lineHeight: 1.2 }}>{title}</Typography>
+                    <Typography sx={{ fontSize: 16, color: MF.textSub, lineHeight: 1.75, maxWidth: 400 }}>{desc}</Typography>
+                  </Box>
+
+                  {/* Center dot */}
+                  <Box sx={{
+                    display: { xs: 'none', lg: 'flex' }, width: 36, height: 36,
+                    borderRadius: '50%', bgcolor: MF.bg, border: `4px solid ${color}`,
+                    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                    position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 10,
+                    boxShadow: `0 0 24px ${color}60`,
+                  }}>
+                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color }} />
+                  </Box>
+
+                  {/* Image */}
+                  <Box sx={{ flex: 1 }}>
+                    <motion.div whileHover={{ y: -6, transition: { duration: 0.3 } }}>
+                      <Box sx={{ ...glass, p: 2.5, borderRadius: '28px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', position: 'relative', overflow: 'hidden' }}>
+                        <Box sx={{ borderRadius: '16px', overflow: 'hidden', aspectRatio: '16/9', border: `1px solid ${MF.outlineVar}44`, position: 'relative' }}>
+                          <Box component="img" src={img} sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s', '&:hover': { transform: 'scale(1.04)' } }} />
+                          <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${color}25, transparent 60%)`, opacity: 0, transition: 'opacity 0.3s', '&:hover': { opacity: 1 } }} />
                         </Box>
                       </Box>
-                    </Box>
+                    </motion.div>
                   </Box>
-                </M>
-              );
-            })}
-          </Box>
+                </Box>
+              </motion.div>
+            );
+          })}
         </Box>
+      </Box>
 
-        {/* Final CTA */}
-        <Box component="section" sx={{ py: 10, bgcolor: MF.surfaceHighest, px: 6 }}>
-          <Box sx={{ maxWidth: 1280, mx: 'auto', textAlign: 'center' }}>
-            <Typography variant="h1" sx={{ fontSize: { xs: 36, md: 48 }, fontWeight: 700, letterSpacing: '-0.03em', mb: 2 }}>Ready to transform your service?</Typography>
-            <Typography sx={{ fontSize: 17, color: MF.textSub, maxWidth: 520, mx: 'auto', mb: 5, lineHeight: 1.65 }}>
-              Join over 2,000 restaurants that have elevated their dining experience with MenuFlow.
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Box component="button" onClick={() => navigate('/register')} sx={{ bgcolor: MF.primary, color: '#fff', px: 5, py: 1.75, borderRadius: '12px', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: `0 8px 24px ${MF.primary}4D`, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.02)' } }}>
-                Launch Your Menu
-              </Box>
-              <Box component="button" onClick={() => navigate('/contact')} sx={{ bgcolor: MF.surfaceLowest, color: MF.text, border: `1px solid ${MF.outlineVar}`, px: 5, py: 1.75, borderRadius: '12px', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s', '&:hover': { bgcolor: MF.surfaceHigh } }}>
-                Talk to Sales
+      {/* ── Quick facts bar ── */}
+      <Box component="section" sx={{ background: MF.gradient, py: { xs: 6, md: 8 }, px: { xs: 3, md: 6 }, position: 'relative', overflow: 'hidden' }}>
+        <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '48px 48px', pointerEvents: 'none' }} />
+        <Box sx={{ maxWidth: 1280, mx: 'auto', display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4,1fr)' }, gap: 4, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          {[
+            { val: '<200ms', label: 'Menu load time' },
+            { val: '20 min', label: 'Average setup time' },
+            { val: '99.9%',  label: 'Platform uptime' },
+            { val: '0',      label: 'Apps to download' },
+          ].map(({ val, label }) => (
+            <motion.div key={label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
+              <Typography sx={{ fontSize: { xs: 32, md: 44 }, fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', lineHeight: 1.1 }}>{val}</Typography>
+              <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', mt: 1 }}>{label}</Typography>
+            </motion.div>
+          ))}
+        </Box>
+      </Box>
+
+      {/* ── CTA ── */}
+      <Box component="section" sx={{ py: { xs: 10, md: 14 }, px: { xs: 3, md: 6 } }}>
+        <motion.div initial={{ opacity: 0, scale: 0.92 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} viewport={{ once: true, amount: 0.3 }}>
+          <Box sx={{ maxWidth: 960, mx: 'auto', background: MF.gradient, borderRadius: '44px', p: { xs: 6, md: 12 }, textAlign: 'center', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+            <Box sx={{ position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15), transparent)', pointerEvents: 'none' }} />
+            <Box sx={{ position: 'absolute', bottom: -60, left: -60, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.1), transparent)', pointerEvents: 'none' }} />
+            <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '44px 44px', pointerEvents: 'none' }} />
+            <Box sx={{ position: 'relative', zIndex: 1 }}>
+              <Typography sx={{ fontSize: { xs: 30, md: 52 }, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, mb: 3, fontFamily: 'Manrope, Inter, sans-serif' }}>
+                Ready to launch<br />your digital menu?
+              </Typography>
+              <Typography sx={{ fontSize: 17, color: 'rgba(255,255,255,0.8)', mb: 6, maxWidth: 480, mx: 'auto', lineHeight: 1.75 }}>
+                Join over 2,000 restaurants that have elevated their dining experience. Set up in under 20 minutes.
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <motion.button whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/register')}
+                  style={{ background: '#fff', color: MF.primary, padding: '17px 44px', borderRadius: 16, fontWeight: 800, fontSize: 16, border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 12px 36px rgba(0,0,0,0.15)' }}>
+                  Launch Your Menu
+                </motion.button>
+                <motion.button whileHover={{ scale: 1.04, background: 'rgba(255,255,255,0.2)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/contact')}
+                  style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.3)', padding: '17px 44px', borderRadius: 16, fontWeight: 700, fontSize: 16, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  Talk to Sales
+                </motion.button>
               </Box>
             </Box>
           </Box>
-        </Box>
+        </motion.div>
       </Box>
+
       <MenuFlowFooter />
     </Box>
   );
