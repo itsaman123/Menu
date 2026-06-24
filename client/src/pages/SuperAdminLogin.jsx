@@ -2,7 +2,7 @@
 import { Box, Typography } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 export default function SuperAdminLogin() {
   const T = useTokens();
@@ -14,7 +14,7 @@ export default function SuperAdminLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post('http://localhost:5000/api/superadmin/login', { email, password });
+      const { data } = await api.post('/api/superadmin/login', { email, password });
       localStorage.setItem('saToken', data.token);
       navigate('/superadmin');
     } catch (err) {

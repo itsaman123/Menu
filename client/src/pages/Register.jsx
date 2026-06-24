@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { fadeUp, slideLeft, staggerContainer } from '../hooks/useScrollAnimation';
-import axios from 'axios';
+import api from '../api';
 
 const M = motion.create(Box);
 const MTypo = motion.create(Typography);
@@ -43,7 +43,7 @@ export default function Register() {
     setError('');
     setLoading(true);
     try {
-      const { data } = await axios.post('http://localhost:5000/auth/register', form);
+      const { data } = await api.post('/auth/register', form);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({
         _id: data._id,

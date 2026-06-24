@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { fadeUp, slideLeft, staggerContainer } from '../hooks/useScrollAnimation';
-import axios from 'axios';
+import api from '../api';
 
 const M = motion.create(Box);
 
@@ -19,7 +19,7 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post('http://localhost:5000/auth/login', { email, password });
+      const { data } = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({
         _id: data._id,
