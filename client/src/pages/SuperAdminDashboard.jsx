@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+﻿import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, CircularProgress,
@@ -29,7 +29,7 @@ function OField({ label, value, onChange, type = 'text', placeholder = '', T }) 
         width: '100%', px: 2, py: 1.5, bgcolor: T.surfaceAlt,
         border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem',
         fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text,
-        outline: 'none', boxSizing: 'border-box', '&:focus': { borderColor: '#5341cd' },
+        outline: 'none', boxSizing: 'border-box', '&:focus': { borderColor: '#f97316' },
       }} />
     </Box>
   );
@@ -135,8 +135,8 @@ function OnboardingModal({ open, onClose, onCreated }) {
           <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
             {STEPS.map((label, i) => { const idx = i + 1; const done = step > idx; const active = step === idx; return (
               <Box key={label} sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-                <Box sx={{ width: '100%', height: 4, borderRadius: 2, bgcolor: done || active ? '#5341cd' : T.surfaceHigh, transition: 'background-color 0.3s' }} />
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: done || active ? '#5341cd' : T.textMuted }}>{done ? '✓ ' : ''}{label}</Typography>
+                <Box sx={{ width: '100%', height: 4, borderRadius: 2, bgcolor: done || active ? '#f97316' : T.surfaceHigh, transition: 'background-color 0.3s' }} />
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: done || active ? '#f97316' : T.textMuted }}>{done ? '✓ ' : ''}{label}</Typography>
               </Box>
             ); })}
           </Box>
@@ -147,14 +147,14 @@ function OnboardingModal({ open, onClose, onCreated }) {
               <OField label="Restaurant Name" value={form.restaurantName} onChange={handleChange('restaurantName')} placeholder="e.g. The Spice Garden" T={T} />
               <Box>
                 <OField label="URL Slug" value={form.slug} onChange={handleChange('slug')} placeholder="e.g. spice-garden" T={T} />
-                <Typography sx={{ fontSize: '0.7rem', color: T.textMuted, mt: 0.5 }}>Public menu URL: <Box component="span" sx={{ fontWeight: 700, color: '#5341cd' }}>/menu/{form.slug || 'your-slug'}</Box></Typography>
+                <Typography sx={{ fontSize: '0.7rem', color: T.textMuted, mt: 0.5 }}>Public menu URL: <Box component="span" sx={{ fontWeight: 700, color: '#f97316' }}>/menu/{form.slug || 'your-slug'}</Box></Typography>
               </Box>
               <Box>
                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textSub, mb: 0.75, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Subscription</Typography>
                 <Box sx={{ display: 'flex', gap: 1.5 }}>
                   {['trial', 'active', 'inactive'].map(s => (
-                    <Box key={s} onClick={() => setForm(p => ({ ...p, subscriptionStatus: s }))} sx={{ flex: 1, py: 1, borderRadius: '0.5rem', textAlign: 'center', cursor: 'pointer', border: `2px solid ${form.subscriptionStatus === s ? '#5341cd' : T.surfaceHigh}`, bgcolor: form.subscriptionStatus === s ? 'rgba(83,65,205,0.08)' : T.surfaceAlt, transition: 'all 0.2s' }}>
-                      <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'capitalize', color: form.subscriptionStatus === s ? '#5341cd' : T.textSub }}>{s}</Typography>
+                    <Box key={s} onClick={() => setForm(p => ({ ...p, subscriptionStatus: s }))} sx={{ flex: 1, py: 1, borderRadius: '0.5rem', textAlign: 'center', cursor: 'pointer', border: `2px solid ${form.subscriptionStatus === s ? '#f97316' : T.surfaceHigh}`, bgcolor: form.subscriptionStatus === s ? 'rgba(249,115,22,0.08)' : T.surfaceAlt, transition: 'all 0.2s' }}>
+                      <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'capitalize', color: form.subscriptionStatus === s ? '#f97316' : T.textSub }}>{s}</Typography>
                     </Box>
                   ))}
                 </Box>
@@ -167,7 +167,7 @@ function OnboardingModal({ open, onClose, onCreated }) {
               <Box>
                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textSub, mb: 0.75, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Password</Typography>
                 <Box sx={{ position: 'relative' }}>
-                  <Box component="input" type={showPw ? 'text' : 'password'} value={form.password} onChange={handleChange('password')} placeholder="Min. 6 characters" sx={{ width: '100%', px: 2, py: 1.5, pr: '2.75rem', bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text, outline: 'none', boxSizing: 'border-box', '&:focus': { borderColor: '#5341cd' } }} />
+                  <Box component="input" type={showPw ? 'text' : 'password'} value={form.password} onChange={handleChange('password')} placeholder="Min. 6 characters" sx={{ width: '100%', px: 2, py: 1.5, pr: '2.75rem', bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text, outline: 'none', boxSizing: 'border-box', '&:focus': { borderColor: '#f97316' } }} />
                   <Box component="button" type="button" onClick={() => setShowPw(p => !p)} sx={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', border: 'none', bgcolor: 'transparent', cursor: 'pointer', color: T.textMuted, display: 'flex', p: 0 }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{showPw ? 'visibility_off' : 'visibility'}</span>
                   </Box>
@@ -189,16 +189,16 @@ function OnboardingModal({ open, onClose, onCreated }) {
                 {[{ label: 'Admin Email', value: form.email }, { label: 'Password', value: form.password }, { label: 'Subscription', value: created.restaurant.subscriptionStatus }].map(row => (
                   <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography sx={{ fontSize: '0.78rem', color: T.textMuted, fontWeight: 600 }}>{row.label}</Typography>
-                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: row.label === 'Subscription' ? '#5341cd' : T.text, textTransform: row.label === 'Subscription' ? 'capitalize' : 'none' }}>{row.value}</Typography>
+                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: row.label === 'Subscription' ? '#f97316' : T.text, textTransform: row.label === 'Subscription' ? 'capitalize' : 'none' }}>{row.value}</Typography>
                   </Box>
                 ))}
               </Box>
               <Box sx={{ display: 'flex', gap: 1.5 }}>
-                <Box component="button" onClick={copyCredentials} sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, py: 1.5, borderRadius: '0.5rem', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', border: `1.5px solid ${copied ? '#006c49' : T.surfaceHigh}`, color: copied ? '#006c49' : T.textSub, bgcolor: 'transparent', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { borderColor: '#5341cd', color: '#5341cd' } }}>
+                <Box component="button" onClick={copyCredentials} sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, py: 1.5, borderRadius: '0.5rem', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', border: `1.5px solid ${copied ? '#006c49' : T.surfaceHigh}`, color: copied ? '#006c49' : T.textSub, bgcolor: 'transparent', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { borderColor: '#f97316', color: '#f97316' } }}>
                   <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{copied ? 'check' : 'content_copy'}</span>
                   {copied ? 'Copied!' : 'Copy'}
                 </Box>
-                <Box component="button" onClick={sendCredentials} disabled={sending || emailSent} sx={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, py: 1.5, borderRadius: '0.5rem', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', border: 'none', background: emailSent ? 'rgba(0,108,73,0.12)' : 'linear-gradient(135deg,#5341cd,#6c5ce7)', color: emailSent ? '#006c49' : '#fff', cursor: sending || emailSent ? 'not-allowed' : 'pointer', opacity: sending ? 0.75 : 1 }}>
+                <Box component="button" onClick={sendCredentials} disabled={sending || emailSent} sx={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, py: 1.5, borderRadius: '0.5rem', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', border: 'none', background: emailSent ? 'rgba(0,108,73,0.12)' : 'linear-gradient(135deg,#f97316,#ea580c)', color: emailSent ? '#006c49' : '#fff', cursor: sending || emailSent ? 'not-allowed' : 'pointer', opacity: sending ? 0.75 : 1 }}>
                   <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{emailSent ? 'mark_email_read' : 'send'}</span>
                   {sending ? 'Sending…' : emailSent ? 'Email Sent!' : 'Send via Email'}
                 </Box>
@@ -208,9 +208,9 @@ function OnboardingModal({ open, onClose, onCreated }) {
           )}
           {error && <Box sx={{ mt: 2, p: 1.5, borderRadius: '0.5rem', bgcolor: 'rgba(186,26,26,0.08)', display: 'flex', alignItems: 'center', gap: 1 }}><span className="material-symbols-outlined" style={{ fontSize: 16, color: '#ba1a1a' }}>error</span><Typography sx={{ fontSize: '0.8rem', color: '#ba1a1a', fontWeight: 600 }}>{error}</Typography></Box>}
           <Box sx={{ mt: 3, display: 'flex', gap: 1.5 }}>
-            {step === 1 && (<><Box component="button" onClick={handleClose} sx={{ flex: 1, py: 1.5, borderRadius: '0.5rem', border: `1.5px solid ${T.surfaceHigh}`, bgcolor: 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: T.textSub, fontWeight: 600, fontSize: '0.875rem' }}>Cancel</Box><Box component="button" onClick={nextStep} sx={{ flex: 2, py: 1.5, borderRadius: '0.5rem', border: 'none', background: 'linear-gradient(135deg,#5341cd,#6c5ce7)', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: '#fff', fontWeight: 700, fontSize: '0.875rem' }}>Next →</Box></>)}
-            {step === 2 && (<><Box component="button" onClick={() => { setStep(1); setError(''); }} sx={{ flex: 1, py: 1.5, borderRadius: '0.5rem', border: `1.5px solid ${T.surfaceHigh}`, bgcolor: 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: T.textSub, fontWeight: 600, fontSize: '0.875rem' }}>← Back</Box><Box component="button" onClick={handleSubmit} disabled={submitting} sx={{ flex: 2, py: 1.5, borderRadius: '0.5rem', border: 'none', background: 'linear-gradient(135deg,#5341cd,#6c5ce7)', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', color: '#fff', fontWeight: 700, fontSize: '0.875rem', opacity: submitting ? 0.7 : 1 }}>{submitting ? 'Creating…' : 'Create Restaurant'}</Box></>)}
-            {step === 3 && <Box component="button" onClick={handleClose} sx={{ flex: 1, py: 1.5, borderRadius: '0.5rem', border: 'none', background: 'linear-gradient(135deg,#5341cd,#6c5ce7)', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: '#fff', fontWeight: 700, fontSize: '0.875rem' }}>Done</Box>}
+            {step === 1 && (<><Box component="button" onClick={handleClose} sx={{ flex: 1, py: 1.5, borderRadius: '0.5rem', border: `1.5px solid ${T.surfaceHigh}`, bgcolor: 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: T.textSub, fontWeight: 600, fontSize: '0.875rem' }}>Cancel</Box><Box component="button" onClick={nextStep} sx={{ flex: 2, py: 1.5, borderRadius: '0.5rem', border: 'none', background: 'linear-gradient(135deg,#f97316,#ea580c)', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: '#fff', fontWeight: 700, fontSize: '0.875rem' }}>Next →</Box></>)}
+            {step === 2 && (<><Box component="button" onClick={() => { setStep(1); setError(''); }} sx={{ flex: 1, py: 1.5, borderRadius: '0.5rem', border: `1.5px solid ${T.surfaceHigh}`, bgcolor: 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: T.textSub, fontWeight: 600, fontSize: '0.875rem' }}>← Back</Box><Box component="button" onClick={handleSubmit} disabled={submitting} sx={{ flex: 2, py: 1.5, borderRadius: '0.5rem', border: 'none', background: 'linear-gradient(135deg,#f97316,#ea580c)', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', color: '#fff', fontWeight: 700, fontSize: '0.875rem', opacity: submitting ? 0.7 : 1 }}>{submitting ? 'Creating…' : 'Create Restaurant'}</Box></>)}
+            {step === 3 && <Box component="button" onClick={handleClose} sx={{ flex: 1, py: 1.5, borderRadius: '0.5rem', border: 'none', background: 'linear-gradient(135deg,#f97316,#ea580c)', cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: '#fff', fontWeight: 700, fontSize: '0.875rem' }}>Done</Box>}
           </Box>
         </Box>
       </M>
@@ -243,10 +243,10 @@ function DashboardView({ stats, admins, otpStats, loading, onViewChange }) {
 
       {/* Stats */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2,1fr)', lg: 'repeat(4,1fr)' }, gap: 3, mb: 5 }}>
-        {loading ? <Box sx={{ gridColumn: '1/-1', display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress sx={{ color: '#5341cd' }} /></Box>
+        {loading ? <Box sx={{ gridColumn: '1/-1', display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress sx={{ color: '#f97316' }} /></Box>
           : STAT_CARDS.map(s => (
             <Box key={s.label} sx={{ bgcolor: T.surface, p: 3, borderRadius: '0.5rem', position: 'relative', overflow: 'hidden', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.02)' } }}>
-              <Box sx={{ position: 'absolute', top: 0, right: 0, p: 2, opacity: 0.1 }}><span className="material-symbols-outlined" style={{ fontSize: 60, color: '#5341cd' }}>{s.icon}</span></Box>
+              <Box sx={{ position: 'absolute', top: 0, right: 0, p: 2, opacity: 0.1 }}><span className="material-symbols-outlined" style={{ fontSize: 60, color: '#f97316' }}>{s.icon}</span></Box>
               <Typography sx={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub, fontWeight: 700, mb: 1 }}>{s.label}</Typography>
               <Typography sx={{ fontSize: '2.25rem', fontWeight: 900, color: T.text }}>{s.value}</Typography>
               <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', color: '#006c49', fontSize: '0.875rem', fontWeight: 700 }}><span className="material-symbols-outlined" style={{ fontSize: 14, marginRight: 4 }}>info</span>{s.sub}</Box>
@@ -262,13 +262,13 @@ function DashboardView({ stats, admins, otpStats, loading, onViewChange }) {
           <Box sx={{ height: 220, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 1 }}>
             {CHART_BARS.map(bar => (
               <Box key={bar.label} sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Box sx={{ width: '100%', bgcolor: bar.primary ? '#5341cd' : T.surfaceHigh, borderRadius: '0.5rem 0.5rem 0 0', height: bar.h, transition: 'background-color 0.3s', '&:hover': { bgcolor: '#6c5ce7' } }} />
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: bar.primary ? '#5341cd' : T.textSub, mt: 1.5 }}>{bar.label}</Typography>
+                <Box sx={{ width: '100%', bgcolor: bar.primary ? '#f97316' : T.surfaceHigh, borderRadius: '0.5rem 0.5rem 0 0', height: bar.h, transition: 'background-color 0.3s', '&:hover': { bgcolor: '#ea580c' } }} />
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: bar.primary ? '#f97316' : T.textSub, mt: 1.5 }}>{bar.label}</Typography>
               </Box>
             ))}
           </Box>
         </Box>
-        <Box sx={{ background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)', p: 4, borderRadius: '0.5rem', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
+        <Box sx={{ background: 'linear-gradient(to bottom right, #f97316, #ea580c)', p: 4, borderRadius: '0.5rem', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
           <Box sx={{ position: 'relative', zIndex: 10 }}>
             <Typography variant="h3" sx={{ fontSize: '1.5rem', fontWeight: 900, mb: 1 }}>Quick Actions</Typography>
             <Typography sx={{ color: 'rgba(250,246,255,0.8)', fontSize: '0.875rem', mb: 3 }}>Jump to any management section.</Typography>
@@ -290,11 +290,11 @@ function DashboardView({ stats, admins, otpStats, loading, onViewChange }) {
               return (
                 <Box key={String(row.restaurantId)} sx={{ bgcolor: T.surface, borderRadius: '0.5rem', p: 3, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                    <Box sx={{ width: 36, height: 36, borderRadius: 1, bgcolor: 'rgba(83,65,205,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#5341cd', fontSize: '0.875rem' }}>{(row.name || '?')[0].toUpperCase()}</Box>
+                    <Box sx={{ width: 36, height: 36, borderRadius: 1, bgcolor: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#f97316', fontSize: '0.875rem' }}>{(row.name || '?')[0].toUpperCase()}</Box>
                     <Box><Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.875rem' }}>{row.name}</Typography><Typography sx={{ fontSize: '0.7rem', color: T.textMuted }}>/{row.slug}</Typography></Box>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 2 }}>
-                    {[{ v: row.sent, label: 'Sent', c: '#5341cd' }, { v: row.verified, label: 'Verified', c: '#006c49' }, { v: `${rate}%`, label: 'Conv.', c: '#884800' }].map(x => (
+                    {[{ v: row.sent, label: 'Sent', c: '#f97316' }, { v: row.verified, label: 'Verified', c: '#006c49' }, { v: `${rate}%`, label: 'Conv.', c: '#884800' }].map(x => (
                       <Box key={x.label} sx={{ flex: 1, bgcolor: T.surfaceAlt, borderRadius: '0.5rem', p: 1.5, textAlign: 'center' }}>
                         <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: x.c }}>{x.v}</Typography>
                         <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{x.label}</Typography>
@@ -312,11 +312,11 @@ function DashboardView({ stats, admins, otpStats, loading, onViewChange }) {
       <Box component="section" sx={{ bgcolor: T.surface, borderRadius: '0.5rem', overflow: 'hidden' }}>
         <Box sx={{ p: 4, borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, color: T.text }}>Recently Joined Restaurants</Typography>
-          <Box component="button" onClick={() => onViewChange('restaurants')} sx={{ color: '#5341cd', fontWeight: 700, fontSize: '0.875rem', display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', '&:hover': { textDecoration: 'underline' } }}>
+          <Box component="button" onClick={() => onViewChange('restaurants')} sx={{ color: '#f97316', fontWeight: 700, fontSize: '0.875rem', display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', '&:hover': { textDecoration: 'underline' } }}>
             View All <span className="material-symbols-outlined" style={{ fontSize: 14, marginLeft: 4 }}>arrow_forward</span>
           </Box>
         </Box>
-        {loading ? <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#5341cd' }} /></Box>
+        {loading ? <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#f97316' }} /></Box>
           : admins.length === 0 ? <Box sx={{ p: 8, textAlign: 'center' }}><Typography sx={{ color: T.textSub }}>No restaurants registered yet.</Typography></Box>
           : (
             <TableContainer><Table sx={{ minWidth: 600 }}>
@@ -328,7 +328,7 @@ function DashboardView({ stats, admins, otpStats, loading, onViewChange }) {
                   <TableRow key={row._id} sx={{ '&:hover': { bgcolor: T.surfaceAlt } }}>
                     <TableCell sx={{ px: 4, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Box sx={{ width: 36, height: 36, borderRadius: 1, bgcolor: T.surfaceHigh, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#5341cd', fontSize: '0.875rem' }}>{(row.restaurantId?.name || '?')[0].toUpperCase()}</Box>
+                        <Box sx={{ width: 36, height: 36, borderRadius: 1, bgcolor: T.surfaceHigh, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#f97316', fontSize: '0.875rem' }}>{(row.restaurantId?.name || '?')[0].toUpperCase()}</Box>
                         <Box><Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.875rem' }}>{row.restaurantId?.name}</Typography><Typography sx={{ fontSize: '0.7rem', color: T.textMuted }}>/{row.restaurantId?.slug}</Typography></Box>
                       </Box>
                     </TableCell>
@@ -432,7 +432,7 @@ function RestaurantsView({ admins, setAdmins }) {
                     {/* Restaurant */}
                     <TableCell sx={{ px: 3, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Box sx={{ width: 38, height: 38, borderRadius: 1, bgcolor: 'rgba(83,65,205,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#5341cd', fontSize: '0.9rem', flexShrink: 0 }}>{(rest?.name || '?')[0].toUpperCase()}</Box>
+                        <Box sx={{ width: 38, height: 38, borderRadius: 1, bgcolor: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#f97316', fontSize: '0.9rem', flexShrink: 0 }}>{(rest?.name || '?')[0].toUpperCase()}</Box>
                         <Box><Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.875rem' }}>{rest?.name || '—'}</Typography><Typography sx={{ fontSize: '0.7rem', color: T.textMuted }}>/{rest?.slug}</Typography></Box>
                       </Box>
                     </TableCell>
@@ -445,7 +445,7 @@ function RestaurantsView({ admins, setAdmins }) {
                           <Box component="select" value={curSub} onChange={e => setSubEditing(p => ({ ...p, [row._id]: e.target.value }))} sx={{ bgcolor: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: '0.375rem', px: 1, py: 0.5, fontSize: '0.8rem', color: T.text, outline: 'none', fontFamily: 'Inter, sans-serif' }}>
                             {['trial', 'active', 'inactive'].map(s => <option key={s} value={s}>{s}</option>)}
                           </Box>
-                          <Box component="button" onClick={() => handleSubSave(row)} disabled={savingId === row._id} sx={{ p: 0.75, border: 'none', bgcolor: '#5341cd', color: '#fff', borderRadius: '0.375rem', cursor: 'pointer', display: 'flex' }}><span className="material-symbols-outlined" style={{ fontSize: 14 }}>check</span></Box>
+                          <Box component="button" onClick={() => handleSubSave(row)} disabled={savingId === row._id} sx={{ p: 0.75, border: 'none', bgcolor: '#f97316', color: '#fff', borderRadius: '0.375rem', cursor: 'pointer', display: 'flex' }}><span className="material-symbols-outlined" style={{ fontSize: 14 }}>check</span></Box>
                           <Box component="button" onClick={() => setSubEditing(p => { const n = { ...p }; delete n[row._id]; return n; })} sx={{ p: 0.75, border: 'none', bgcolor: T.surfaceHigh, color: T.textSub, borderRadius: '0.375rem', cursor: 'pointer', display: 'flex' }}><span className="material-symbols-outlined" style={{ fontSize: 14 }}>close</span></Box>
                         </Box>
                       ) : (
@@ -467,7 +467,7 @@ function RestaurantsView({ admins, setAdmins }) {
                     {/* Actions */}
                     <TableCell sx={{ px: 3, py: 2.5, borderBottom: `1px solid ${T.border}` }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Box component="button" title="Manage Features" onClick={() => setExpandedId(isExpanded ? null : row._id)} sx={{ p: 1, border: 'none', bgcolor: isExpanded ? 'rgba(83,65,205,0.1)' : 'transparent', color: isExpanded ? '#5341cd' : T.textMuted, borderRadius: '0.375rem', cursor: 'pointer', display: 'flex', '&:hover': { bgcolor: T.surfaceHigh } }}>
+                        <Box component="button" title="Manage Features" onClick={() => setExpandedId(isExpanded ? null : row._id)} sx={{ p: 1, border: 'none', bgcolor: isExpanded ? 'rgba(249,115,22,0.1)' : 'transparent', color: isExpanded ? '#f97316' : T.textMuted, borderRadius: '0.375rem', cursor: 'pointer', display: 'flex', '&:hover': { bgcolor: T.surfaceHigh } }}>
                           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>tune</span>
                         </Box>
                         <Box component="button" title="Delete" onClick={() => !deletingId && handleDelete(row._id)} sx={{ p: 1, border: 'none', bgcolor: 'transparent', color: T.textMuted, borderRadius: '0.375rem', cursor: 'pointer', display: 'flex', '&:hover': { color: '#ba1a1a', bgcolor: 'rgba(186,26,26,0.08)' } }}>
@@ -479,7 +479,7 @@ function RestaurantsView({ admins, setAdmins }) {
                   {/* Feature toggles row */}
                   {isExpanded && (
                     <TableRow>
-                      <TableCell colSpan={6} sx={{ px: 3, py: 2, bgcolor: 'rgba(83,65,205,0.04)', borderBottom: `1px solid ${T.border}` }}>
+                      <TableCell colSpan={6} sx={{ px: 3, py: 2, bgcolor: 'rgba(249,115,22,0.04)', borderBottom: `1px solid ${T.border}` }}>
                         <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.08em', mb: 1.5 }}>Feature Access</Typography>
                         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                           {SA_FEATURES.map(f => {
@@ -540,7 +540,7 @@ function SubscriptionsView({ admins, setAdmins }) {
 
       {/* Summary cards */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4,1fr)' }, gap: 3, mb: 5 }}>
-        {[{ label: 'All', key: 'all', icon: 'storefront', c: '#5341cd' }, { label: 'Active', key: 'active', icon: 'verified', c: '#006c49' }, { label: 'Trial', key: 'trial', icon: 'timer', c: '#884800' }, { label: 'Inactive', key: 'inactive', icon: 'block', c: '#ba1a1a' }].map(item => (
+        {[{ label: 'All', key: 'all', icon: 'storefront', c: '#f97316' }, { label: 'Active', key: 'active', icon: 'verified', c: '#006c49' }, { label: 'Trial', key: 'trial', icon: 'timer', c: '#884800' }, { label: 'Inactive', key: 'inactive', icon: 'block', c: '#ba1a1a' }].map(item => (
           <Box key={item.key} onClick={() => setFilter(item.key)} sx={{ bgcolor: T.surface, p: 3, borderRadius: '0.75rem', cursor: 'pointer', border: `2px solid ${filter === item.key ? item.c : 'transparent'}`, transition: 'all 0.2s', '&:hover': { borderColor: item.c } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
               <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: `${item.c}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined" style={{ fontSize: 18, color: item.c }}>{item.icon}</span></Box>
@@ -579,7 +579,7 @@ function SubscriptionsView({ admins, setAdmins }) {
                   ))}
                 </Box>
               </Box>
-              {isSaving && <Typography sx={{ fontSize: '0.75rem', color: '#5341cd', fontWeight: 600 }}>Saving…</Typography>}
+              {isSaving && <Typography sx={{ fontSize: '0.75rem', color: '#f97316', fontWeight: 600 }}>Saving…</Typography>}
             </Box>
           );
         })}
@@ -618,7 +618,7 @@ function AnalyticsView({ stats, otpStats }) {
       {stats && (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4,1fr)' }, gap: 3, mb: 5 }}>
           {[
-            { label: 'Total Restaurants', value: stats.totalAdmins, icon: 'storefront', c: '#5341cd' },
+            { label: 'Total Restaurants', value: stats.totalAdmins, icon: 'storefront', c: '#f97316' },
             { label: 'Total Orders',      value: stats.totalOrders, icon: 'receipt_long', c: '#006c49' },
             { label: 'Platform Revenue',  value: formatCurrency(stats.totalRevenue), icon: 'payments', c: '#884800' },
             { label: 'OTP Conversions',   value: `${otpStats.reduce((s,r)=>s+r.verified,0)} / ${otpStats.reduce((s,r)=>s+r.sent,0)}`, icon: 'phone_in_talk', c: '#2563eb' },
@@ -638,11 +638,11 @@ function AnalyticsView({ stats, otpStats }) {
           <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '1.125rem' }}>Revenue by Restaurant</Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
             {[{ v: 'revenue', label: 'By Revenue' }, { v: 'orders', label: 'By Orders' }].map(s => (
-              <Box key={s.v} component="button" onClick={() => setSortBy(s.v)} sx={{ px: 2, py: 0.75, border: 'none', borderRadius: '9999px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.8rem', fontWeight: 700, bgcolor: sortBy === s.v ? '#5341cd' : T.surfaceAlt, color: sortBy === s.v ? '#fff' : T.textSub, transition: 'all 0.2s' }}>{s.label}</Box>
+              <Box key={s.v} component="button" onClick={() => setSortBy(s.v)} sx={{ px: 2, py: 0.75, border: 'none', borderRadius: '9999px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.8rem', fontWeight: 700, bgcolor: sortBy === s.v ? '#f97316' : T.surfaceAlt, color: sortBy === s.v ? '#fff' : T.textSub, transition: 'all 0.2s' }}>{s.label}</Box>
             ))}
           </Box>
         </Box>
-        {loading ? <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#5341cd' }} /></Box>
+        {loading ? <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#f97316' }} /></Box>
           : sorted.length === 0 ? <Box sx={{ py: 8, textAlign: 'center', color: T.textSub }}>No order data yet.</Box>
           : (
             <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -652,7 +652,7 @@ function AnalyticsView({ stats, otpStats }) {
                   <Box key={String(row.restaurantId)}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: i < 3 ? '#5341cd' : T.surfaceHigh, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 900, color: i < 3 ? '#fff' : T.textMuted }}>{i + 1}</Box>
+                        <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: i < 3 ? '#f97316' : T.surfaceHigh, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 900, color: i < 3 ? '#fff' : T.textMuted }}>{i + 1}</Box>
                         <Box><Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.875rem' }}>{row.name}</Typography><Typography sx={{ fontSize: '0.7rem', color: T.textMuted }}>/{row.slug}</Typography></Box>
                       </Box>
                       <Box sx={{ textAlign: 'right' }}>
@@ -661,7 +661,7 @@ function AnalyticsView({ stats, otpStats }) {
                       </Box>
                     </Box>
                     <Box sx={{ height: 6, bgcolor: T.surfaceHigh, borderRadius: 3, overflow: 'hidden' }}>
-                      <Box sx={{ height: '100%', width: `${pct}%`, bgcolor: i < 3 ? '#5341cd' : T.textMuted, borderRadius: 3, transition: 'width 0.5s ease' }} />
+                      <Box sx={{ height: '100%', width: `${pct}%`, bgcolor: i < 3 ? '#f97316' : T.textMuted, borderRadius: 3, transition: 'width 0.5s ease' }} />
                     </Box>
                   </Box>
                 );
@@ -771,7 +771,7 @@ function UsersView({ admins, setAdmins }) {
           return (
             <Box key={row._id} sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 3, boxShadow: T.shadow, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                <Box sx={{ width: 44, height: 44, borderRadius: '50%', bgcolor: 'rgba(83,65,205,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#5341cd', fontSize: '1.1rem', flexShrink: 0 }}>{row.email[0].toUpperCase()}</Box>
+                <Box sx={{ width: 44, height: 44, borderRadius: '50%', bgcolor: 'rgba(249,115,22,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#f97316', fontSize: '1.1rem', flexShrink: 0 }}>{row.email[0].toUpperCase()}</Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.email}</Typography>
                   <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>Restaurant: {row.restaurantId?.name || '—'}</Typography>
@@ -785,7 +785,7 @@ function UsersView({ admins, setAdmins }) {
                 <Box component="button" onClick={() => handleToggleActive(row)} disabled={togglingId === row._id} sx={{ flex: 1, py: 1, border: `1px solid ${T.border}`, bgcolor: 'transparent', color: T.textSub, borderRadius: '0.5rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', fontWeight: 700, transition: 'all 0.2s', '&:hover': { borderColor: isActive ? '#ba1a1a' : '#006c49', color: isActive ? '#ba1a1a' : '#006c49' } }}>
                   {togglingId === row._id ? '…' : (isActive ? 'Disable' : 'Enable')}
                 </Box>
-                <Box component="button" onClick={() => { setResetTarget({ _id: row._id, email: row.email }); setNewPw(''); setResetMsg(''); }} sx={{ flex: 1, py: 1, border: `1px solid ${T.border}`, bgcolor: 'transparent', color: T.textSub, borderRadius: '0.5rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', fontWeight: 700, transition: 'all 0.2s', '&:hover': { borderColor: '#5341cd', color: '#5341cd' } }}>
+                <Box component="button" onClick={() => { setResetTarget({ _id: row._id, email: row.email }); setNewPw(''); setResetMsg(''); }} sx={{ flex: 1, py: 1, border: `1px solid ${T.border}`, bgcolor: 'transparent', color: T.textSub, borderRadius: '0.5rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', fontWeight: 700, transition: 'all 0.2s', '&:hover': { borderColor: '#f97316', color: '#f97316' } }}>
                   Reset Pwd
                 </Box>
                 <Box component="button" onClick={() => handleDelete(row._id)} disabled={deletingId === row._id} sx={{ py: 1, px: 1.5, border: `1px solid ${T.border}`, bgcolor: 'transparent', color: T.textMuted, borderRadius: '0.5rem', cursor: 'pointer', display: 'flex', '&:hover': { borderColor: '#ba1a1a', color: '#ba1a1a' } }}>
@@ -805,11 +805,11 @@ function UsersView({ admins, setAdmins }) {
           <Box sx={{ position: 'relative', zIndex: 1, bgcolor: T.surface, borderRadius: '1rem', p: 4, width: '100%', maxWidth: 400, boxShadow: '0 24px 56px rgba(0,0,0,0.2)' }}>
             <Typography sx={{ fontWeight: 900, fontSize: '1.1rem', color: T.text, mb: 0.5 }}>Reset Password</Typography>
             <Typography sx={{ fontSize: '0.8rem', color: T.textMuted, mb: 3 }}>{resetTarget.email}</Typography>
-            <Box component="input" type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="New password (min. 6 chars)" sx={{ width: '100%', px: 2, py: 1.5, bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text, outline: 'none', boxSizing: 'border-box', mb: 2, '&:focus': { borderColor: '#5341cd' } }} />
+            <Box component="input" type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="New password (min. 6 chars)" sx={{ width: '100%', px: 2, py: 1.5, bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text, outline: 'none', boxSizing: 'border-box', mb: 2, '&:focus': { borderColor: '#f97316' } }} />
             {resetMsg && <Typography sx={{ fontSize: '0.8rem', color: resetMsg.includes('success') ? '#006c49' : '#ba1a1a', mb: 2, fontWeight: 600 }}>{resetMsg}</Typography>}
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               <Box component="button" onClick={() => setResetTarget(null)} sx={{ flex: 1, py: 1.5, border: `1.5px solid ${T.surfaceHigh}`, bgcolor: 'transparent', color: T.textSub, borderRadius: '0.5rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.875rem' }}>Cancel</Box>
-              <Box component="button" onClick={handleResetPassword} disabled={resetting || newPw.length < 6} sx={{ flex: 2, py: 1.5, border: 'none', background: 'linear-gradient(135deg,#5341cd,#6c5ce7)', color: '#fff', borderRadius: '0.5rem', cursor: resetting || newPw.length < 6 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', opacity: resetting || newPw.length < 6 ? 0.6 : 1 }}>{resetting ? 'Resetting…' : 'Reset Password'}</Box>
+              <Box component="button" onClick={handleResetPassword} disabled={resetting || newPw.length < 6} sx={{ flex: 2, py: 1.5, border: 'none', background: 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff', borderRadius: '0.5rem', cursor: resetting || newPw.length < 6 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', opacity: resetting || newPw.length < 6 ? 0.6 : 1 }}>{resetting ? 'Resetting…' : 'Reset Password'}</Box>
             </Box>
           </Box>
         </Box>
@@ -838,8 +838,8 @@ function TicketsView() {
       </Box>
 
       <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 5, textAlign: 'center', mb: 4, boxShadow: T.shadow }}>
-        <Box sx={{ width: 72, height: 72, borderRadius: '50%', bgcolor: 'rgba(83,65,205,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 36, color: '#5341cd' }}>support_agent</span>
+        <Box sx={{ width: 72, height: 72, borderRadius: '50%', bgcolor: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 36, color: '#f97316' }}>support_agent</span>
         </Box>
         <Typography sx={{ fontWeight: 800, fontSize: '1.125rem', color: T.text, mb: 0.5 }}>Ticketing System — Coming Soon</Typography>
         <Typography sx={{ color: T.textSub, fontSize: '0.875rem' }}>A full support ticket system with status tracking and email notifications is planned.</Typography>
@@ -920,7 +920,7 @@ export default function SuperAdminDashboard() {
   const sidebarContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ mb: 4, px: 2, pt: { xs: 2, md: 0 } }}>
-        <Typography sx={{ fontWeight: 900, color: '#4338ca', fontSize: '1.125rem', textTransform: 'uppercase', letterSpacing: '-0.025em' }}>SaaS Admin</Typography>
+        <Typography sx={{ fontWeight: 900, color: '#c2410c', fontSize: '1.125rem', textTransform: 'uppercase', letterSpacing: '-0.025em' }}>SaaS Admin</Typography>
         <Typography sx={{ color: T.textMuted, fontSize: '0.75rem', fontWeight: 500 }}>Management Portal</Typography>
       </Box>
       <Box component="nav" sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -937,7 +937,7 @@ export default function SuperAdminDashboard() {
         })}
       </Box>
       <Box sx={{ mt: 'auto', px: 2, py: 3, borderTop: `1px solid ${T.border}` }}>
-        <Box component="button" onClick={() => setOnboardOpen(true)} sx={{ width: '100%', background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)', color: '#fff', py: 1.5, borderRadius: '9999px', fontWeight: 700, fontSize: '0.875rem', boxShadow: '0 10px 15px -3px rgba(199,210,254,0.6)', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', mb: 2, '&:active': { transform: 'scale(0.95)' } }}>+ New Restaurant</Box>
+        <Box component="button" onClick={() => setOnboardOpen(true)} sx={{ width: '100%', background: 'linear-gradient(to bottom right, #f97316, #ea580c)', color: '#fff', py: 1.5, borderRadius: '9999px', fontWeight: 700, fontSize: '0.875rem', boxShadow: '0 10px 15px -3px rgba(199,210,254,0.6)', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', mb: 2, '&:active': { transform: 'scale(0.95)' } }}>+ New Restaurant</Box>
         <Box component="button" onClick={handleLogout} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: T.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', '&:hover': { color: '#ba1a1a' }, p: 0 }}>
           <span className="material-symbols-outlined">logout</span>
           <Typography sx={{ fontSize: '0.875rem', fontWeight: 500 }}>Logout</Typography>
@@ -956,15 +956,15 @@ export default function SuperAdminDashboard() {
           <Box component="button" onClick={() => setMobileSidebarOpen(v => !v)} sx={{ display: { md: 'none' }, p: 1, border: 'none', bgcolor: 'transparent', cursor: 'pointer', color: T.textSub }}>
             <span className="material-symbols-outlined">menu</span>
           </Box>
-          <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
-            The Curated Canvas
+          <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #f97316, #ea580c)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
+            MenuFlow
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box component="button" onClick={fetchAll} sx={{ p: 1, borderRadius: '50%', color: T.textSub, border: 'none', cursor: 'pointer', bgcolor: 'transparent', display: 'flex', '&:hover': { bgcolor: T.surfaceHigh } }}>
             <span className="material-symbols-outlined">refresh</span>
           </Box>
-          <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: '#6c5ce7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.875rem' }}>SA</Box>
+          <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: '#ea580c', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.875rem' }}>SA</Box>
         </Box>
       </Box>
 

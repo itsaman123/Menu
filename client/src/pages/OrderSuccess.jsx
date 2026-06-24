@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+﻿import React, { useEffect, useState, useRef } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -148,7 +148,7 @@ export default function OrderSuccess() {
     pending:    { label: 'Pending',    bg: '#ffdcc3', color: '#2f1500' },
     confirmed:  { label: 'Confirmed',  bg: '#6cf8bb', color: '#00714d' },
     preparing:  { label: 'Preparing',  bg: '#6cf8bb', color: '#00714d' },
-    completed:  { label: 'Completed',  bg: '#e4dfff', color: '#5341cd' },
+    completed:  { label: 'Completed',  bg: '#ffedd5', color: '#f97316' },
     cancelled:  { label: 'Cancelled',  bg: '#ffd6d6', color: '#ba1a1a' },
   };
   const st = STATUS_MAP[order?.status] || STATUS_MAP.pending;
@@ -166,7 +166,7 @@ export default function OrderSuccess() {
         '@media print': { display: 'none' },
       }}>
         {loading ? (
-          <CircularProgress sx={{ color: '#5341cd' }} />
+          <CircularProgress sx={{ color: '#f97316' }} />
         ) : error ? (
           <Box sx={{ textAlign: 'center' }}>
             <Typography sx={{ color: '#ba1a1a', fontWeight: 700, mb: 2 }}>{error}</Typography>
@@ -220,7 +220,7 @@ export default function OrderSuccess() {
                         {st.label}
                       </Box>
                     ) : (
-                      <Typography sx={{ fontWeight: 700, color: row.highlight ? '#5341cd' : T.text, fontSize: '0.875rem' }}>
+                      <Typography sx={{ fontWeight: 700, color: row.highlight ? '#f97316' : T.text, fontSize: '0.875rem' }}>
                         {row.value}
                       </Typography>
                     )}
@@ -268,7 +268,7 @@ export default function OrderSuccess() {
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1, borderTop: `1px solid ${T.surfaceHigh}` }}>
                       <Typography sx={{ fontSize: '0.9375rem', fontWeight: 900, color: T.text }}>Total</Typography>
-                      <Typography sx={{ fontSize: '0.9375rem', fontWeight: 900, color: '#5341cd' }}>
+                      <Typography sx={{ fontSize: '0.9375rem', fontWeight: 900, color: '#f97316' }}>
                         ₹{order.totalAmount.toFixed(2)}
                       </Typography>
                     </Box>
@@ -302,9 +302,9 @@ export default function OrderSuccess() {
                   onClick={handlePrint}
                   sx={{
                     width: '100%', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5,
-                    background: 'linear-gradient(135deg, #5341CD, #6C5CE7)',
+                    background: 'linear-gradient(135deg, #f97316, #ea580c)',
                     color: '#fff', fontWeight: 700, borderRadius: '1rem',
-                    boxShadow: '0 10px 20px rgba(83,65,205,0.2)', cursor: 'pointer',
+                    boxShadow: '0 10px 20px rgba(249,115,22,0.2)', cursor: 'pointer',
                     border: 'none', fontFamily: 'Inter, sans-serif', fontSize: '1rem',
                     '&:hover': { transform: 'scale(1.02)' }, '&:active': { transform: 'scale(0.95)' },
                     transition: 'transform 0.15s',

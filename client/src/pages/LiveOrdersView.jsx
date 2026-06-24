@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
@@ -33,7 +33,7 @@ const STATUS_FLOW = {
   pending:   { next: 'confirmed',  nextLabel: 'Confirm',    color: '#884800', bg: '#ffdcc3' },
   confirmed: { next: 'preparing',  nextLabel: 'Start Prep', color: '#2563eb', bg: '#dbeafe' },
   preparing: { next: 'completed',  nextLabel: 'Mark Ready', color: '#006c49', bg: '#6cf8bb' },
-  completed: { next: null,         nextLabel: 'Done',       color: '#5341cd', bg: '#e4dfff' },
+  completed: { next: null,         nextLabel: 'Done',       color: '#f97316', bg: '#ffedd5' },
   cancelled: { next: null,         nextLabel: 'Cancelled',  color: '#ba1a1a', bg: '#ffd6d6' },
 };
 
@@ -165,9 +165,9 @@ export default function LiveOrdersView() {
           <Typography sx={{ fontSize: '10px', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 1.5 }}>Pending</Typography>
           <Typography sx={{ fontSize: '2.5rem', fontWeight: 900, color: T.text }}>{pending.length}</Typography>
         </Box>
-        <Box sx={{ bgcolor: '#6c5ce7', p: 3, borderRadius: '0.75rem' }}>
+        <Box sx={{ bgcolor: '#ea580c', p: 3, borderRadius: '0.75rem' }}>
           <Typography sx={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 1.5, color: 'rgba(250,246,255,0.8)' }}>Preparing</Typography>
-          <Typography sx={{ fontSize: '2.5rem', fontWeight: 900, color: '#faf6ff' }}>{preparing.length}</Typography>
+          <Typography sx={{ fontSize: '2.5rem', fontWeight: 900, color: '#fff7ed' }}>{preparing.length}</Typography>
         </Box>
         <Box sx={{ bgcolor: T.surface, p: 3, borderRadius: '0.75rem', boxShadow: T.shadow }}>
           <Typography sx={{ fontSize: '10px', fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 1.5 }}>Completed Today</Typography>
@@ -194,7 +194,7 @@ export default function LiveOrdersView() {
               px: { xs: 2, sm: 3 }, py: 1, borderRadius: '9999px', border: 'none', cursor: 'pointer',
               fontFamily: 'Inter, sans-serif', fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: 700,
               transition: 'all 0.2s',
-              bgcolor: filter === f.key ? '#5341cd' : 'transparent',
+              bgcolor: filter === f.key ? '#f97316' : 'transparent',
               color:   filter === f.key ? '#fff'    : T.textSub,
             }}
           >
@@ -206,7 +206,7 @@ export default function LiveOrdersView() {
       {/* Orders grid */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
-          <CircularProgress sx={{ color: '#5341cd' }} />
+          <CircularProgress sx={{ color: '#f97316' }} />
         </Box>
       ) : displayed.length === 0 ? (
         <Box sx={{ bgcolor: T.surface, p: { xs: 6, md: 10 }, borderRadius: '0.75rem', textAlign: 'center', boxShadow: T.shadow }}>
@@ -296,13 +296,13 @@ export default function LiveOrdersView() {
                       onClick={() => updateStatus(order._id, sf.next)}
                       disabled={isUpdating}
                       sx={{
-                        bgcolor: isUpdating ? T.surfaceHigh : '#5341cd', color: isUpdating ? T.textMuted : '#fff',
+                        bgcolor: isUpdating ? T.surfaceHigh : '#f97316', color: isUpdating ? T.textMuted : '#fff',
                         py: 1.5, px: 2, borderRadius: '9999px',
                         fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em',
                         border: 'none', cursor: isUpdating ? 'not-allowed' : 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5,
-                        boxShadow: isUpdating ? 'none' : '0 4px 6px rgba(83,65,205,0.2)',
-                        '&:hover': { bgcolor: isUpdating ? T.surfaceHigh : '#4029ba' }, transition: 'all 0.15s',
+                        boxShadow: isUpdating ? 'none' : '0 4px 6px rgba(249,115,22,0.2)',
+                        '&:hover': { bgcolor: isUpdating ? T.surfaceHigh : '#c2410c' }, transition: 'all 0.15s',
                       }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 14 }}>

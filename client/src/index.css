@@ -1,5 +1,5 @@
-/* ============================================
-   The Curated Canvas — Design System
+﻿/* ============================================
+   MenuFlow
    Light-First Editorial Design
    "Physical layers for digital experiences."
    ============================================ */
@@ -8,12 +8,12 @@
 
 :root {
   /* ─── Primary Palette ─── */
-  --cc-primary: #5341cd;
-  --cc-primary-container: #6c5ce7;
-  --cc-primary-fixed: #e4dfff;
+  --cc-primary: #f97316;
+  --cc-primary-container: #ea580c;
+  --cc-primary-fixed: #ffedd5;
   --cc-primary-fixed-dim: #c6bfff;
   --cc-on-primary: #ffffff;
-  --cc-on-primary-container: #faf6ff;
+  --cc-on-primary-container: #fff7ed;
   --cc-on-primary-fixed: #160066;
 
   /* ─── Secondary (Green) ─── */
@@ -28,23 +28,23 @@
   --cc-on-tertiary: #ffffff;
 
   /* ─── Surface Hierarchy (Tonal Layering) ─── */
-  --cc-background: #f8f9ff;
-  --cc-surface: #f8f9ff;
-  --cc-surface-bright: #f8f9ff;
-  --cc-surface-container: #e6eeff;
-  --cc-surface-container-high: #dee9fc;
-  --cc-surface-container-highest: #d9e3f6;
-  --cc-surface-container-low: #eff4ff;
+  --cc-background: #fffaf6;
+  --cc-surface: #fffaf6;
+  --cc-surface-bright: #fffaf6;
+  --cc-surface-container: #ffedd5;
+  --cc-surface-container-high: #fed7aa;
+  --cc-surface-container-highest: #fdba74;
+  --cc-surface-container-low: #fff7ed;
   --cc-surface-container-lowest: #ffffff;
   --cc-surface-dim: #d0dbed;
 
   /* ─── On-Surface ─── */
-  --cc-on-background: #121c2a;
-  --cc-on-surface: #121c2a;
-  --cc-on-surface-variant: #474554;
+  --cc-on-background: #1a1c1d;
+  --cc-on-surface: #1a1c1d;
+  --cc-on-surface-variant: #5c4a3a;
 
   /* ─── Outline ─── */
-  --cc-outline: #787586;
+  --cc-outline: #8c7a6a;
   --cc-outline-variant: #c8c4d7;
   --cc-ghost-border: rgba(200, 196, 215, 0.15);
 
@@ -85,9 +85,9 @@
 /* ─── Dark Mode Overrides ─── */
 [data-theme="dark"] {
   --cc-primary: #c6bfff;
-  --cc-primary-container: #4029ba;
+  --cc-primary-container: #c2410c;
   --cc-on-primary: #2a0091;
-  --cc-on-primary-container: #e4dfff;
+  --cc-on-primary-container: #ffedd5;
 
   --cc-secondary: #4edea3;
   --cc-secondary-container: #005236;
@@ -112,7 +112,7 @@
   --cc-on-surface-variant: #c8c4d7;
 
   --cc-outline: #928f9f;
-  --cc-outline-variant: #474554;
+  --cc-outline-variant: #5c4a3a;
   --cc-ghost-border: rgba(200, 196, 215, 0.08);
 
   --cc-error: #ffb4ab;
@@ -171,10 +171,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ─── Signature Gradient for primary CTAs ─── */
 .gradient-primary {
-  background: linear-gradient(135deg, #5341cd 0%, #6c5ce7 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
 }
 [data-theme="dark"] .gradient-primary {
-  background: linear-gradient(135deg, #6c5ce7 0%, #8b80f0 100%);
+  background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
 }
 
 /* ─── Scrollbar styling ─── */

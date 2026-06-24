@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -192,7 +192,7 @@ export default function Checkout() {
                     flex: 1, height: 56, px: 3, borderRadius: '1rem',
                     bgcolor: T.surfaceAlt, border: 'none', color: T.text, outline: 'none',
                     fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem',
-                    '&:focus': { boxShadow: '0 0 0 2px rgba(83,65,205,0.2)' },
+                    '&:focus': { boxShadow: '0 0 0 2px rgba(249,115,22,0.2)' },
                     '&::placeholder': { color: T.textMuted },
                   }}
                 />
@@ -223,7 +223,7 @@ export default function Checkout() {
                       border: `1px solid ${T.border}`, borderRadius: '0.5rem',
                       fontSize: '1.5rem', fontWeight: 700, color: T.text, outline: 'none',
                       fontFamily: 'Inter, sans-serif',
-                      '&:focus': { borderColor: T.accent, boxShadow: '0 0 0 2px rgba(83,65,205,0.2)' },
+                      '&:focus': { borderColor: T.accent, boxShadow: '0 0 0 2px rgba(249,115,22,0.2)' },
                     }}
                   />
                 ))}
@@ -240,9 +240,9 @@ export default function Checkout() {
             onClick={otpSent ? verifyOtp : sendOtp}
             sx={{
               width: '100%', height: 56,
-              background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)',
+              background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
               color: '#fff', fontWeight: 700, borderRadius: '1rem',
-              boxShadow: '0 10px 20px rgba(83,65,205,0.2)', cursor: 'pointer',
+              boxShadow: '0 10px 20px rgba(249,115,22,0.2)', cursor: 'pointer',
               border: 'none', fontFamily: 'Inter, sans-serif', fontSize: '1rem',
               transition: 'all 0.3s', '&:hover': { transform: 'scale(1.02)' },
               '&:active': { transform: 'scale(0.95)' },

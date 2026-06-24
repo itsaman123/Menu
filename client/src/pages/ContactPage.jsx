@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import MenuFlowNav from './menuflow/MenuFlowNav';
 import MenuFlowFooter from './menuflow/MenuFlowFooter';
 import { MF } from './menuflow/mfTheme';
@@ -23,7 +22,6 @@ const OFFICES = [
 ];
 
 export default function ContactPage() {
-  const navigate   = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [focused,   setFocused]   = useState('');
   const [hovered,   setHovered]   = useState(null);

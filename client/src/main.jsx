@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -60,11 +60,11 @@ const lightMuiTheme = createTheme({
   ...baseTheme,
   palette: {
     mode: 'light',
-    primary: { main: '#5341cd', light: '#6c5ce7', dark: '#4029ba', contrastText: '#fff' },
+    primary: { main: '#f97316', light: '#ea580c', dark: '#c2410c', contrastText: '#fff' },
     secondary: { main: '#006c49' },
     error: { main: '#ba1a1a' },
-    background: { default: '#f8f9ff', paper: '#ffffff' },
-    text: { primary: '#121c2a', secondary: '#474554' },
+    background: { default: '#fffaf6', paper: '#ffffff' },
+    text: { primary: '#1a1c1d', secondary: '#5c4a3a' },
     divider: 'rgba(200,196,215,0.15)',
   },
 });
@@ -73,7 +73,7 @@ const darkMuiTheme = createTheme({
   ...baseTheme,
   palette: {
     mode: 'dark',
-    primary: { main: '#c6bfff', light: '#e4dfff', dark: '#4029ba', contrastText: '#160066' },
+    primary: { main: '#c6bfff', light: '#ffedd5', dark: '#c2410c', contrastText: '#160066' },
     secondary: { main: '#4edea3' },
     error: { main: '#ffb4ab' },
     background: { default: '#0f1117', paper: '#141720' },

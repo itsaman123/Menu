@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +29,7 @@ export default function SuperAdminLogin() {
       fontFamily: 'Inter, sans-serif',
     }}>
       {/* Background */}
-      <Box sx={{ position: 'absolute', top: '-20%', right: '-10%', width: 600, height: 600, bgcolor: 'rgba(83,65,205,0.05)', borderRadius: '50%', filter: 'blur(100px)', pointerEvents: 'none' }} />
+      <Box sx={{ position: 'absolute', top: '-20%', right: '-10%', width: 600, height: 600, bgcolor: 'rgba(249,115,22,0.05)', borderRadius: '50%', filter: 'blur(100px)', pointerEvents: 'none' }} />
 
       <Box sx={{
         width: '100%', maxWidth: 440, bgcolor: T.surface, borderRadius: '1.5rem',
@@ -39,9 +39,9 @@ export default function SuperAdminLogin() {
         <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Box sx={{
             width: 56, height: 56, borderRadius: '50%', mx: 'auto', mb: 3,
-            background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)',
+            background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 8px 28px rgba(83,65,205,0.3)',
+            boxShadow: '0 8px 28px rgba(249,115,22,0.3)',
           }}>
             <span className="material-symbols-outlined" style={{ color: '#fff', fontSize: 28 }}>shield_person</span>
           </Box>
@@ -68,7 +68,7 @@ export default function SuperAdminLogin() {
                   bgcolor: T.surfaceAlt, border: 'none', borderRadius: '1rem',
                   color: T.text, outline: 'none', fontSize: '0.875rem',
                   fontFamily: 'Inter, sans-serif', fontWeight: 500,
-                  '&:focus': { boxShadow: '0 0 0 2px rgba(83,65,205,0.2)', bgcolor: T.surface },
+                  '&:focus': { boxShadow: '0 0 0 2px rgba(249,115,22,0.2)', bgcolor: T.surface },
                   '&::placeholder': { color: T.textMuted },
                 }}
               />
@@ -87,7 +87,7 @@ export default function SuperAdminLogin() {
                   bgcolor: T.surfaceAlt, border: 'none', borderRadius: '1rem',
                   color: T.text, outline: 'none', fontSize: '0.875rem',
                   fontFamily: 'Inter, sans-serif', fontWeight: 500,
-                  '&:focus': { boxShadow: '0 0 0 2px rgba(83,65,205,0.2)', bgcolor: T.surface },
+                  '&:focus': { boxShadow: '0 0 0 2px rgba(249,115,22,0.2)', bgcolor: T.surface },
                   '&::placeholder': { color: T.textMuted },
                 }}
               />
@@ -96,9 +96,9 @@ export default function SuperAdminLogin() {
 
           <Box component="button" type="submit" sx={{
             width: '100%', height: 56,
-            background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)',
-            color: '#faf6ff', fontWeight: 700, borderRadius: '1rem',
-            boxShadow: '0 10px 20px rgba(83,65,205,0.2)', cursor: 'pointer',
+            background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
+            color: '#fff7ed', fontWeight: 700, borderRadius: '1rem',
+            boxShadow: '0 10px 20px rgba(249,115,22,0.2)', cursor: 'pointer',
             border: 'none', fontFamily: 'Inter, sans-serif', fontSize: '1rem',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
             '&:hover': { transform: 'scale(1.02)' }, '&:active': { transform: 'scale(0.95)' },

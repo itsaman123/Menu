@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import api from '../api';
@@ -6,7 +6,7 @@ import api from '../api';
 const ROLES = ['manager', 'waiter', 'chef', 'cashier', 'delivery', 'other'];
 
 const ROLE_META = {
-  manager:  { bg: '#e4dfff', color: '#5341cd' },
+  manager:  { bg: '#ffedd5', color: '#f97316' },
   waiter:   { bg: '#d1fae5', color: '#065f46' },
   chef:     { bg: '#fef3c7', color: '#92400e' },
   cashier:  { bg: '#dbeafe', color: '#1e40af' },
@@ -18,7 +18,7 @@ const STATUS_OPTS = [
   { value: 'present',  label: 'Present',  bg: '#6cf8bb', color: '#00714d' },
   { value: 'absent',   label: 'Absent',   bg: '#ffd6d6', color: '#ba1a1a' },
   { value: 'half-day', label: 'Half Day', bg: '#ffdcc3', color: '#884800' },
-  { value: 'leave',    label: 'Leave',    bg: '#e4dfff', color: '#5341cd' },
+  { value: 'leave',    label: 'Leave',    bg: '#ffedd5', color: '#f97316' },
 ];
 
 const todayStr  = () => new Date().toISOString().split('T')[0];
@@ -45,7 +45,7 @@ function Field({ label, value, onChange, type = 'text', placeholder = '' }) {
           border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem',
           fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text,
           outline: 'none', boxSizing: 'border-box',
-          '&:focus': { borderColor: '#5341cd' },
+          '&:focus': { borderColor: '#f97316' },
         }}
       />
     </Box>
@@ -59,13 +59,13 @@ function StatCard({ label, value, gradient = false, valueColor }) {
     <Box sx={{
       p: 3, borderRadius: '0.75rem', boxShadow: T.shadow,
       ...(gradient
-        ? { background: 'linear-gradient(135deg,#5341CD,#6C5CE7)' }
+        ? { background: 'linear-gradient(135deg,#f97316,#ea580c)' }
         : { bgcolor: T.surface }),
     }}>
       <Typography sx={{
         fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase',
         letterSpacing: '0.1em', mb: 1,
-        color: gradient ? 'rgba(228,223,255,0.8)' : T.textSub,
+        color: gradient ? 'rgba(255,237,213,0.8)' : T.textSub,
       }}>
         {label}
       </Typography>
@@ -241,7 +241,7 @@ export default function EmployeeManagementView() {
   const inputSx = {
     px: 2, py: 1.5, bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`,
     borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif',
-    color: T.text, outline: 'none', '&:focus': { borderColor: '#5341cd' },
+    color: T.text, outline: 'none', '&:focus': { borderColor: '#f97316' },
   };
 
   /* ─────────────────── RENDER ─────────────────── */
@@ -264,10 +264,10 @@ export default function EmployeeManagementView() {
             onClick={openAdd}
             sx={{
               display: 'flex', alignItems: 'center', gap: 1, px: 3, py: 1.5,
-              bgcolor: '#5341cd', color: '#fff', borderRadius: '9999px', border: 'none',
+              bgcolor: '#f97316', color: '#fff', borderRadius: '9999px', border: 'none',
               cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', fontWeight: 700,
               whiteSpace: 'nowrap', alignSelf: { xs: 'flex-start', sm: 'auto' },
-              '&:hover': { bgcolor: '#4029ba' }, transition: 'background-color 0.2s',
+              '&:hover': { bgcolor: '#c2410c' }, transition: 'background-color 0.2s',
             }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>
@@ -288,7 +288,7 @@ export default function EmployeeManagementView() {
               cursor: 'pointer', fontFamily: 'Inter, sans-serif',
               fontSize: { xs: '0.8rem', sm: '0.875rem' }, fontWeight: 700,
               transition: 'all 0.2s',
-              bgcolor: tab === t ? '#5341cd' : 'transparent',
+              bgcolor: tab === t ? '#f97316' : 'transparent',
               color:   tab === t ? '#fff'    : T.textSub,
             }}
           >
@@ -309,7 +309,7 @@ export default function EmployeeManagementView() {
 
           {loadingEmps ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
-              <CircularProgress size={32} sx={{ color: '#5341cd' }} />
+              <CircularProgress size={32} sx={{ color: '#f97316' }} />
             </Box>
           ) : employees.length === 0 ? (
             <Box sx={{ bgcolor: T.surface, p: { xs: 6, md: 10 }, borderRadius: '0.75rem', textAlign: 'center', boxShadow: T.shadow }}>
@@ -337,7 +337,7 @@ export default function EmployeeManagementView() {
                         <Box sx={{
                           width: 48, height: 48, borderRadius: '50%', bgcolor: T.surfaceAlt, flexShrink: 0,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontWeight: 900, color: '#5341cd', fontSize: '1.125rem',
+                          fontWeight: 900, color: '#f97316', fontSize: '1.125rem',
                         }}>
                           {emp.name[0].toUpperCase()}
                         </Box>
@@ -359,7 +359,7 @@ export default function EmployeeManagementView() {
                         <Box component="button" onClick={() => openEdit(emp)} sx={{
                           p: 1, bgcolor: T.surfaceAlt, border: 'none', cursor: 'pointer',
                           borderRadius: '0.5rem', color: T.textSub, display: 'flex',
-                          '&:hover': { bgcolor: T.surfaceHigh, color: '#5341cd' }, transition: 'all 0.15s',
+                          '&:hover': { bgcolor: T.surfaceHigh, color: '#f97316' }, transition: 'all 0.15s',
                         }}>
                           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
                         </Box>
@@ -453,7 +453,7 @@ export default function EmployeeManagementView() {
                 </Box>
                 <Box component="button" onClick={saveAttendance} disabled={savingAtt} sx={{
                   display: 'flex', alignItems: 'center', gap: 1,
-                  px: 3, py: 1.5, bgcolor: savingAtt ? T.surfaceHigh : '#5341cd',
+                  px: 3, py: 1.5, bgcolor: savingAtt ? T.surfaceHigh : '#f97316',
                   color: savingAtt ? T.textMuted : '#fff', borderRadius: '9999px',
                   border: 'none', cursor: savingAtt ? 'not-allowed' : 'pointer',
                   fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', fontWeight: 700,
@@ -484,7 +484,7 @@ export default function EmployeeManagementView() {
 
           {loadingAtt ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
-              <CircularProgress size={32} sx={{ color: '#5341cd' }} />
+              <CircularProgress size={32} sx={{ color: '#f97316' }} />
             </Box>
           ) : employees.length === 0 ? (
             <Box sx={{ bgcolor: T.surface, p: 8, borderRadius: '0.75rem', textAlign: 'center', boxShadow: T.shadow }}>
@@ -506,7 +506,7 @@ export default function EmployeeManagementView() {
                       <Box sx={{
                         width: 44, height: 44, borderRadius: '50%', bgcolor: T.surfaceAlt, flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 900, color: '#5341cd',
+                        fontWeight: 900, color: '#f97316',
                       }}>
                         {emp.name[0].toUpperCase()}
                       </Box>
@@ -569,7 +569,7 @@ export default function EmployeeManagementView() {
 
           {loadingSal ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
-              <CircularProgress size={32} sx={{ color: '#5341cd' }} />
+              <CircularProgress size={32} sx={{ color: '#f97316' }} />
             </Box>
           ) : salSummary.length === 0 ? (
             <Box sx={{ bgcolor: T.surface, p: 8, borderRadius: '0.75rem', textAlign: 'center', boxShadow: T.shadow }}>
@@ -582,7 +582,7 @@ export default function EmployeeManagementView() {
                 <StatCard label="Total Payable"     value={`₹${totalSalPayable.toLocaleString('en-IN')}`} gradient />
                 <StatCard label="Employees"         value={salSummary.length} />
                 <StatCard label="Total Absent Days" value={salSummary.reduce((s, r) => s + r.absentDays, 0)} valueColor="#ba1a1a" />
-                <StatCard label="Total Leave Days"  value={salSummary.reduce((s, r) => s + r.leaveDays, 0)}  valueColor="#5341cd" />
+                <StatCard label="Total Leave Days"  value={salSummary.reduce((s, r) => s + r.leaveDays, 0)}  valueColor="#f97316" />
               </Box>
 
               {/* Salary table — scrollable on mobile */}
@@ -618,7 +618,7 @@ export default function EmployeeManagementView() {
                       <Box sx={{
                         width: 36, height: 36, borderRadius: '50%', bgcolor: T.surfaceAlt, flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 900, color: '#5341cd', fontSize: '0.875rem',
+                        fontWeight: 900, color: '#f97316', fontSize: '0.875rem',
                       }}>
                         {s.employee.name[0].toUpperCase()}
                       </Box>
@@ -635,7 +635,7 @@ export default function EmployeeManagementView() {
                     {/* Absent */}
                     <Typography sx={{ fontWeight: 700, color: '#ba1a1a', display: { xs: 'none', sm: 'block' } }}>{s.absentDays}</Typography>
                     {/* Leave */}
-                    <Typography sx={{ fontWeight: 700, color: '#5341cd', display: { xs: 'none', sm: 'block' } }}>{s.leaveDays}</Typography>
+                    <Typography sx={{ fontWeight: 700, color: '#f97316', display: { xs: 'none', sm: 'block' } }}>{s.leaveDays}</Typography>
 
                     {/* Salary */}
                     <Box>
@@ -660,7 +660,7 @@ export default function EmployeeManagementView() {
                     Total Payroll
                   </Typography>
                   <Box sx={{ display: { xs: 'none', sm: 'block' }, gridColumn: '2 / 6' }} />
-                  <Typography sx={{ fontWeight: 900, color: '#5341cd', fontSize: '1.125rem' }}>
+                  <Typography sx={{ fontWeight: 900, color: '#f97316', fontSize: '1.125rem' }}>
                     ₹{totalSalPayable.toLocaleString('en-IN')}
                   </Typography>
                 </Box>
@@ -679,7 +679,7 @@ export default function EmployeeManagementView() {
                         { label: 'Present',  value: s.presentDays, color: '#006c49' },
                         { label: 'Half Day', value: s.halfDays,    color: '#884800' },
                         { label: 'Absent',   value: s.absentDays,  color: '#ba1a1a' },
-                        { label: 'Leave',    value: s.leaveDays,   color: '#5341cd' },
+                        { label: 'Leave',    value: s.leaveDays,   color: '#f97316' },
                       ].map(row => (
                         <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>{row.label}</Typography>
@@ -816,7 +816,7 @@ export default function EmployeeManagementView() {
                 disabled={saving}
                 sx={{
                   flex: 2, py: 1.5,
-                  bgcolor: saving ? T.surfaceHigh : '#5341cd',
+                  bgcolor: saving ? T.surfaceHigh : '#f97316',
                   color:   saving ? T.textMuted  : '#fff',
                   border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
                   borderRadius: '0.75rem', fontFamily: 'Inter, sans-serif',

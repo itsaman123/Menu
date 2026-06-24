@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
@@ -34,7 +34,7 @@ const STATUS_STYLE = {
   pending:   { bg: '#ffdcc3', color: '#2f1500' },
   confirmed: { bg: '#dbeafe', color: '#1e40af' },
   preparing: { bg: '#6cf8bb', color: '#00714d' },
-  completed: { bg: '#e4dfff', color: '#5341cd' },
+  completed: { bg: '#ffedd5', color: '#f97316' },
   cancelled: { bg: '#ffd6d6', color: '#ba1a1a' },
 };
 
@@ -80,7 +80,7 @@ function AnalyticsView() {
   };
 
   const OTP_CARDS = otpStats ? [
-    { label: 'Total OTPs Sent',      value: otpStats.totalSent,     icon: 'send',         color: '#5341cd' },
+    { label: 'Total OTPs Sent',      value: otpStats.totalSent,     icon: 'send',         color: '#f97316' },
     { label: 'Total Verified',        value: otpStats.totalVerified, icon: 'verified',     color: '#006c49' },
     { label: 'Sent (Last 30 Days)',   value: otpStats.last30Days,    icon: 'calendar_month', color: '#884800' },
     { label: 'Conversion Rate',
@@ -108,7 +108,7 @@ function AnalyticsView() {
       </Typography>
       {loadingOtp ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <CircularProgress sx={{ color: '#5341cd' }} />
+          <CircularProgress sx={{ color: '#f97316' }} />
         </Box>
       ) : (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3, mb: 6 }}>
@@ -138,7 +138,7 @@ function AnalyticsView() {
       </Typography>
       <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 4, boxShadow: T.shadowHov, maxWidth: 560 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-          <span className="material-symbols-outlined" style={{ color: '#5341cd', fontSize: 28 }}>analytics</span>
+          <span className="material-symbols-outlined" style={{ color: '#f97316', fontSize: 28 }}>analytics</span>
           <Box>
             <Typography sx={{ fontWeight: 800, color: T.text }}>Measurement ID</Typography>
             <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>Paste your GA4 Measurement ID to track menu traffic per restaurant.</Typography>
@@ -162,13 +162,13 @@ function AnalyticsView() {
               flex: 1, minWidth: 200, height: 48, px: 3, borderRadius: '0.75rem',
               bgcolor: T.surfaceAlt, border: `1px solid ${T.border}`, color: T.text, outline: 'none',
               fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', fontWeight: 500,
-              '&:focus': { borderColor: '#5341cd', boxShadow: '0 0 0 2px rgba(83,65,205,0.15)' },
+              '&:focus': { borderColor: '#f97316', boxShadow: '0 0 0 2px rgba(249,115,22,0.15)' },
               '&::placeholder': { color: T.textMuted },
             }}
           />
           <Box component="button" onClick={saveGa} disabled={saving}
             sx={{
-              height: 48, px: 3, background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)',
+              height: 48, px: 3, background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
               color: '#fff', fontWeight: 700, borderRadius: '0.75rem', border: 'none',
               cursor: saving ? 'wait' : 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.875rem',
               whiteSpace: 'nowrap', '&:hover': { opacity: 0.9 }, '&:disabled': { opacity: 0.6 },
@@ -258,7 +258,7 @@ function SettingsView({ adminEmail, restaurantName, slug }) {
       {/* Change Password */}
       <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 4, mb: 4, boxShadow: T.shadow, maxWidth: 520 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-          <span className="material-symbols-outlined" style={{ color: '#5341cd', fontSize: 24 }}>lock</span>
+          <span className="material-symbols-outlined" style={{ color: '#f97316', fontSize: 24 }}>lock</span>
           <Box>
             <Typography sx={{ fontWeight: 800, color: T.text }}>Change Password</Typography>
             <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>You will be logged out after changing.</Typography>
@@ -268,11 +268,11 @@ function SettingsView({ adminEmail, restaurantName, slug }) {
           {[{ key: 'current', label: 'Current Password' }, { key: 'next', label: 'New Password' }, { key: 'confirm', label: 'Confirm New Password' }].map(f => (
             <Box key={f.key}>
               <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textSub, mb: 0.75, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{f.label}</Typography>
-              <Box component="input" type="password" value={pw[f.key]} onChange={e => setPw(p => ({ ...p, [f.key]: e.target.value }))} sx={{ width: '100%', px: 2, py: 1.5, bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text, outline: 'none', boxSizing: 'border-box', '&:focus': { borderColor: '#5341cd' } }} />
+              <Box component="input" type="password" value={pw[f.key]} onChange={e => setPw(p => ({ ...p, [f.key]: e.target.value }))} sx={{ width: '100%', px: 2, py: 1.5, bgcolor: T.surfaceAlt, border: `1.5px solid ${T.surfaceHigh}`, borderRadius: '0.5rem', fontSize: '0.9375rem', fontFamily: 'Inter, sans-serif', color: T.text, outline: 'none', boxSizing: 'border-box', '&:focus': { borderColor: '#f97316' } }} />
             </Box>
           ))}
           {pwMsg && <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: pwMsg.includes('changed') ? '#006c49' : '#ba1a1a' }}>{pwMsg}</Typography>}
-          <Box component="button" onClick={changePw} disabled={pwSaving} sx={{ py: 1.5, px: 3, border: 'none', background: 'linear-gradient(135deg,#5341cd,#6c5ce7)', color: '#fff', borderRadius: '0.5rem', cursor: pwSaving ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', opacity: pwSaving ? 0.7 : 1, alignSelf: 'flex-start' }}>
+          <Box component="button" onClick={changePw} disabled={pwSaving} sx={{ py: 1.5, px: 3, border: 'none', background: 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff', borderRadius: '0.5rem', cursor: pwSaving ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', opacity: pwSaving ? 0.7 : 1, alignSelf: 'flex-start' }}>
             {pwSaving ? 'Changing…' : 'Change Password'}
           </Box>
         </Box>
@@ -281,7 +281,7 @@ function SettingsView({ adminEmail, restaurantName, slug }) {
       {/* Google Analytics */}
       <Box sx={{ bgcolor: T.surface, borderRadius: '0.75rem', p: 4, boxShadow: T.shadow, maxWidth: 520 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-          <span className="material-symbols-outlined" style={{ color: '#5341cd', fontSize: 24 }}>analytics</span>
+          <span className="material-symbols-outlined" style={{ color: '#f97316', fontSize: 24 }}>analytics</span>
           <Box>
             <Typography sx={{ fontWeight: 800, color: T.text }}>Google Analytics</Typography>
             <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>Track your menu page visitors with GA4.</Typography>
@@ -289,8 +289,8 @@ function SettingsView({ adminEmail, restaurantName, slug }) {
         </Box>
         {gaId && <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, mb: 2, px: 2, py: 0.75, bgcolor: 'rgba(0,108,73,0.1)', borderRadius: '9999px' }}><span className="material-symbols-outlined" style={{ color: '#006c49', fontSize: 14 }}>check_circle</span><Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#006c49' }}>Active: {gaId}</Typography></Box>}
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <Box component="input" type="text" value={gaInput} onChange={e => { setGaInput(e.target.value); setGaMsg(''); }} placeholder="e.g. G-XXXXXXXXXX" sx={{ flex: 1, minWidth: 200, height: 48, px: 3, borderRadius: '0.75rem', bgcolor: T.surfaceAlt, border: `1px solid ${T.border}`, color: T.text, outline: 'none', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', '&:focus': { borderColor: '#5341cd' }, '&::placeholder': { color: T.textMuted } }} />
-          <Box component="button" onClick={saveGa} disabled={gaSaving} sx={{ height: 48, px: 3, background: 'linear-gradient(to bottom right,#5341CD,#6C5CE7)', color: '#fff', fontWeight: 700, borderRadius: '0.75rem', border: 'none', cursor: gaSaving ? 'wait' : 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', opacity: gaSaving ? 0.6 : 1 }}>{gaSaving ? 'Saving…' : 'Save'}</Box>
+          <Box component="input" type="text" value={gaInput} onChange={e => { setGaInput(e.target.value); setGaMsg(''); }} placeholder="e.g. G-XXXXXXXXXX" sx={{ flex: 1, minWidth: 200, height: 48, px: 3, borderRadius: '0.75rem', bgcolor: T.surfaceAlt, border: `1px solid ${T.border}`, color: T.text, outline: 'none', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', '&:focus': { borderColor: '#f97316' }, '&::placeholder': { color: T.textMuted } }} />
+          <Box component="button" onClick={saveGa} disabled={gaSaving} sx={{ height: 48, px: 3, background: 'linear-gradient(to bottom right,#f97316,#ea580c)', color: '#fff', fontWeight: 700, borderRadius: '0.75rem', border: 'none', cursor: gaSaving ? 'wait' : 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.875rem', opacity: gaSaving ? 0.6 : 1 }}>{gaSaving ? 'Saving…' : 'Save'}</Box>
         </Box>
         {gaMsg && <Typography sx={{ mt: 1.5, fontSize: '0.8rem', fontWeight: 600, color: gaMsg === 'Saved!' ? '#006c49' : '#ba1a1a' }}>{gaMsg}</Typography>}
       </Box>
@@ -374,7 +374,7 @@ export default function AdminDashboard() {
         }}
       >
         <Box sx={{ px: 2, mb: 4 }}>
-          <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: T.text }}>The Curated Canvas</Typography>
+          <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: T.text }}>MenuFlow</Typography>
           <Typography sx={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub, fontWeight: 700, mt: 0.5 }}>
             Premium Dining Admin
           </Typography>
@@ -405,15 +405,15 @@ export default function AdminDashboard() {
         </Box>
 
         {/* Storage */}
-        <Box sx={{ px: 2, py: 3, bgcolor: '#EFF4FF', borderRadius: '0.5rem', mx: 1, mb: 3 }}>
+        <Box sx={{ px: 2, py: 3, bgcolor: '#fff7ed', borderRadius: '0.5rem', mx: 1, mb: 3 }}>
           <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: T.textSub, mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Storage Used
           </Typography>
-          <Box sx={{ height: 8, width: '100%', bgcolor: '#dee9fc', borderRadius: '9999px', overflow: 'hidden' }}>
-            <Box sx={{ height: '100%', bgcolor: '#5341cd', width: '75%' }} />
+          <Box sx={{ height: 8, width: '100%', bgcolor: '#fed7aa', borderRadius: '9999px', overflow: 'hidden' }}>
+            <Box sx={{ height: '100%', bgcolor: '#f97316', width: '75%' }} />
           </Box>
           <Box component="button" sx={{
-            mt: 2, width: '100%', py: 1, bgcolor: '#6c5ce7', color: '#faf6ff',
+            mt: 2, width: '100%', py: 1, bgcolor: '#ea580c', color: '#fff7ed',
             fontSize: '0.75rem', fontWeight: 700, borderRadius: '9999px', border: 'none',
             cursor: 'pointer', fontFamily: 'Inter, sans-serif',
             '&:active': { transform: 'scale(0.95)' },
@@ -474,11 +474,11 @@ export default function AdminDashboard() {
                       rel="noopener noreferrer"
                       sx={{
                         display: 'inline-flex', alignItems: 'center', gap: 0.75,
-                        px: 2, py: 0.75, bgcolor: 'rgba(83,65,205,0.08)', borderRadius: '9999px',
-                        color: '#5341cd', fontWeight: 600, fontSize: '0.8rem',
+                        px: 2, py: 0.75, bgcolor: 'rgba(249,115,22,0.08)', borderRadius: '9999px',
+                        color: '#f97316', fontWeight: 600, fontSize: '0.8rem',
                         textDecoration: 'none', fontFamily: 'monospace',
                         transition: 'background-color 0.2s',
-                        '&:hover': { bgcolor: 'rgba(83,65,205,0.15)' },
+                        '&:hover': { bgcolor: 'rgba(249,115,22,0.15)' },
                       }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 14 }}>link</span>
@@ -493,7 +493,7 @@ export default function AdminDashboard() {
                         px: 2, py: 0.75, bgcolor: T.surfaceAlt, border: 'none', borderRadius: '9999px',
                         color: T.textSub, fontWeight: 700, fontSize: '0.75rem',
                         cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                        transition: 'all 0.2s', '&:hover': { bgcolor: '#5341cd', color: '#fff' },
+                        transition: 'all 0.2s', '&:hover': { bgcolor: '#f97316', color: '#fff' },
                       }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 14 }}>qr_code</span>
@@ -511,7 +511,7 @@ export default function AdminDashboard() {
                   <span className="material-symbols-outlined">notifications</span>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: T.surfaceAlt, pl: 1, pr: 2, py: 1, borderRadius: '9999px' }}>
-                  <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#5341cd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900, fontSize: '1rem', flexShrink: 0 }}>
+                  <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900, fontSize: '1rem', flexShrink: 0 }}>
                     {adminEmail ? adminEmail[0].toUpperCase() : 'A'}
                   </Box>
                   <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -531,7 +531,7 @@ export default function AdminDashboard() {
             >
               <M variants={scaleUp} custom={0} sx={{ bgcolor: T.surface, p: 4, borderRadius: '0.5rem', boxShadow: T.shadowHov, position: 'relative', overflow: 'hidden' }}>
                 <Box sx={{ position: 'relative', zIndex: 10 }}>
-                  <span className="material-symbols-outlined" style={{ color: '#5341cd', fontSize: 32, display: 'block', marginBottom: 16 }}>shopping_bag</span>
+                  <span className="material-symbols-outlined" style={{ color: '#f97316', fontSize: 32, display: 'block', marginBottom: 16 }}>shopping_bag</span>
                   <Typography sx={{ color: T.textSub, fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 0.5 }}>Total Orders Today</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
                     <Typography sx={{ fontSize: '2.25rem', fontWeight: 900, color: T.text, letterSpacing: '-0.05em' }}>
@@ -546,13 +546,13 @@ export default function AdminDashboard() {
               </M>
 
               <M variants={scaleUp} custom={1} sx={{
-                background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)', color: '#fff',
+                background: 'linear-gradient(to bottom right, #f97316, #ea580c)', color: '#fff',
                 p: 4, borderRadius: '0.5rem', boxShadow: '0px 20px 40px rgba(18,28,42,0.12)',
                 position: 'relative', overflow: 'hidden',
               }}>
                 <Box sx={{ position: 'relative', zIndex: 10 }}>
-                  <span className="material-symbols-outlined" style={{ color: '#e4dfff', fontSize: 32, display: 'block', marginBottom: 16 }}>payments</span>
-                  <Typography sx={{ color: 'rgba(228,223,255,0.8)', fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 0.5 }}>Revenue Today</Typography>
+                  <span className="material-symbols-outlined" style={{ color: '#ffedd5', fontSize: 32, display: 'block', marginBottom: 16 }}>payments</span>
+                  <Typography sx={{ color: 'rgba(255,237,213,0.8)', fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 0.5 }}>Revenue Today</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
                     <Typography sx={{ fontSize: '2.25rem', fontWeight: 900, letterSpacing: '-0.05em' }}>
                       {loadingStats ? '—' : `₹${todayRevenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
@@ -580,7 +580,7 @@ export default function AdminDashboard() {
               <Box component="section">
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                   <Typography variant="h3" sx={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.025em', color: T.text }}>Recent Orders</Typography>
-                  <Box component="button" onClick={() => setActiveNav('Live Orders')} sx={{ color: '#5341cd', fontSize: '0.875rem', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', '&:hover': { textDecoration: 'underline' } }}>
+                  <Box component="button" onClick={() => setActiveNav('Live Orders')} sx={{ color: '#f97316', fontSize: '0.875rem', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', '&:hover': { textDecoration: 'underline' } }}>
                     View All
                   </Box>
                 </Box>
@@ -604,7 +604,7 @@ export default function AdminDashboard() {
                           <Box sx={{
                             width: 48, height: 48, borderRadius: '50%', bgcolor: T.surfaceAlt, flexShrink: 0,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontWeight: 700, color: '#5341cd', fontSize: '0.875rem',
+                            fontWeight: 700, color: '#f97316', fontSize: '0.875rem',
                           }}>{initials}</Box>
                           <Box>
                             <Typography sx={{ fontWeight: 700, color: T.text }}>
@@ -634,7 +634,7 @@ export default function AdminDashboard() {
               {/* Right Bento */}
               <Box component="section" sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {/* Top Sellers */}
-                <Box sx={{ bgcolor: '#eff4ff', p: 4, borderRadius: '0.5rem' }}>
+                <Box sx={{ bgcolor: '#fff7ed', p: 4, borderRadius: '0.5rem' }}>
                   <Typography variant="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.025em', color: T.text, mb: 3 }}>Top Sellers</Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     {[
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
                           <Box component="img" src={item.img} alt={item.name} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </Box>
                         <Box>
-                          <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#5341cd', mb: 0.5 }}>{item.category}</Typography>
+                          <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#f97316', mb: 0.5 }}>{item.category}</Typography>
                           <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '0.875rem', lineHeight: 1.25 }}>{item.name}</Typography>
                           <Typography sx={{ fontSize: '0.75rem', color: T.textSub, mt: 0.5 }}>{item.orders}</Typography>
                         </Box>
@@ -656,18 +656,18 @@ export default function AdminDashboard() {
                 </Box>
 
                 {/* Promotions */}
-                <Box sx={{ bgcolor: '#EFF4FF', p: 4, borderRadius: '0.5rem', position: 'relative', overflow: 'hidden' }}>
+                <Box sx={{ bgcolor: '#fff7ed', p: 4, borderRadius: '0.5rem', position: 'relative', overflow: 'hidden' }}>
                   <Box sx={{ position: 'relative', zIndex: 10 }}>
                     <Typography variant="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.025em', color: T.text, mb: 1 }}>Grow your reach</Typography>
                     <Typography sx={{ fontSize: '0.875rem', color: T.textSub, mb: 3 }}>Create a new weekend special menu and boost sales by up to 20%.</Typography>
                     <Box component="button" sx={{
-                      px: 3, py: 1.5, bgcolor: '#5341cd', color: '#fff',
+                      px: 3, py: 1.5, bgcolor: '#f97316', color: '#fff',
                       fontSize: '0.875rem', fontWeight: 700, borderRadius: '9999px', border: 'none',
                       cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                       transition: 'box-shadow 0.3s', '&:hover': { boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' },
                     }}>Create Promo</Box>
                   </Box>
-                  <Box sx={{ position: 'absolute', right: -48, bottom: -48, width: 160, height: 160, bgcolor: 'rgba(83,65,205,0.1)', borderRadius: '50%', filter: 'blur(24px)' }} />
+                  <Box sx={{ position: 'absolute', right: -48, bottom: -48, width: 160, height: 160, bgcolor: 'rgba(249,115,22,0.1)', borderRadius: '50%', filter: 'blur(24px)' }} />
                 </Box>
               </Box>
             </Box>
@@ -704,8 +704,8 @@ export default function AdminDashboard() {
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
                   border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                   ...(isActive
-                    ? { background: 'linear-gradient(135deg,#5341CD,#6C5CE7)', color: '#fff', borderRadius: '9999px', px: 2, py: 1.25, mb: 0.5, transform: 'scale(1.08)' }
-                    : { bgcolor: 'transparent', color: '#787586', p: 1 }
+                    ? { background: 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff', borderRadius: '9999px', px: 2, py: 1.25, mb: 0.5, transform: 'scale(1.08)' }
+                    : { bgcolor: 'transparent', color: '#8c7a6a', p: 1 }
                   ),
                 }}
               >

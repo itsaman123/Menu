@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, TextField, Drawer } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
@@ -47,7 +47,7 @@ const TOTAL_SECS = 15 * 60; // 15 minutes
 const ORDER_STAGES = [
   { icon: 'check_circle', label: 'Order Received', sub: 'Kitchen notified', color: '#006c49', threshold: TOTAL_SECS },
   { icon: 'local_fire_department', label: 'Being Prepared', sub: 'Chefs are cooking', color: '#884800', threshold: Math.round(TOTAL_SECS * 0.67) },
-  { icon: 'room_service', label: 'Ready to Serve', sub: 'On its way to you', color: '#5341cd', threshold: 0 },
+  { icon: 'room_service', label: 'Ready to Serve', sub: 'On its way to you', color: '#f97316', threshold: 0 },
 ];
 
 function CircleTimer({ secondsLeft, total }) {
@@ -62,10 +62,10 @@ function CircleTimer({ secondsLeft, total }) {
   return (
     <Box sx={{ position: 'relative', width: 140, height: 140, mx: 'auto', mb: 3 }}>
       <svg width="140" height="140" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="70" cy="70" r={R} fill="none" stroke="rgba(83,65,205,0.1)" strokeWidth="8" />
+        <circle cx="70" cy="70" r={R} fill="none" stroke="rgba(249,115,22,0.1)" strokeWidth="8" />
         <circle
           cx="70" cy="70" r={R} fill="none"
-          stroke={isDone ? '#006c49' : '#5341cd'}
+          stroke={isDone ? '#006c49' : '#f97316'}
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={`${isDone ? circ : dash} ${circ}`}
@@ -77,10 +77,10 @@ function CircleTimer({ secondsLeft, total }) {
           <span className="material-symbols-outlined" style={{ fontSize: 36, color: '#006c49' }}>check_circle</span>
         ) : (
           <>
-            <Typography sx={{ fontWeight: 900, fontSize: '1.6rem', letterSpacing: '-0.05em', color: '#5341cd', lineHeight: 1 }}>
+            <Typography sx={{ fontWeight: 900, fontSize: '1.6rem', letterSpacing: '-0.05em', color: '#f97316', lineHeight: 1 }}>
               {mins}:{secs}
             </Typography>
-            <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'rgba(83,65,205,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'rgba(249,115,22,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               est. ready
             </Typography>
           </>
@@ -163,8 +163,8 @@ export default function DemoMenu() {
         >
           {/* Top label */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: isDone ? '#006c49' : '#5341cd', animation: isDone ? 'none' : 'pulse 1.5s infinite' }} />
-            <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isDone ? '#006c49' : '#5341cd' }}>
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: isDone ? '#006c49' : '#f97316', animation: isDone ? 'none' : 'pulse 1.5s infinite' }} />
+            <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isDone ? '#006c49' : '#f97316' }}>
               {isDone ? 'Order Ready!' : 'Live Tracking'}
             </Typography>
           </Box>
@@ -260,10 +260,10 @@ export default function DemoMenu() {
             onClick={handleBackToMenu}
             sx={{
               width: '100%', py: 1.5, borderRadius: '9999px',
-              background: 'linear-gradient(135deg,#5341CD,#6C5CE7)',
+              background: 'linear-gradient(135deg,#f97316,#ea580c)',
               color: '#fff', fontWeight: 700, fontSize: '0.95rem', fontFamily: 'Inter, sans-serif',
               border: 'none', cursor: 'pointer', letterSpacing: '-0.02em',
-              boxShadow: '0 8px 24px rgba(83,65,205,0.25)',
+              boxShadow: '0 8px 24px rgba(249,115,22,0.25)',
               '&:active': { transform: 'scale(0.98)' },
             }}
           >
@@ -290,7 +290,7 @@ export default function DemoMenu() {
       >
         <Box sx={{ maxWidth: 720, mx: 'auto', px: 3, height: 72, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box sx={{ width: 36, height: 36, bgcolor: '#6c5ce7', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <Box sx={{ width: 36, height: 36, bgcolor: '#ea580c', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>restaurant</span>
             </Box>
             <Box>
@@ -309,7 +309,7 @@ export default function DemoMenu() {
             sx={{
               display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1,
               borderRadius: '9999px', border: 'none', cursor: cartCount > 0 ? 'pointer' : 'default',
-              background: cartCount > 0 ? 'linear-gradient(135deg,#5341CD,#6C5CE7)' : T.surfaceAlt,
+              background: cartCount > 0 ? 'linear-gradient(135deg,#f97316,#ea580c)' : T.surfaceAlt,
               color: cartCount > 0 ? '#fff' : T.textMuted,
               transition: 'all 0.3s', fontFamily: 'Inter, sans-serif',
               '&:active': cartCount > 0 ? { transform: 'scale(0.96)' } : {},
@@ -363,7 +363,7 @@ export default function DemoMenu() {
                   fontWeight: 600, fontSize: '0.85rem', border: 'none', cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif', transition: 'all 0.25s',
                   ...(activeCategory === cat.id
-                    ? { background: 'linear-gradient(135deg,#5341CD,#6C5CE7)', color: '#fff', boxShadow: '0 4px 12px rgba(83,65,205,0.3)' }
+                    ? { background: 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff', boxShadow: '0 4px 12px rgba(249,115,22,0.3)' }
                     : { bgcolor: T.surfaceAlt, color: T.textSub, '&:hover': { bgcolor: T.surfaceHigh } }
                   ),
                   '&:active': { transform: 'scale(0.95)' },
@@ -430,9 +430,9 @@ export default function DemoMenu() {
                         ) : (
                           <Box component="button" onClick={() => add(item.id)} sx={{
                             width: 36, height: 36, borderRadius: '50%',
-                            background: 'linear-gradient(135deg,#5341CD,#6C5CE7)',
+                            background: 'linear-gradient(135deg,#f97316,#ea580c)',
                             color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 4px 12px rgba(83,65,205,0.3)', border: 'none', cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(249,115,22,0.3)', border: 'none', cursor: 'pointer',
                             '&:active': { transform: 'scale(0.9)' },
                           }}>
                             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
@@ -470,9 +470,9 @@ export default function DemoMenu() {
                 onClick={() => setCartOpen(true)}
                 sx={{
                   width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  background: 'linear-gradient(135deg,#5341CD,#6C5CE7)', color: '#fff',
+                  background: 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff',
                   borderRadius: '9999px', px: 3, py: 2, border: 'none', cursor: 'pointer',
-                  boxShadow: '0 20px 40px rgba(83,65,205,0.35)', fontFamily: 'Inter, sans-serif',
+                  boxShadow: '0 20px 40px rgba(249,115,22,0.35)', fontFamily: 'Inter, sans-serif',
                   '&:active': { transform: 'scale(0.99)' },
                 }}
               >
@@ -595,10 +595,10 @@ export default function DemoMenu() {
             onClick={handlePlaceOrder}
             sx={{
               width: '100%', py: 1.75, borderRadius: '9999px',
-              background: 'linear-gradient(135deg,#5341CD,#6C5CE7)',
+              background: 'linear-gradient(135deg,#f97316,#ea580c)',
               color: '#fff', fontWeight: 800, fontSize: '1rem',
               fontFamily: 'Inter, sans-serif', border: 'none', cursor: 'pointer',
-              letterSpacing: '-0.02em', boxShadow: '0 8px 24px rgba(83,65,205,0.3)',
+              letterSpacing: '-0.02em', boxShadow: '0 8px 24px rgba(249,115,22,0.3)',
               '&:active': { transform: 'scale(0.99)' },
             }}
           >

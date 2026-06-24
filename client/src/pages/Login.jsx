@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
@@ -43,7 +43,7 @@ export default function Login() {
       <M
         animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        sx={{ position: 'absolute', top: '-10%', right: '-5%', width: 600, height: 600, bgcolor: 'rgba(83,65,205,0.05)', borderRadius: '50%', filter: 'blur(64px)', pointerEvents: 'none' }}
+        sx={{ position: 'absolute', top: '-10%', right: '-5%', width: 600, height: 600, bgcolor: 'rgba(249,115,22,0.05)', borderRadius: '50%', filter: 'blur(64px)', pointerEvents: 'none' }}
       />
       <M
         animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.7, 0.4] }}
@@ -79,10 +79,10 @@ export default function Login() {
             <Box sx={{ mb: 6 }}>
               <Typography sx={{
                 fontSize: '1.25rem', fontWeight: 900,
-                background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)',
+                background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
                 WebkitBackgroundClip: 'text', color: 'transparent', letterSpacing: '-0.025em',
               }}>
-                The Curated Canvas
+                MenuFlow
               </Typography>
             </Box>
             <Typography variant="h1" sx={{ fontSize: '3rem', fontWeight: 900, color: T.text, letterSpacing: '-0.05em', lineHeight: 1.1, mb: 3 }}>
@@ -133,8 +133,8 @@ export default function Login() {
 
             {/* Mobile Logo */}
             <Box sx={{ display: { md: 'none' }, mb: 6, textAlign: 'center' }}>
-              <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
-                The Curated Canvas
+              <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #f97316, #ea580c)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
+                MenuFlow
               </Typography>
             </Box>
 
@@ -164,7 +164,7 @@ export default function Login() {
                       bgcolor: T.surfaceAlt, border: 'none', borderRadius: '1rem',
                       color: T.text, outline: 'none', fontSize: '0.875rem',
                       fontFamily: 'Inter, sans-serif', transition: 'all 0.3s',
-                      '&:focus': { boxShadow: '0 0 0 2px rgba(83,65,205,0.2)', bgcolor: T.surface },
+                      '&:focus': { boxShadow: '0 0 0 2px rgba(249,115,22,0.2)', bgcolor: T.surface },
                       '&::placeholder': { color: T.textMuted },
                     }}
                   />
@@ -185,7 +185,7 @@ export default function Login() {
                       bgcolor: T.surfaceAlt, border: 'none', borderRadius: '1rem',
                       color: T.text, outline: 'none', fontSize: '0.875rem',
                       fontFamily: 'Inter, sans-serif', transition: 'all 0.3s',
-                      '&:focus': { boxShadow: '0 0 0 2px rgba(83,65,205,0.2)', bgcolor: T.surface },
+                      '&:focus': { boxShadow: '0 0 0 2px rgba(249,115,22,0.2)', bgcolor: T.surface },
                       '&::placeholder': { color: T.textMuted },
                     }}
                   />
@@ -211,9 +211,9 @@ export default function Login() {
               {/* CTA */}
               <Box component="button" type="submit" sx={{
                 width: '100%', height: 56,
-                background: 'linear-gradient(to bottom right, #5341CD, #6C5CE7)',
-                color: '#faf6ff', fontWeight: 700, borderRadius: '1rem',
-                boxShadow: '0 10px 20px rgba(83,65,205,0.2)', cursor: 'pointer',
+                background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
+                color: '#fff7ed', fontWeight: 700, borderRadius: '1rem',
+                boxShadow: '0 10px 20px rgba(249,115,22,0.2)', cursor: 'pointer',
                 border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
                 fontFamily: 'Inter, sans-serif', fontSize: '1rem',
                 transition: 'all 0.3s', position: 'relative', overflow: 'hidden',

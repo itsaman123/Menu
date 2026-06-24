@@ -1,7 +1,7 @@
-/**
+﻿/**
  * Shared Framer Motion animation variants for scroll-triggered reveals.
  * Used across all pages for consistent entrance behaviour matching
- * The Curated Canvas editorial aesthetic.
+ * MenuFlow editorial aesthetic.
  */
 
 /* ── Fade Up (default section entrance) ── */

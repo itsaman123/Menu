@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { IconButton, Tooltip } from '@mui/material';
 import { LightMode, DarkMode } from '@mui/icons-material';
@@ -43,8 +43,8 @@ const ThemeToggleButton = () => {
           '&:hover': {
             transform: 'scale(1.08) rotate(15deg)',
             boxShadow: isDark
-              ? '0 6px 28px rgba(198,191,255,0.4)'
-              : '0 6px 28px rgba(83,65,205,0.35)',
+              ? '0 6px 28px rgba(251,146,60,0.4)'
+              : '0 6px 28px rgba(249,115,22,0.35)',
           },
           '&:active': { transform: 'scale(0.96)' },
         }}
