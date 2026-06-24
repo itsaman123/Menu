@@ -65,7 +65,7 @@ function TeamCard({ name, role, src }) {
 }
 
 const TIMELINE = [
-  { year: '2020', title: 'The Foundation',    desc: 'MenuFlow launches the first touchless QR menu that prioritized design and speed over generic templates.', color: MF.primary },
+  { year: '2020', title: 'The Foundation',    desc: 'ScanIt launches the first touchless QR menu that prioritized design and speed over generic templates.', color: MF.primary },
   { year: '2021', title: 'Global Scale',      desc: 'Secured Series A funding. Expanded to 15 countries. Introduced multi-language support and AI-driven menu optimization.', color: '#ea580c' },
   { year: '2022', title: 'Full Integration',  desc: 'Launched deep integrations with major POS systems, creating a seamless loop from digital order to kitchen fulfillment.', color: '#059669' },
   { year: 'Now',  title: 'The Next Frontier', desc: 'Developing predictive analytics to help restaurants reduce food waste and optimize staff scheduling through behavioral insights.', color: '#d97706' },
@@ -74,7 +74,7 @@ const TIMELINE = [
 const VALUES = [
   { icon: 'lightbulb',  title: 'Innovation',     desc: "We don't settle for good enough. We constantly explore the intersection of design and data to solve complex problems simply.", color: MF.primary },
   { icon: 'verified',   title: 'Reliability',    desc: 'In hospitality, uptime is everything. Our infrastructure is built for enterprise-grade stability so your business never misses a beat.', color: '#ea580c' },
-  { icon: 'favorite',   title: 'Customer-First', desc: 'We listen more than we talk. Our roadmap is defined by real-world feedback from chefs and managers who use MenuFlow every day.', color: '#dc2626' },
+  { icon: 'favorite',   title: 'Customer-First', desc: 'We listen more than we talk. Our roadmap is defined by real-world feedback from chefs and managers who use ScanIt every day.', color: '#dc2626' },
 ];
 
 const TEAM = [
@@ -133,7 +133,7 @@ export default function AboutPage() {
             <Typography sx={{ fontSize: { xs: 28, md: 40 }, fontWeight: 900, letterSpacing: '-0.03em', mb: 3.5, lineHeight: 1.15, fontFamily: 'Manrope, Inter, sans-serif' }}>Why We Built This</Typography>
             {[
               "In 2020, we watched as the hospitality industry faced its most significant challenge in decades — not just logistical struggles, but a fundamental disconnect between traditional service and a rapidly digital world.",
-              "MenuFlow was born from a simple observation: most 'solutions' were friction-heavy, clunky, and sterile. We believed that technology should be invisible — a silent partner that enables waiters to be hosts and chefs to be artists.",
+              "ScanIt was born from a simple observation: most 'solutions' were friction-heavy, clunky, and sterile. We believed that technology should be invisible — a silent partner that enables waiters to be hosts and chefs to be artists.",
               "Today we're serving thousands of locations globally, but our core philosophy remains: simplify the operational complexity so the magic of dining can take center stage.",
             ].map((p, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: i * 0.12 }} viewport={{ once: true }}>
@@ -221,7 +221,7 @@ export default function AboutPage() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 10, flexWrap: 'wrap', gap: 3 }}>
               <Box>
                 <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MF.primary, mb: 2 }}>Leadership</Typography>
-                <Typography sx={{ fontSize: { xs: 30, md: 44 }, fontWeight: 900, letterSpacing: '-0.035em', fontFamily: 'Manrope, Inter, sans-serif' }}>The people behind MenuFlow</Typography>
+                <Typography sx={{ fontSize: { xs: 30, md: 44 }, fontWeight: 900, letterSpacing: '-0.035em', fontFamily: 'Manrope, Inter, sans-serif' }}>The people behind ScanIt</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}>
                 <Typography sx={{ fontWeight: 700, color: MF.primary, fontSize: 15 }}>See Open Roles</Typography>

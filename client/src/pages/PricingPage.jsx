@@ -80,7 +80,7 @@ const COMPARE_ROWS = [
 const FAQS = [
   { q: 'Can I change plans later?',            a: 'Yes, upgrade or downgrade any time. Changes reflect in your next billing cycle. Upgrades mid-month are prorated.' },
   { q: 'What payment methods do you support?', a: 'All major credit cards, Apple Pay, and Google Pay via Stripe. Enterprise plans also support bank transfers.' },
-  { q: 'Are there any hidden transaction fees?',a: 'No hidden fees from MenuFlow. You pay your monthly subscription and standard Stripe/Square processing fees (2.9% + 30¢).' },
+  { q: 'Are there any hidden transaction fees?',a: 'No hidden fees from ScanIt. You pay your monthly subscription and standard Stripe/Square processing fees (2.9% + 30¢).' },
   { q: 'Do you offer a free trial?',           a: 'Yes! Every plan starts with a 30-day free trial. No credit card required.' },
   { q: 'How long does onboarding take?',       a: 'Most restaurants are fully live within 20 minutes. Our onboarding wizard guides you step by step.' },
 ];

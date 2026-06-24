@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import logo from '../assets/logo.png';
 import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -116,13 +117,14 @@ export default function Register() {
           }}
         >
           <M variants={slideLeft} sx={{ position: 'relative', zIndex: 10 }}>
-            <Box sx={{ mb: 6 }}>
+            <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box component="img" src={logo} alt="ScanIt" sx={{ height: 32, width: 'auto' }} />
               <Typography sx={{
                 fontSize: '1.25rem', fontWeight: 900,
                 background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
                 WebkitBackgroundClip: 'text', color: 'transparent', letterSpacing: '-0.025em',
               }}>
-                MenuFlow
+                ScanIt
               </Typography>
             </Box>
             <Typography variant="h1" sx={{ fontSize: '3rem', fontWeight: 900, color: T.text, letterSpacing: '-0.05em', lineHeight: 1.1, mb: 3 }}>
@@ -162,7 +164,7 @@ export default function Register() {
             {/* Mobile Logo */}
             <Box sx={{ display: { md: 'none' }, mb: 6, textAlign: 'center' }}>
               <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #f97316, #ea580c)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
-                MenuFlow
+                ScanIt
               </Typography>
             </Box>
 
@@ -190,7 +192,7 @@ export default function Register() {
                   <span className="material-symbols-outlined" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: T.textMuted, fontSize: 20 }}>store</span>
                   <Box component="input" type="text" required value={form.restaurantName}
                     onChange={handleChange('restaurantName')}
-                    placeholder="e.g. MenuFlow"
+                    placeholder="e.g. ScanIt"
                     sx={inputSx}
                   />
                 </Box>

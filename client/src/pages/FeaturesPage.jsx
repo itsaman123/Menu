@@ -175,7 +175,7 @@ export default function FeaturesPage() {
             <Box sx={{ borderRadius: '20px', border: `1px solid ${MF.outlineVar}`, overflow: 'hidden', bgcolor: MF.surfaceLowest }}>
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', bgcolor: MF.surface, borderBottom: `1px solid ${MF.outlineVar}` }}>
                 <Typography sx={{ p: 2.5, fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: MF.textSub }}>Traditional</Typography>
-                <Typography sx={{ p: 2.5, fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: MF.primary }}>With MenuFlow</Typography>
+                <Typography sx={{ p: 2.5, fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: MF.primary }}>With ScanIt</Typography>
               </Box>
               {COMPARE.map(([old, neo], i) => (
                 <Box key={i} sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: i < COMPARE.length - 1 ? `1px solid ${MF.outlineVar}33` : 'none' }}>
@@ -226,7 +226,7 @@ export default function FeaturesPage() {
             <Box sx={{ textAlign: 'center', mb: 10 }}>
               <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MF.primary, mb: 2 }}>Seamless orchestration</Typography>
               <Typography sx={{ fontSize: { xs: 30, md: 48 }, fontWeight: 900, letterSpacing: '-0.035em', fontFamily: 'Manrope, Inter, sans-serif', color: MF.text }}>One automated workflow</Typography>
-              <Typography sx={{ fontSize: 17, color: MF.textSub, mt: 2, maxWidth: 500, mx: 'auto' }}>Watch how MenuFlow connects every touchpoint.</Typography>
+              <Typography sx={{ fontSize: 17, color: MF.textSub, mt: 2, maxWidth: 500, mx: 'auto' }}>Watch how ScanIt connects every touchpoint.</Typography>
             </Box>
           </M>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4,1fr)' }, gap: 3 }}>
@@ -299,7 +299,7 @@ export default function FeaturesPage() {
                 Ready to transform<br />your service?
               </Typography>
               <Typography sx={{ fontSize: 17, color: 'rgba(255,255,255,0.8)', mb: 6, maxWidth: 480, mx: 'auto', lineHeight: 1.75 }}>
-                Join over 2,500 premium restaurants that rely on MenuFlow every day.
+                Join over 2,500 premium restaurants that rely on ScanIt every day.
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <motion.button whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/register')}

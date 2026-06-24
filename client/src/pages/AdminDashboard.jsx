@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
+import logo from '../assets/logo.png';
 import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -374,8 +375,11 @@ export default function AdminDashboard() {
         }}
       >
         <Box sx={{ px: 2, mb: 4 }}>
-          <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: T.text }}>MenuFlow</Typography>
-          <Typography sx={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub, fontWeight: 700, mt: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <Box component="img" src={logo} alt="ScanIt" sx={{ height: 28, width: 'auto' }} />
+            <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: T.text }}>ScanIt</Typography>
+          </Box>
+          <Typography sx={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub, fontWeight: 700 }}>
             Premium Dining Admin
           </Typography>
         </Box>

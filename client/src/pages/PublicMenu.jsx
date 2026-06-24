@@ -269,7 +269,7 @@ export default function PublicMenu() {
       <Box component="footer" sx={{ width: '100%', py: 6, bgcolor: T.surfaceAlt, textAlign: 'center' }}>
         <Box sx={{ maxWidth: 1280, mx: 'auto', px: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <Typography sx={{ fontSize: '1.125rem', fontWeight: 900, color: T.text }}>{restaurantName}</Typography>
-          <Typography sx={{ fontSize: '0.875rem', color: T.textSub }}>Powered by QR Menu</Typography>
+          <Typography sx={{ fontSize: '0.875rem', color: T.textSub }}>Powered by ScanIt</Typography>
         </Box>
       </Box>
     </Box>

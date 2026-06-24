@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MF, NAV_LINKS } from './mfTheme';
+import logo from '../../assets/logo.png';
 
 export default function MenuFlowNav() {
   const navigate = useNavigate();
@@ -15,19 +16,16 @@ export default function MenuFlowNav() {
       boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
     }}>
       <Box sx={{
-        maxWidth: 1280, mx: 'auto', px: 6,
+        maxWidth: 1280, mx: 'auto', px: 1,
         height: 72, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         {/* Logo */}
-        <Typography
-          onClick={() => navigate('/')}
-          sx={{
-            fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em',
-            color: MF.text, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-          }}
-        >
-          MenuFlow
-        </Typography>
+        <Box onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
+          <Box component="img" src={logo} alt="ScanIt" sx={{ height: 150, width: 'auto' }} />
+          {/* <Typography sx={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', color: MF.text, fontFamily: 'Inter, sans-serif' }}>
+            ScanIt
+          </Typography> */}
+        </Box>
 
         {/* Nav links */}
         <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3, alignItems: 'center' }}>

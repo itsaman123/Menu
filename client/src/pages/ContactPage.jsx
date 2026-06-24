@@ -10,7 +10,7 @@ const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } 
 const fadeUp  = { hidden: { opacity: 0, y: 36 }, visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] } } };
 
 const SHORTCUTS = [
-  { icon: 'help',      title: 'Help Center',      desc: 'Browse documentation and tutorials to master every MenuFlow feature at your pace.', link: 'Explore Docs →',    color: MF.primary,   bg: `${MF.primary}15`   },
+  { icon: 'help',      title: 'Help Center',      desc: 'Browse documentation and tutorials to master every ScanIt feature at your pace.', link: 'Explore Docs →',    color: MF.primary,   bg: `${MF.primary}15`   },
   { icon: 'chat',      title: 'Sales Chat',        desc: 'Instant answers for pricing, capabilities, and enterprise integration questions.',  link: 'Start Chatting →',  color: '#7c3aed',    bg: '#7c3aed15'         },
   { icon: 'handshake', title: 'Partner Program',   desc: 'Collaborate with us or join our integration ecosystem and reseller network.',       link: 'Learn More →',      color: '#059669',    bg: '#05906915'         },
 ];
@@ -158,7 +158,7 @@ export default function ContactPage() {
                     <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Available now</Typography>
                   </Box>
                   <Typography sx={{ fontSize: 22, fontWeight: 800, mb: 1.5, letterSpacing: '-0.02em' }}>Book a Personal Demo</Typography>
-                  <Typography sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', mb: 4, lineHeight: 1.7 }}>See how MenuFlow transforms your specific workflow with a 30-minute expert walkthrough.</Typography>
+                  <Typography sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', mb: 4, lineHeight: 1.7 }}>See how ScanIt transforms your specific workflow with a 30-minute expert walkthrough.</Typography>
                   {/* Mini calendar visual */}
                   <Box sx={{ bgcolor: 'rgba(255,255,255,0.12)', borderRadius: '16px', p: 2.5, border: '1px solid rgba(255,255,255,0.2)' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

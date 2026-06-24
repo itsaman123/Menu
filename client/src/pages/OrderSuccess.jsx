@@ -36,7 +36,7 @@ function PrintReceipt({ order, restaurantName }) {
           {restaurantName || 'Restaurant'}
         </Typography>
         <Typography sx={{ fontFamily: 'inherit', fontSize: '11px', mt: '1mm' }}>
-          Powered by QR Menu
+          Powered by ScanIt
         </Typography>
         <Box sx={{ borderTop: '1px dashed #000', mt: '3mm', mb: '3mm' }} />
         <Typography sx={{ fontFamily: 'inherit', fontSize: '11px' }}>
@@ -348,7 +348,7 @@ export default function OrderSuccess() {
             <Box sx={{ mt: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
               <span className="material-symbols-outlined" style={{ color: T.textMuted, fontSize: 16 }}>verified</span>
               <Typography sx={{ fontSize: '0.75rem', color: T.textMuted, fontWeight: 500 }}>
-                Powered by QR Menu
+                Powered by ScanIt
               </Typography>
             </Box>
           </Box>

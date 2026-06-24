@@ -1,13 +1,13 @@
-﻿import React, { useState } from 'react';
+﻿import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
+import logo from '../assets/logo.png';
+import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import { fadeUp, slideLeft, slideRight, staggerContainer, float } from '../hooks/useScrollAnimation';
+import { fadeUp, slideLeft, staggerContainer } from '../hooks/useScrollAnimation';
 import axios from 'axios';
 
 const M = motion.create(Box);
-const MTypo = motion.create(Typography);
 
 export default function Login() {
   const T = useTokens();
@@ -36,8 +36,8 @@ export default function Login() {
 
   return (
     <Box sx={{
-      bgcolor: T.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      p: 3, position: 'relative', overflow: 'hidden', fontFamily: 'Inter, sans-serif',
+      bgcolor: T.bg, minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+       position: 'relative', overflow: 'hidden', fontFamily: 'Inter, sans-serif',
     }}>
       {/* Background Decor — animated pulse */}
       <M
@@ -76,14 +76,8 @@ export default function Login() {
           }}
         >
           <M variants={slideLeft} sx={{ position: 'relative', zIndex: 10 }}>
-            <Box sx={{ mb: 6 }}>
-              <Typography sx={{
-                fontSize: '1.25rem', fontWeight: 900,
-                background: 'linear-gradient(to bottom right, #f97316, #ea580c)',
-                WebkitBackgroundClip: 'text', color: 'transparent', letterSpacing: '-0.025em',
-              }}>
-                MenuFlow
-              </Typography>
+            <Box>
+              <Box component="img" src={logo} alt="ScanIt" sx={{ height: 150, width: 'auto' }} />
             </Box>
             <Typography variant="h1" sx={{ fontSize: '3rem', fontWeight: 900, color: T.text, letterSpacing: '-0.05em', lineHeight: 1.1, mb: 3 }}>
               Elevate your <br /> digital presence.
@@ -113,12 +107,7 @@ export default function Login() {
             </Box>
           </M>
           {/* Decorative image */}
-          <Box sx={{ position: 'absolute', bottom: 0, right: 0, width: '75%', height: '50%', opacity: 0.2, pointerEvents: 'none' }}>
-            <Box component="img"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlAYKAJZEpE8xOO8vwb_hRATTmDEI9nlC25WWCODU7_uvPEzOGwPlsHakkieJ5BysWAPam1CJHbGHJ37xi-ABDAj-AzGxk0yB9V1EefHXBX8qMdaU1kEqTi9eijty5hYDJ8ZCoLyrTHaGVyiPhfmjZ9bVtONyphFyYHfq0ZQXx9Lgb55WKaKKKh0mnMN-ptsVXZ1fgLPO3SGCKwKgY3h9WuwkqhkZy6NkPgBVBLLzmGgPeixRCEJYFQlNo0-QBAdhQqP1x-9ufYnU"
-              alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(100%)' }}
-            />
-          </Box>
+
         </M>
 
         {/* ─── Right Column: Login Form ─── */}
@@ -133,9 +122,7 @@ export default function Login() {
 
             {/* Mobile Logo */}
             <Box sx={{ display: { md: 'none' }, mb: 6, textAlign: 'center' }}>
-              <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #f97316, #ea580c)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
-                MenuFlow
-              </Typography>
+              <Box component="img" src={logo} alt="ScanIt" sx={{ height: 44, width: 'auto' }} />
             </Box>
 
             <Box component="header" sx={{ mb: 5 }}>
@@ -224,44 +211,6 @@ export default function Login() {
               </Box>
             </Box>
 
-            {/* Footer */}
-            <Box component="footer" sx={{ mt: 6, textAlign: 'center' }}>
-              <Typography sx={{ color: T.textSub, fontWeight: 500 }}>
-                Don't have an account?
-                <Typography component="span" onClick={() => navigate('/register')} sx={{
-                  color: T.text, fontWeight: 700, ml: 1, cursor: 'pointer',
-                  transition: 'color 0.3s', '&:hover': { color: T.accent },
-                }}>Sign up</Typography>
-              </Typography>
-            </Box>
-
-            {/* OAuth Separator */}
-            <Box sx={{ mt: 5, pt: 5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-              <Box sx={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
-                  <Box sx={{ width: '100%', borderTop: `1px solid rgba(200,196,215,0.2)` }} />
-                </Box>
-                <Typography component="span" sx={{
-                  position: 'relative', bgcolor: T.surface, px: 2,
-                  fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em',
-                  color: T.textMuted, fontWeight: 700,
-                }}>Or continue with</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
-                {[
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuD5tVRLWf02r7V6qPWGegqk22D42ZPLkk5j7frKzZ9d9ZGfZI-OfAhqae500gZFEv9czQycCwpWRR1-XGOeZu0ri7hQnWBigC7nS07Vd0xPvnJCN3mpW6PfqLvVdNtjfq1X7ND4SAOeLPczgOqhsU546mKs9rJPoigYQ-LDQuggKlxVZZyMgMhVE8IFDaRd-EV_F7Qo6mmFQYyikkS3WrPuy-WeMHdogFxlNlVxWnnZ_NLfcTpD6NkfyqI3z833sllBPlj4_2yUy7c',
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuDQEgmc93TN7_UqiCFm9tjlS6onHUjUUb7WzJPufl2Y4bAzSMci8rAYwKl5LjtBmHfYy-nUhkXfMIBUyQEIHStVqXZQT0ftO5svsOLRrSumk1akESF4b8IB9ewOPw2mqj4L5h9lzN8R3D51fisyfpZMTSNmsxLMNNFrADjIP8UTfBW93t4B2lYQWVy_afBxjuEOV9ckl6JXlMXVtlRx9gESq3EK1qKd8pfQ5tBPSCbDXiZ74czcx9GbZO7mZzPgqD0HjMplkwhqdiA',
-                ].map((src, i) => (
-                  <Box component="button" key={i} sx={{
-                    flex: 1, height: 48, bgcolor: T.surfaceAlt, borderRadius: '1rem', border: 'none',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                    transition: 'background-color 0.3s', '&:hover': { bgcolor: T.surfaceHigh },
-                  }}>
-                    <Box component="img" src={src} alt="" sx={{ width: 20, height: 20 }} />
-                  </Box>
-                ))}
-              </Box>
-            </Box>
           </Box>
         </M>
       </M>

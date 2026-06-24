@@ -3,6 +3,7 @@ import {
   Box, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, CircularProgress,
 } from '@mui/material';
+import logo from '../assets/logo.png';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
@@ -956,9 +957,12 @@ export default function SuperAdminDashboard() {
           <Box component="button" onClick={() => setMobileSidebarOpen(v => !v)} sx={{ display: { md: 'none' }, p: 1, border: 'none', bgcolor: 'transparent', cursor: 'pointer', color: T.textSub }}>
             <span className="material-symbols-outlined">menu</span>
           </Box>
-          <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #f97316, #ea580c)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
-            MenuFlow
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box component="img" src={logo} alt="ScanIt" sx={{ height: 28, width: 'auto' }} />
+            <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, background: 'linear-gradient(to bottom right, #f97316, #ea580c)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
+              ScanIt
+            </Typography>
+          </Box>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box component="button" onClick={fetchAll} sx={{ p: 1, borderRadius: '50%', color: T.textSub, border: 'none', cursor: 'pointer', bgcolor: 'transparent', display: 'flex', '&:hover': { bgcolor: T.surfaceHigh } }}>

@@ -3,6 +3,7 @@ import { Box, Typography, TextField, Drawer } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
 import { scaleUp, staggerContainer } from '../hooks/useScrollAnimation';
+import logo from '../assets/logo.png';
 
 const M = motion.create(Box);
 
@@ -290,15 +291,10 @@ export default function DemoMenu() {
       >
         <Box sx={{ maxWidth: 720, mx: 'auto', px: 3, height: 72, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box sx={{ width: 36, height: 36, bgcolor: '#ea580c', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>restaurant</span>
-            </Box>
-            <Box>
-              <Typography sx={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '-0.04em', color: T.text, lineHeight: 1.1 }}>CulinaryCanvas</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00a86b', animation: 'pulse 2s infinite' }} />
-                <Typography sx={{ fontSize: '0.7rem', color: '#00a86b', fontWeight: 600 }}>Demo Mode</Typography>
-              </Box>
+            <Box component="img" src={logo} alt="ScanIt" sx={{ height: 40, width: 'auto' }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00a86b', animation: 'pulse 2s infinite' }} />
+              <Typography sx={{ fontSize: '0.7rem', color: '#00a86b', fontWeight: 600 }}>Demo Mode</Typography>
             </Box>
           </Box>
 
