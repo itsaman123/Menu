@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_BASE_URL } from './environment';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '',
+  baseURL: API_BASE_URL,
 });
 
 // Interceptor: Attach both Auth Token AND Restaurant ID on every request
@@ -25,6 +26,7 @@ api.interceptors.request.use((config) => {
         config.headers['X-Restaurant-Id'] = parsed.restaurantId;
       }
     } catch (e) {
+      console.error('Error parsing user from localStorage:', e);
       // invalid JSON in localStorage, ignore
     }
   }

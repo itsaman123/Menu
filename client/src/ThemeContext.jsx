@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 
 const ThemeCtx = createContext();
 
-/* ─── Light tokens — MenuFlow warm-orange ─── */
 const LIGHT = {
   bg:               '#fffaf6',
   surface:          '#ffffff',
@@ -39,74 +38,13 @@ const LIGHT = {
   gradientHero:     'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(249,115,22,0.1) 0%, transparent 70%)',
 };
 
-/* ─── Dark tokens — neutral dark with orange accent ─── */
-const DARK = {
-  bg:               '#0f1117',
-  surface:          '#141720',
-  surfaceAlt:       '#1a1e28',
-  surfaceContainer: '#1a1e28',
-  surfaceHigh:      '#222632',
-  surfaceHighest:   '#2a2e3b',
-  border:           'rgba(232,213,196,0.08)',
-  accent:           '#fb923c',
-  accentContainer:  '#c2410c',
-  accentHov:        '#fdba74',
-  accentDim:        'rgba(251,146,60,0.12)',
-  accentSoft:       'rgba(251,146,60,0.15)',
-  green:            '#4edea3',
-  greenDim:         'rgba(78,222,163,0.1)',
-  greenContainer:   '#005236',
-  orange:           '#ffb77d',
-  orangeDim:        'rgba(255,183,125,0.1)',
-  blue:             '#93b4f4',
-  blueDim:          'rgba(147,180,244,0.1)',
-  red:              '#ffb4ab',
-  redDim:           'rgba(255,180,171,0.1)',
-  text:             '#e2e4ea',
-  textSub:          '#c8c4d7',
-  textMuted:        '#928f9f',
-  navBg:            'rgba(20,23,32,0.85)',
-  pillActive:       'linear-gradient(135deg,#f97316,#ea580c)', pillActiveTxt: '#fff',
-  pillInactive:     'rgba(232,213,196,0.06)',                  pillInactiveTxt: '#c8c4d7',
-  cartBg:           'linear-gradient(135deg,#f97316,#ea580c)',
-  cartGlow:         '0 8px 28px rgba(249,115,22,0.25)',
-  shadow:           '0 4px 20px rgba(0,0,0,0.25)',
-  shadowHov:        '0 20px 40px rgba(0,0,0,0.4)',
-  inputBg:          'rgba(232,213,196,0.05)',
-  gradientHero:     'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(249,115,22,0.15) 0%, transparent 70%)',
-};
-
-export const ThemeContextProvider = ({ children }) => {
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('cc-theme');
-    return saved ? saved === 'dark' : false;
-  });
-
-  const toggle = () => {
-    setIsDark(prev => {
-      const next = !prev;
-      localStorage.setItem('cc-theme', next ? 'dark' : 'light');
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    document.body.style.backgroundColor = isDark ? '#0f1117' : '#fffaf6';
-    document.body.style.color = isDark ? '#e2e4ea' : '#1a1c1d';
-  }, [isDark]);
-
-  return (
-    <ThemeCtx.Provider value={{ isDark, toggle }}>
-      {children}
-    </ThemeCtx.Provider>
-  );
-};
+export const ThemeContextProvider = ({ children }) => (
+  <ThemeCtx.Provider value={{}}>
+    {children}
+  </ThemeCtx.Provider>
+);
 
 export const useAppTheme = () => useContext(ThemeCtx);
 
-/** Returns the full colour-token object for the current mode. */
-export const useTokens = () => {
-  const { isDark } = useAppTheme();
-  return isDark ? DARK : LIGHT;
-};
+/** Returns the colour-token object. Always light mode. */
+export const useTokens = () => LIGHT;

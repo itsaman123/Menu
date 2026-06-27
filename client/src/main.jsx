@@ -4,7 +4,7 @@ import App from './App';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import { ThemeContextProvider, useAppTheme } from './ThemeContext';
+import { ThemeContextProvider } from './ThemeContext';
 import './index.css';
 
 const queryClient = new QueryClient();
@@ -69,31 +69,14 @@ const lightMuiTheme = createTheme({
   },
 });
 
-const darkMuiTheme = createTheme({
-  ...baseTheme,
-  palette: {
-    mode: 'dark',
-    primary: { main: '#c6bfff', light: '#ffedd5', dark: '#c2410c', contrastText: '#160066' },
-    secondary: { main: '#4edea3' },
-    error: { main: '#ffb4ab' },
-    background: { default: '#0f1117', paper: '#141720' },
-    text: { primary: '#e2e4ea', secondary: '#c8c4d7' },
-    divider: 'rgba(200,196,215,0.08)',
-  },
-});
-
-// Inner wrapper that reads theme context
-const ThemedApp = () => {
-  const { isDark } = useAppTheme();
-  return (
-    <ThemeProvider theme={isDark ? darkMuiTheme : lightMuiTheme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ThemeProvider>
-  );
-};
+const ThemedApp = () => (
+  <ThemeProvider theme={lightMuiTheme}>
+    <CssBaseline />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </ThemeProvider>
+);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

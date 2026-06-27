@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../environment';
 import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
 import { firebaseApp } from '../firebase';
 
@@ -51,7 +52,7 @@ export default function Checkout() {
       const confirmation = await signInWithPhoneNumber(auth, fullPhone, recaptchaRef.current);
       confirmationRef.current = confirmation;
       // Log send event for analytics (fire-and-forget)
-      axios.post('/api/otp/log-send', { phone: fullPhone, slug }).catch(() => {});
+      axios.post(`${API_BASE_URL}/api/otp/log-send`, { phone: fullPhone, slug }).catch(() => {});
       setOtpSent(true);
     } catch (err) {
       setError(firebaseErrorMsg(err.code) || 'Failed to send OTP. Please try again.');
@@ -70,7 +71,7 @@ export default function Checkout() {
     try {
       const result = await confirmationRef.current.confirm(code);
       const idToken = await result.user.getIdToken();
-      const { data } = await axios.post('/api/otp/verify-firebase', {
+      const { data } = await axios.post(`${API_BASE_URL}/api/otp/verify-firebase`, {
         idToken,
         phone: `+91${phone.replace(/\D/g, '')}`,
         slug,
@@ -80,7 +81,7 @@ export default function Checkout() {
 
       // Create the order using the verified OTP token
       const cart = JSON.parse(localStorage.getItem('pendingCart') || '{"items":[]}');
-      const { data: order } = await axios.post('/api/orders/create', {
+      const { data: order } = await axios.post(`${API_BASE_URL}/api/orders/create`, {
         restaurantSlug: cart.restaurantSlug || slug,
         items: (cart.items || []).map(i => ({ menuItemId: i.menuItemId, name: i.name, quantity: i.quantity })),
         tableNumber: cart.tableNumber || '',

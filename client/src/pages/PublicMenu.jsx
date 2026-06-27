@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTokens } from '../ThemeContext';
 import { fadeUp, scaleUp, staggerContainer } from '../hooks/useScrollAnimation';
 import axios from 'axios';
+import { API_BASE_URL } from '../environment';
 
 const M = motion.create(Box);
 const GA_ID_RE = /^(G-|UA-|AW-)[A-Z0-9-]+$/i;
@@ -25,7 +26,7 @@ export default function PublicMenu() {
   // Fetch real menu from backend
   useEffect(() => {
     let script1, script2;
-    axios.get(`/public/menu/${slug}`)
+    axios.get(`${API_BASE_URL}/public/menu/${slug}`)
       .then(({ data }) => {
         setRestaurant(data.restaurant);
         setMenu(data.menu || []);
