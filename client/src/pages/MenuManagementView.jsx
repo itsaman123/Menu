@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
@@ -392,62 +392,90 @@ export default function MenuManagementView() {
         </Box>
       </Box>
 
-      {/* Items grid */}
+      {/* Items list */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}><CircularProgress sx={{ color: '#f97316' }} /></Box>
       ) : (
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2,1fr)', xl: 'repeat(3,1fr)' }, gap: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {/* Column header */}
+          <Box sx={{ display: { xs: 'none', md: 'grid' }, gridTemplateColumns: '48px 1fr 100px 120px 80px 110px 80px', gap: 2, alignItems: 'center', px: 2, py: 1, borderBottom: `1px solid ${T.surfaceHigh}` }}>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}></Typography>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Item</Typography>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Price</Typography>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Category</Typography>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Type</Typography>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Status</Typography>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: 'center' }}>Actions</Typography>
+          </Box>
+
           {filtered.map(item => (
-            <Box key={item._id} sx={{ bgcolor: T.surface, borderRadius: '0.75rem', overflow: 'hidden', transition: 'all 0.2s', '&:hover': { transform: 'scale(1.02)', boxShadow: T.shadowHov }, boxShadow: T.shadow }}>
-              <Box sx={{ height: 220, position: 'relative', overflow: 'hidden', bgcolor: T.surfaceAlt }}>
+            <Box key={item._id} sx={{
+              bgcolor: T.surface, borderRadius: '0.625rem', overflow: 'hidden', transition: 'all 0.15s',
+              '&:hover': { boxShadow: T.shadowHov, bgcolor: T.surfaceAlt },
+              boxShadow: T.shadow,
+              display: { xs: 'flex', md: 'grid' },
+              flexDirection: { xs: 'column', md: 'unset' },
+              gridTemplateColumns: { md: '48px 1fr 100px 120px 80px 110px 80px' },
+              gap: { xs: 1.5, md: 2 }, alignItems: 'center',
+              px: 2, py: 1.25
+            }}>
+              {/* Thumbnail */}
+              <Box sx={{ width: 40, height: 40, borderRadius: '0.5rem', overflow: 'hidden', bgcolor: T.surfaceAlt, flexShrink: 0, display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center' }}>
                 {item.image
                   ? <Box component="img" src={item.image} alt={item.name} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined" style={{ fontSize: 48, color: T.textMuted }}>restaurant</span></Box>
+                  : <span className="material-symbols-outlined" style={{ fontSize: 20, color: T.textMuted }}>restaurant</span>
                 }
-                <Box sx={{ position: 'absolute', top: 12, left: 12, display: 'flex', gap: 1 }}>
-                  <Box component="span" sx={{ bgcolor: item.isVeg !== false ? '#6cf8bb' : 'rgba(186,26,26,0.9)', color: item.isVeg !== false ? '#00714d' : '#fff', px: 1.5, py: 0.5, borderRadius: '9999px', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    {item.isVeg !== false ? 'Veg' : 'Non-Veg'}
-                  </Box>
-                  {getCatName(item.categoryId) && (
-                    <Box component="span" sx={{ bgcolor: 'rgba(249,115,22,0.88)', color: '#fff', px: 1.5, py: 0.5, borderRadius: '9999px', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      {getCatName(item.categoryId)}
-                    </Box>
-                  )}
-                </Box>
               </Box>
-              <Box sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                  <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: T.text, lineHeight: 1.25, pr: 1 }}>{item.name}</Typography>
-                  <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, color: '#f97316', flexShrink: 0 }}>₹{item.price}</Typography>
-                </Box>
+
+              {/* Name + description */}
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: T.text, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</Typography>
                 {item.description && (
-                  <Typography sx={{ color: T.textSub, fontSize: '0.875rem', mb: 2, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.description}</Typography>
+                  <Typography sx={{ color: T.textMuted, fontSize: '0.75rem', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mt: 0.25 }}>{item.description}</Typography>
                 )}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, borderTop: `1px solid ${T.surfaceHigh}` }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }} onClick={() => toggleAvailability(item)}>
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: T.textSub }}>{item.isAvailable ? 'Available' : 'Unavailable'}</Typography>
-                    <Box sx={{ width: 44, height: 22, borderRadius: '9999px', p: '3px', position: 'relative', bgcolor: item.isAvailable ? '#6cf8bb' : T.surfaceHigh, transition: 'background-color 0.2s' }}>
-                      <Box sx={{ width: 16, height: 16, bgcolor: '#fff', borderRadius: '50%', position: 'absolute', transition: 'left 0.2s', left: item.isAvailable ? 'calc(100% - 19px)' : '3px' }} />
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 0.5 }}>
-                    <Box component="button" onClick={() => openEdit(item)} sx={{ p: 1, bgcolor: T.surfaceAlt, border: 'none', cursor: 'pointer', borderRadius: '0.5rem', color: T.textSub, display: 'flex', '&:hover': { bgcolor: T.surfaceHigh, color: '#f97316' } }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
-                    </Box>
-                    <Box component="button" onClick={() => handleDelete(item._id)} sx={{ p: 1, bgcolor: T.surfaceAlt, border: 'none', cursor: 'pointer', borderRadius: '0.5rem', color: T.textSub, display: 'flex', '&:hover': { bgcolor: '#ffd6d6', color: '#ba1a1a' } }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
-                    </Box>
-                  </Box>
+              </Box>
+
+              {/* Price */}
+              <Typography sx={{ fontSize: '0.875rem', fontWeight: 800, color: '#f97316', flexShrink: 0 }}>₹{item.price}</Typography>
+
+              {/* Category */}
+              {getCatName(item.categoryId) ? (
+                <Box component="span" sx={{ bgcolor: 'rgba(249,115,22,0.1)', color: '#f97316', px: 1.25, py: 0.375, borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {getCatName(item.categoryId)}
+                </Box>
+              ) : (
+                <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>—</Typography>
+              )}
+
+              {/* Veg/Non-Veg */}
+              <Box component="span" sx={{ bgcolor: item.isVeg !== false ? '#e8faf0' : '#ffeaea', color: item.isVeg !== false ? '#00714d' : '#ba1a1a', px: 1, py: 0.375, borderRadius: '9999px', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center', flexShrink: 0 }}>
+                {item.isVeg !== false ? 'Veg' : 'Non-Veg'}
+              </Box>
+
+              {/* Availability toggle */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', flexShrink: 0 }} onClick={() => toggleAvailability(item)}>
+                <Box sx={{ width: 34, height: 18, borderRadius: '9999px', p: '2px', position: 'relative', bgcolor: item.isAvailable ? '#6cf8bb' : T.surfaceHigh, transition: 'background-color 0.2s', flexShrink: 0 }}>
+                  <Box sx={{ width: 14, height: 14, bgcolor: '#fff', borderRadius: '50%', position: 'absolute', transition: 'left 0.2s', left: item.isAvailable ? 'calc(100% - 16px)' : '2px' }} />
+                </Box>
+                <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: T.textSub, display: { xs: 'block', md: 'none' } }}>{item.isAvailable ? 'On' : 'Off'}</Typography>
+              </Box>
+
+              {/* Actions */}
+              <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center', flexShrink: 0 }}>
+                <Box component="button" onClick={() => openEdit(item)} sx={{ p: 0.75, bgcolor: T.surfaceAlt, border: 'none', cursor: 'pointer', borderRadius: '0.375rem', color: T.textSub, display: 'flex', '&:hover': { bgcolor: T.surfaceHigh, color: '#f97316' }, transition: 'all 0.15s' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
+                </Box>
+                <Box component="button" onClick={() => handleDelete(item._id)} sx={{ p: 0.75, bgcolor: T.surfaceAlt, border: 'none', cursor: 'pointer', borderRadius: '0.375rem', color: T.textSub, display: 'flex', '&:hover': { bgcolor: '#ffd6d6', color: '#ba1a1a' }, transition: 'all 0.15s' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
                 </Box>
               </Box>
             </Box>
           ))}
-          <Box onClick={openAdd} sx={{ border: `2px dashed ${T.surfaceHigh}`, borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', p: 5, cursor: 'pointer', transition: 'all 0.2s', minHeight: 280, '&:hover': { borderColor: 'rgba(249,115,22,0.4)', bgcolor: 'rgba(249,115,22,0.04)' } }}>
-            <Box sx={{ width: 72, height: 72, bgcolor: T.surfaceAlt, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 32, color: T.textMuted }}>add_circle</span>
-            </Box>
-            <Typography sx={{ fontSize: '1.125rem', fontWeight: 700, color: T.text }}>Add New Selection</Typography>
-            <Typography sx={{ color: T.textSub, fontSize: '0.875rem', mt: 0.5 }}>Expand your menu with a new dish.</Typography>
+
+          {/* Add new item row */}
+          <Box onClick={openAdd} sx={{ border: `1.5px dashed ${T.surfaceHigh}`, borderRadius: '0.625rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, py: 2, cursor: 'pointer', transition: 'all 0.2s', '&:hover': { borderColor: 'rgba(249,115,22,0.4)', bgcolor: 'rgba(249,115,22,0.04)' } }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20, color: T.textMuted }}>add_circle</span>
+            <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: T.textSub }}>Add New Item</Typography>
           </Box>
         </Box>
       )}

@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const SuperAdmin = require('./models/SuperAdmin');
 
-const email    = process.env.SA_EMAIL    || 'superadmin@system.com';
-const password = process.env.SA_PASSWORD || 'SuperSecret123!';
+const email    = process.env.SA_EMAIL;
+const password = process.env.SA_PASSWORD;
 const reset    = process.argv.includes('--reset');
 
 mongoose.connect(process.env.MONGODB_URI)

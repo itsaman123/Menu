@@ -127,6 +127,80 @@ async function sendOnboardingEmail(opts) {
   return data;
 }
 
+/**
+ * Notify the platform inbox of a new marketing-site contact/inquiry submission.
+ *
+ * @param {object} opts
+ * @param {string} opts.name
+ * @param {string} opts.email      - submitter's email (used as reply-to)
+ * @param {string} opts.phone
+ * @param {string} opts.subject
+ * @param {string} opts.message
+ */
+async function sendInquiryNotification(opts) {
+  const { name, email, phone, subject, message } = opts;
+
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Inquiry</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:'Inter',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:100%;">
+
+          <tr>
+            <td style="background:linear-gradient(135deg,#f97316,#ea580c);padding:36px 40px;text-align:center;">
+              <p style="margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,237,213,0.85);">ScanIt Website</p>
+              <h1 style="margin:0;font-size:26px;font-weight:900;color:#ffffff;letter-spacing:-0.02em;">New Inquiry Received</h1>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:36px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff7ed;border:1.5px solid #ffdcc3;border-radius:12px;margin-bottom:8px;">
+                <tr><td style="padding:24px 28px;">
+                  <p style="margin:0 0 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ea580c;">Contact Details</p>
+
+                  ${row('Name', name)}
+                  ${row('Email', email)}
+                  ${row('Phone', phone || '—')}
+                  ${row('Subject', subject || '—')}
+                  ${divider()}
+                  ${row('Message', message)}
+                </td></tr>
+              </table>
+
+              <p style="margin:20px 0 0;font-size:13px;color:#9ca3af;line-height:1.6;">
+                Reply directly to this email to respond to ${name}, or view all inquiries in the SuperAdmin panel.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const { data, error } = await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+    to: process.env.INQUIRY_TO_EMAIL || process.env.RESEND_FROM_EMAIL,
+    replyTo: email,
+    subject: `New inquiry from ${name}${subject ? ` — ${subject}` : ''}`,
+    html,
+  });
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 /* ── helpers ── */
 function row(label, value, mono = false) {
   return `
@@ -142,4 +216,4 @@ function divider() {
   return `<hr style="border:none;border-top:1px solid #e4dfff;margin:14px 0;" />`;
 }
 
-module.exports = { sendOnboardingEmail };
+module.exports = { sendOnboardingEmail, sendInquiryNotification };

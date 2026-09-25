@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ export default function SuperAdminLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
@@ -80,10 +81,10 @@ export default function SuperAdminLogin() {
             <Typography component="label" sx={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, color: T.textSub }}>Password</Typography>
             <Box sx={{ position: 'relative' }}>
               <span className="material-symbols-outlined" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: T.textMuted, fontSize: 20 }}>lock</span>
-              <Box component="input" type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+              <Box component="input" type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 sx={{
-                  width: '100%', height: 56, pl: '48px', pr: 2,
+                  width: '100%', height: 56, pl: '48px', pr: '48px',
                   bgcolor: T.surfaceAlt, border: 'none', borderRadius: '1rem',
                   color: T.text, outline: 'none', fontSize: '0.875rem',
                   fontFamily: 'Inter, sans-serif', fontWeight: 500,
@@ -91,6 +92,13 @@ export default function SuperAdminLogin() {
                   '&::placeholder': { color: T.textMuted },
                 }}
               />
+              <Box component="button" type="button" onClick={() => setShowPassword((p) => !p)} aria-label={showPassword ? 'Hide password' : 'Show password'} sx={{
+                position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
+                border: 'none', bgcolor: 'transparent', cursor: 'pointer', color: T.textMuted,
+                display: 'flex', p: 0, '&:hover': { color: T.textSub },
+              }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>{showPassword ? 'visibility_off' : 'visibility'}</span>
+              </Box>
             </Box>
           </Box>
 

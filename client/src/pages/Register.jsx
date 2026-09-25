@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import logo from '../assets/logo.png';
 import { motion } from 'framer-motion';
@@ -275,12 +275,12 @@ export default function Register() {
       </M>
 
       {/* Security badge */}
-      <M
+      {/* <M
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 1, ease: [0.22, 1, 0.36, 1] }}
         sx={{
-          position: 'fixed', bottom: 32, left: 32,
+          position: 'fixed', bottom: 32, right: 32,
           display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1.5, p: 1.5,
           bgcolor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(24px)',
           borderRadius: '9999px', boxShadow: T.shadowHov,
@@ -293,7 +293,7 @@ export default function Register() {
         <Typography sx={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, color: T.textSub, pr: 1 }}>
           Secure Cloud Infrastructure
         </Typography>
-      </M>
+      </M> */}
     </Box>
   );
 }

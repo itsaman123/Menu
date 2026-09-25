@@ -1,5 +1,8 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import CheckBoxOutlineBlankRoundedIcon from "@mui/icons-material/CheckBoxOutlineBlankRounded";
+import CheckBoxRoundedIcon from "@mui/icons-material/CheckBoxRounded";
+import Checkbox from "@mui/material/Checkbox";
 import logo from '../assets/logo.png';
 import { motion } from 'framer-motion';
 import { useTokens } from '../ThemeContext';
@@ -14,6 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
@@ -37,7 +41,7 @@ export default function Login() {
   return (
     <Box sx={{
       bgcolor: T.bg, minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-       position: 'relative', overflow: 'hidden', fontFamily: 'Inter, sans-serif',
+      position: 'relative', overflow: 'hidden', fontFamily: 'Inter, sans-serif',
     }}>
       {/* Background Decor — animated pulse */}
       <M
@@ -165,10 +169,10 @@ export default function Login() {
                 </Typography>
                 <Box sx={{ position: 'relative' }}>
                   <span className="material-symbols-outlined" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: T.textMuted, fontSize: 20 }}>lock</span>
-                  <Box component="input" type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                  <Box component="input" type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     sx={{
-                      width: '100%', height: 56, pl: '48px', pr: 2,
+                      width: '100%', height: 56, pl: '48px', pr: '48px',
                       bgcolor: T.surfaceAlt, border: 'none', borderRadius: '1rem',
                       color: T.text, outline: 'none', fontSize: '0.875rem',
                       fontFamily: 'Inter, sans-serif', transition: 'all 0.3s',
@@ -176,23 +180,73 @@ export default function Login() {
                       '&::placeholder': { color: T.textMuted },
                     }}
                   />
+                  <Box component="button" type="button" onClick={() => setShowPassword((p) => !p)} aria-label={showPassword ? 'Hide password' : 'Show password'} sx={{
+                    position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
+                    border: 'none', bgcolor: 'transparent', cursor: 'pointer', color: T.textMuted,
+                    display: 'flex', p: 0, '&:hover': { color: T.textSub },
+                  }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 20 }}>{showPassword ? 'visibility_off' : 'visibility'}</span>
+                  </Box>
                 </Box>
               </Box>
 
               {/* Options */}
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1 }}>
-                <Box component="label" sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
-                  <Box component="input" type="checkbox" sx={{
-                    appearance: 'none', width: 20, height: 20, bgcolor: T.surfaceAlt,
-                    borderRadius: '6px', border: 'none', cursor: 'pointer',
-                    '&:checked': { bgcolor: T.accent },
-                  }} />
-                  <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: T.textSub }}>Remember me</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  py: 1,
+                }}
+              >
+                {/* Remember Me */}
+                <Box
+                  component="label"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <Checkbox
+                    disableRipple
+                    icon={
+                      <CheckBoxOutlineBlankRoundedIcon
+                        sx={{
+                          fontSize: 22,
+                          color: T.textMuted, // Border color when unchecked
+                        }}
+                      />
+                    }
+                    checkedIcon={
+                      <CheckBoxRoundedIcon
+                        sx={{
+                          fontSize: 22,
+                          color: T.accent, // Checkbox color when checked
+                        }}
+                      />
+                    }
+                    sx={{
+                      p: 0,
+                      mr: 0.5,
+                      "&:hover": {
+                        bgcolor: "transparent",
+                      },
+                    }}
+                  />
+
+                  <Typography
+                    sx={{
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      color: T.textSub,
+                    }}
+                  >
+                    Remember me
+                  </Typography>
                 </Box>
-                <Typography component="a" href="#" sx={{
-                  fontSize: '0.875rem', fontWeight: 700, color: T.accent,
-                  textDecoration: 'none', '&:hover': { color: T.accentHov },
-                }}>Forgot Password?</Typography>
               </Box>
 
               {/* CTA */}
@@ -208,7 +262,20 @@ export default function Login() {
               }}>
                 <span>Sign In</span>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_forward</span>
+
               </Box>
+              {/* Forgot Password */}
+              <Typography
+                title="Password resets are handled by your Super Admin"
+                sx={{
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  color: T.textMuted,
+                  cursor: "default",
+                }}
+              >
+                Forgot password? Contact your Super Admin.
+              </Typography>
             </Box>
 
           </Box>
@@ -216,12 +283,12 @@ export default function Login() {
       </M>
 
       {/* Security badge */}
-      <M
+      {/* <M
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 1, ease: [0.22, 1, 0.36, 1] }}
         sx={{
-          position: 'fixed', bottom: 32, left: 32,
+          position: 'fixed', bottom: 32, right: 32,
           display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1.5, p: 1.5,
           bgcolor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(24px)',
           borderRadius: '9999px', boxShadow: T.shadowHov,
@@ -237,7 +304,7 @@ export default function Login() {
         <Typography sx={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, color: T.textSub, pr: 1 }}>
           Secure Cloud Infrastructure
         </Typography>
-      </M>
+      </M> */}
     </Box>
   );
 }

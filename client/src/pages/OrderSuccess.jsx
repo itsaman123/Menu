@@ -1,147 +1,54 @@
-﻿import React, { useEffect, useState, useRef } from 'react';
+﻿import React from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../api';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { API_BASE_URL } from '../environment';
 
-/* ─── Print Receipt (only visible when window.print() is called) ─── */
-function PrintReceipt({ order, restaurantName }) {
-  if (!order) return null;
-
-  const subtotal = order.totalAmount / 1.05;
-  const gst      = order.totalAmount - subtotal;
-  const dateStr  = new Date(order.createdAt).toLocaleString('en-IN', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', hour12: true,
-  });
-
-  return (
-    <Box
-      id="print-receipt"
-      sx={{
-        display: 'none',
-        '@media print': { display: 'block' },
-        fontFamily: '"Courier New", Courier, monospace',
-        fontSize: '12px',
-        width: '72mm',
-        mx: 'auto',
-        p: '4mm',
-        color: '#000',
-        bgcolor: '#fff',
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: '4mm' }}>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '15px', fontWeight: 'bold', letterSpacing: '0.05em' }}>
-          {restaurantName || 'Restaurant'}
-        </Typography>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '11px', mt: '1mm' }}>
-          Powered by ScanIt
-        </Typography>
-        <Box sx={{ borderTop: '1px dashed #000', mt: '3mm', mb: '3mm' }} />
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '11px' }}>
-          Order #{String(order._id).slice(-8).toUpperCase()}
-        </Typography>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '10px', mt: '1mm' }}>{dateStr}</Typography>
-        {order.tableNumber && (
-          <Typography sx={{ fontFamily: 'inherit', fontSize: '11px', mt: '1mm', fontWeight: 'bold' }}>
-            Table: {order.tableNumber}
-          </Typography>
-        )}
-      </Box>
-
-      <Box sx={{ borderTop: '1px dashed #000', mb: '3mm' }} />
-
-      {/* Header row */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: '1mm' }}>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '10px', fontWeight: 'bold', flex: 1 }}>ITEM</Typography>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '10px', fontWeight: 'bold', width: '30px', textAlign: 'center' }}>QTY</Typography>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '10px', fontWeight: 'bold', width: '55px', textAlign: 'right' }}>AMT</Typography>
-      </Box>
-      <Box sx={{ borderTop: '1px dashed #000', mb: '2mm' }} />
-
-      {/* Items */}
-      {order.items.map((item, i) => (
-        <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', mb: '1.5mm', alignItems: 'flex-start' }}>
-          <Typography sx={{ fontFamily: 'inherit', fontSize: '11px', flex: 1, pr: '2mm', lineHeight: 1.3 }}>
-            {item.name}
-          </Typography>
-          <Typography sx={{ fontFamily: 'inherit', fontSize: '11px', width: '30px', textAlign: 'center' }}>
-            x{item.quantity}
-          </Typography>
-          <Typography sx={{ fontFamily: 'inherit', fontSize: '11px', width: '55px', textAlign: 'right' }}>
-            ₹{(item.price * item.quantity).toFixed(2)}
-          </Typography>
-        </Box>
-      ))}
-
-      <Box sx={{ borderTop: '1px dashed #000', mt: '2mm', mb: '2mm' }} />
-
-      {/* Totals */}
-      {[
-        { label: 'Subtotal',  value: subtotal.toFixed(2) },
-        { label: 'GST (5%)', value: gst.toFixed(2) },
-      ].map(row => (
-        <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between', mb: '1mm' }}>
-          <Typography sx={{ fontFamily: 'inherit', fontSize: '11px' }}>{row.label}</Typography>
-          <Typography sx={{ fontFamily: 'inherit', fontSize: '11px' }}>₹{row.value}</Typography>
-        </Box>
-      ))}
-
-      <Box sx={{ borderTop: '1px solid #000', mt: '2mm', mb: '2mm' }} />
-
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '14px', fontWeight: 'bold' }}>TOTAL</Typography>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '14px', fontWeight: 'bold' }}>
-          ₹{order.totalAmount.toFixed(2)}
-        </Typography>
-      </Box>
-
-      <Box sx={{ borderTop: '1px dashed #000', mt: '4mm', mb: '3mm' }} />
-
-      {/* Footer */}
-      <Box sx={{ textAlign: 'center' }}>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '11px' }}>
-          Thank you for dining with us!
-        </Typography>
-        <Typography sx={{ fontFamily: 'inherit', fontSize: '10px', mt: '1mm', color: '#555' }}>
-          Please visit again
-        </Typography>
-      </Box>
-    </Box>
-  );
-}
+/* Steps: pending/confirmed → 0, preparing → 1, completed → 2, cancelled → -1 */
+const STEP_INDEX = { pending: 0, confirmed: 0, preparing: 1, completed: 2, cancelled: -1 };
 
 export default function OrderSuccess() {
   const T = useTokens();
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [order, setOrder]     = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState('');
+  const {
+    data: order,
+    isLoading: loading,
+    error: queryError,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ['order', id],
+    queryFn: async () => {
+      const token = localStorage.getItem('orderToken');
+      const { data } = await axios.get(`${API_BASE_URL}/api/orders/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      return data;
+    },
+    enabled: !!id,
+    retry: false,
+    // Poll so status changes made from the admin's Live Orders view show up
+    // here without the customer having to manually refresh.
+    refetchInterval: (query) => (query.state.data?.status === 'completed' || query.state.data?.status === 'cancelled' ? false : 5000),
+  });
 
-  useEffect(() => {
-    if (!id) { setLoading(false); return; }
-    (async () => {
-      try {
-        const { data } = await api.get(`/api/orders/${id}`);
-        setOrder(data);
-      } catch {
-        setError('Could not load order details.');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id]);
-
-  function handlePrint() {
-    window.print();
-  }
+  const authFailed = queryError?.response?.status === 401 || queryError?.response?.status === 403;
+  const error = !id ? 'Could not load order details.'
+    : authFailed ? 'Verify your phone number to view this order.'
+    : queryError ? 'Could not load order details.'
+    : '';
 
   const restaurantName = order?.restaurantId?.name || 'Restaurant';
-  const subtotal = order ? order.totalAmount / 1.05 : 0;
-  const gst      = order ? order.totalAmount - subtotal : 0;
+  const estimatedPrepTime = order?.restaurantId?.estimatedPrepTime || '15-20 mins';
+  // Older orders (placed before per-restaurant GST toggling) don't have subtotal/gstAmount
+  // stored — fall back to the old fixed-5% assumption for those.
+  const subtotal = order ? (order.subtotal ?? order.totalAmount / 1.05) : 0;
+  const gst      = order ? (order.gstAmount ?? order.totalAmount - subtotal) : 0;
+  const gstRatePct = order?.gstRatePct || (gst > 0 ? Math.round((gst / subtotal) * 100) : 0);
 
   /* Status display */
   const STATUS_MAP = {
@@ -152,24 +59,28 @@ export default function OrderSuccess() {
     cancelled:  { label: 'Cancelled',  bg: '#ffd6d6', color: '#ba1a1a' },
   };
   const st = STATUS_MAP[order?.status] || STATUS_MAP.pending;
+  const stepIdx = STEP_INDEX[order?.status] ?? 0;
+  const progressPct = stepIdx < 0 ? 0 : ((stepIdx + 1) / 3) * 100;
 
   return (
-    <>
-      {/* ── Print-only receipt (hidden on screen) ── */}
-      <PrintReceipt order={order} restaurantName={restaurantName} />
-
-      {/* ── Screen content (hidden when printing) ── */}
       <Box sx={{
         bgcolor: T.bg, minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: T.text,
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: 'center', p: { xs: 2, sm: 3 },
-        '@media print': { display: 'none' },
       }}>
         {loading ? (
           <CircularProgress sx={{ color: '#f97316' }} />
         ) : error ? (
           <Box sx={{ textAlign: 'center' }}>
             <Typography sx={{ color: '#ba1a1a', fontWeight: 700, mb: 2 }}>{error}</Typography>
+            {authFailed && (
+              <Box component="button" onClick={() => navigate('/my-orders')} sx={{
+                px: 4, py: 1.5, mr: 1.5, background: 'linear-gradient(135deg, #f97316, #ea580c)', color: '#fff', border: 'none',
+                borderRadius: '0.75rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 700,
+              }}>
+                Verify Phone Number
+              </Box>
+            )}
             <Box component="button" onClick={() => navigate(-2)} sx={{
               px: 4, py: 1.5, bgcolor: T.surfaceAlt, color: T.text, border: 'none',
               borderRadius: '0.75rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 700,
@@ -209,7 +120,7 @@ export default function OrderSuccess() {
                   { label: 'Restaurant', value: restaurantName },
                   ...(order?.tableNumber ? [{ label: 'Table', value: order.tableNumber }] : []),
                   { label: 'Status',     pill: true },
-                  { label: 'Est. Time',  value: '15-20 mins', highlight: true },
+                  { label: 'Est. Time',  value: estimatedPrepTime, highlight: true },
                 ].map((row, i) => (
                   <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: i < 4 ? 2 : 0 }}>
                     <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: T.textSub }}>
@@ -237,35 +148,53 @@ export default function OrderSuccess() {
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
                     {order.items.map((item, i) => (
-                      <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-                          <Box sx={{
-                            width: 22, height: 22, borderRadius: '50%', bgcolor: T.surfaceHigh, flexShrink: 0,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.65rem', fontWeight: 900, color: T.textSub,
-                          }}>
-                            {item.quantity}
+                      <Box key={i}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                            <Box sx={{
+                              width: 22, height: 22, borderRadius: '50%', bgcolor: T.surfaceHigh, flexShrink: 0,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: '0.65rem', fontWeight: 900, color: T.textSub,
+                            }}>
+                              {item.quantity}
+                            </Box>
+                            <Typography sx={{ fontSize: '0.875rem', color: T.text, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {item.name}
+                            </Typography>
                           </Box>
-                          <Typography sx={{ fontSize: '0.875rem', color: T.text, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {item.name}
+                          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: T.text, ml: 2, flexShrink: 0 }}>
+                            ₹{(item.price * item.quantity).toFixed(2)}
                           </Typography>
                         </Box>
-                        <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: T.text, ml: 2, flexShrink: 0 }}>
-                          ₹{(item.price * item.quantity).toFixed(2)}
-                        </Typography>
+                        {item.notes && (
+                          <Typography sx={{ fontSize: '0.75rem', color: T.textSub, fontStyle: 'italic', pl: '30px', mt: 0.25 }}>
+                            "{item.notes}"
+                          </Typography>
+                        )}
                       </Box>
                     ))}
                   </Box>
+
+                  {order.notes && (
+                    <Box sx={{ bgcolor: T.surfaceHigh, borderRadius: '0.75rem', p: 1.5, mb: 2 }}>
+                      <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: T.textSub, mb: 0.25 }}>
+                        Order Notes
+                      </Typography>
+                      <Typography sx={{ fontSize: '0.8rem', color: T.text }}>{order.notes}</Typography>
+                    </Box>
+                  )}
 
                   <Box sx={{ borderTop: `1px dashed ${T.surfaceHigh}`, pt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>Subtotal</Typography>
                       <Typography sx={{ fontSize: '0.8rem', color: T.text, fontWeight: 600 }}>₹{subtotal.toFixed(2)}</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>GST (5%)</Typography>
-                      <Typography sx={{ fontSize: '0.8rem', color: T.text, fontWeight: 600 }}>₹{gst.toFixed(2)}</Typography>
-                    </Box>
+                    {gst > 0 && (
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography sx={{ fontSize: '0.8rem', color: T.textSub }}>GST ({gstRatePct}%)</Typography>
+                        <Typography sx={{ fontSize: '0.8rem', color: T.text, fontWeight: 600 }}>₹{gst.toFixed(2)}</Typography>
+                      </Box>
+                    )}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1, borderTop: `1px solid ${T.surfaceHigh}` }}>
                       <Typography sx={{ fontSize: '0.9375rem', fontWeight: 900, color: T.text }}>Total</Typography>
                       <Typography sx={{ fontSize: '0.9375rem', fontWeight: 900, color: '#f97316' }}>
@@ -280,52 +209,59 @@ export default function OrderSuccess() {
               <Box sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
                   {['Order Placed', 'Preparing', 'Ready'].map((s, i) => (
-                    <Typography key={s} sx={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: i === 0 ? '#006c49' : T.textMuted }}>
+                    <Typography key={s} sx={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: i <= stepIdx ? '#006c49' : T.textMuted }}>
                       {s}
                     </Typography>
                   ))}
                 </Box>
                 <Box sx={{ height: 8, bgcolor: T.surfaceHigh, borderRadius: '9999px', overflow: 'hidden' }}>
                   <Box sx={{
-                    height: '100%', width: '33%', bgcolor: '#006c49', borderRadius: '9999px',
-                    animation: 'pulse 2s ease-in-out infinite',
-                    '@keyframes pulse': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.6 } },
+                    height: '100%', width: `${progressPct}%`, bgcolor: order?.status === 'cancelled' ? '#ba1a1a' : '#006c49',
+                    borderRadius: '9999px', transition: 'width 0.4s ease',
+                    ...(order?.status !== 'completed' && order?.status !== 'cancelled' && {
+                      animation: 'pulse 2s ease-in-out infinite',
+                      '@keyframes pulse': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.6 } },
+                    }),
                   }} />
                 </Box>
               </Box>
 
               {/* Action buttons */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {/* Print Bill */}
+                {/* Track Order */}
                 <Box
                   component="button"
-                  onClick={handlePrint}
+                  onClick={() => refetch()}
+                  disabled={isFetching}
                   sx={{
                     width: '100%', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5,
                     background: 'linear-gradient(135deg, #f97316, #ea580c)',
                     color: '#fff', fontWeight: 700, borderRadius: '1rem',
-                    boxShadow: '0 10px 20px rgba(249,115,22,0.2)', cursor: 'pointer',
+                    boxShadow: '0 10px 20px rgba(249,115,22,0.2)', cursor: isFetching ? 'wait' : 'pointer',
                     border: 'none', fontFamily: 'Inter, sans-serif', fontSize: '1rem',
+                    opacity: isFetching ? 0.8 : 1,
                     '&:hover': { transform: 'scale(1.02)' }, '&:active': { transform: 'scale(0.95)' },
                     transition: 'transform 0.15s',
                   }}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 22 }}>print</span>
-                  Print Bill / Receipt
+                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                    {isFetching ? 'hourglass_empty' : 'track_changes'}
+                  </span>
+                  {isFetching ? 'Refreshing…' : 'Track Order'}
                 </Box>
 
-                {/* Track Order */}
+                {/* View all orders */}
                 <Box
                   component="button"
+                  onClick={() => navigate('/my-orders')}
                   sx={{
-                    width: '100%', height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5,
-                    bgcolor: T.surfaceAlt, color: T.text, fontWeight: 700, borderRadius: '1rem',
-                    border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem',
-                    '&:hover': { bgcolor: T.surfaceHigh },
+                    width: '100%', height: 44, bgcolor: 'transparent', color: T.textSub,
+                    fontWeight: 600, borderRadius: '1rem', border: 'none', cursor: 'pointer',
+                    fontFamily: 'Inter, sans-serif', fontSize: '0.875rem',
+                    '&:hover': { color: T.text },
                   }}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>track_changes</span>
-                  Track Order
+                  View All My Orders
                 </Box>
 
                 {/* Back to Menu */}
@@ -354,6 +290,5 @@ export default function OrderSuccess() {
           </Box>
         )}
       </Box>
-    </>
   );
 }

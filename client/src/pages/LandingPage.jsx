@@ -5,16 +5,68 @@ import {
   useSpring, AnimatePresence, useInView, animate, useScroll,
 } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
+import { useMagnetic } from '../hooks/useLenis';
 import MenuFlowNav from './menuflow/MenuFlowNav';
 import MenuFlowFooter from './menuflow/MenuFlowFooter';
+import PricingSection from './menuflow/PricingSection';
 import { MF } from './menuflow/mfTheme';
+
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const M = motion.create(Box);
 
 /* ─── Variants — opacity + translate only (GPU-safe, no blur) ─── */
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.09 } } };
-const fadeUp  = { hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } } };
+const fadeUp = { hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } } };
 const scaleIn = { hidden: { opacity: 0, scale: 0.93 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } } };
+
+/* ─── NEW: word-by-word scroll reveal for big headings (dribbble staple) ─── */
+function SplitHeading({ text, sx, component = 'h2' }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current) return undefined;
+    const split = new SplitText(ref.current, { type: 'words', wordsClass: 'split-word' });
+    gsap.set(split.words, { display: 'inline-block' });
+    const tween = gsap.fromTo(split.words,
+      { opacity: 0, yPercent: 130, rotate: 6 },
+      {
+        opacity: 1, yPercent: 0, rotate: 0,
+        duration: 0.9, stagger: 0.045, ease: 'back.out(1.6)',
+        scrollTrigger: { trigger: ref.current, start: 'top 85%' },
+      }
+    );
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+      split.revert();
+    };
+  }, [text]);
+  return <Typography ref={ref} component={component} sx={{ ...sx, overflow: 'hidden' }}>{text}</Typography>;
+}
+
+/* ─── NEW: soft glowing blob that trails the cursor across the whole page ─── */
+function CursorBlob() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3' });
+    const yTo = gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3' });
+    const onMove = (e) => { xTo(e.clientX); yTo(e.clientY); };
+    window.addEventListener('mousemove', onMove);
+    return () => window.removeEventListener('mousemove', onMove);
+  }, []);
+  return (
+    <Box ref={ref} sx={{
+      position: 'fixed', top: -230, left: -230, width: 460, height: 460, borderRadius: '50%',
+      background: `radial-gradient(circle, ${MF.primary}12 0%, transparent 72%)`,
+      pointerEvents: 'none', zIndex: 3, display: { xs: 'none', md: 'block' },
+    }} />
+  );
+}
 
 /* ─── Scroll progress bar (uses motion values — zero re-renders) ─── */
 function ScrollProgress() {
@@ -68,9 +120,9 @@ function CyclingWord() {
 
 /* ─── Live order card — isolated component so cycling doesn't re-render parent ─── */
 const LIVE_ORDERS = [
-  { table: 4,  amount: '₹1,890', item: 'Dal Makhani + Naan' },
-  { table: 7,  amount: '₹2,350', item: 'Biryani + Raita' },
-  { table: 2,  amount: '₹1,240', item: 'Paneer Tikka + Roti' },
+  { table: 4, amount: '₹1,890', item: 'Dal Makhani + Naan' },
+  { table: 7, amount: '₹2,350', item: 'Biryani + Raita' },
+  { table: 2, amount: '₹1,240', item: 'Paneer Tikka + Roti' },
   { table: 11, amount: '₹3,120', item: 'Seafood Thali' },
 ];
 function LiveOrderCard() {
@@ -116,47 +168,55 @@ function LiveOrderCard() {
 /* ─── 3D tilt hook — uses motion values, zero re-renders ─── */
 function useTilt(strength = 10) {
   const ref = useRef(null);
-  const mx  = useMotionValue(0);
-  const my  = useMotionValue(0);
-  const rX  = useSpring(useTransform(my, [-0.5, 0.5], [ strength, -strength]), { stiffness: 340, damping: 35 });
-  const rY  = useSpring(useTransform(mx, [-0.5, 0.5], [-strength,  strength]), { stiffness: 340, damping: 35 });
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rX = useSpring(useTransform(my, [-0.5, 0.5], [strength, -strength]), { stiffness: 340, damping: 35 });
+  const rY = useSpring(useTransform(mx, [-0.5, 0.5], [-strength, strength]), { stiffness: 340, damping: 35 });
   const handlers = {
     onMouseMove: (e) => {
       const r = ref.current?.getBoundingClientRect();
       if (!r) return;
-      mx.set((e.clientX - r.left) / r.width  - 0.5);
-      my.set((e.clientY - r.top)  / r.height - 0.5);
+      mx.set((e.clientX - r.left) / r.width - 0.5);
+      my.set((e.clientY - r.top) / r.height - 0.5);
     },
     onMouseLeave: () => { mx.set(0); my.set(0); },
   };
   return { ref, rotateX: rX, rotateY: rY, handlers };
 }
 
-/* ─── Animated counter ─── */
+/* ─── Animated counter — now with a little "punch" pop when it finishes ─── */
 function Counter({ to, suffix = '' }) {
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true });
+  const spanRef = useRef(null);
+  const inView = useInView(spanRef, { once: true });
   const [val, setVal] = useState(0);
   useEffect(() => {
     if (!inView) return;
-    const ctrl = animate(0, to, { duration: 2, ease: 'easeOut', onUpdate: v => setVal(Math.floor(v)) });
+    const ctrl = animate(0, to, {
+      duration: 2, ease: 'easeOut',
+      onUpdate: v => setVal(Math.floor(v)),
+      onComplete: () => {
+        if (spanRef.current) {
+          gsap.fromTo(spanRef.current, { scale: 1 }, { scale: 1.16, duration: 0.16, yoyo: true, repeat: 1, ease: 'power2.out' });
+        }
+      },
+    });
     return ctrl.stop;
   }, [inView, to]);
-  return <span ref={ref}>{val.toLocaleString('en-IN')}{suffix}</span>;
+  return <span ref={spanRef} style={{ display: 'inline-block' }}>{val.toLocaleString('en-IN')}{suffix}</span>;
 }
 
-/* ─── Feature pin card ─── */
+/* ─── Feature pin card — punchier 3D-flip entrance ─── */
 function PinCard({ icon, title, desc, color = MF.primary, index = 0 }) {
   const [hovered, setHovered] = useState(false);
   return (
     <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, y: 60, rotateX: -35, scale: 0.92 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+      transition={{ duration: 0.75, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
       viewport={{ once: true, amount: 0.15 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 60, position: 'relative' }}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 60, position: 'relative', transformPerspective: 1200 }}
     >
       <motion.div
         animate={{ y: hovered ? -24 : 0 }}
@@ -188,48 +248,77 @@ function PinCard({ icon, title, desc, color = MF.primary, index = 0 }) {
   );
 }
 
+/* ─── Magnetic CTA button — GSAP-site "pull to cursor" wow-effect ─── */
+function MagneticButton({ children, onClick, variant = 'primary', style }) {
+  const attachMagnetic = useMagnetic(0.3);
+  const base = variant === 'primary'
+    ? { background: 'linear-gradient(135deg, #f97316, #ea580c)', color: '#fff', boxShadow: '0 10px 28px rgba(249,115,22,0.38)', border: 'none' }
+    : { background: '#fff', color: MF.text, border: '1.5px solid rgba(249,115,22,0.2)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' };
+  return (
+    <motion.button
+      ref={attachMagnetic}
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.96 }}
+      onClick={onClick}
+      style={{
+        padding: '15px 32px', borderRadius: 14, fontWeight: 700, fontSize: 15,
+        cursor: 'pointer', fontFamily: 'Inter, sans-serif', ...base, ...style,
+      }}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
+/* ─── decorative floating food icons — the "pizzazz" layer ─── */
+const FOOD_ICONS = [
+  { icon: 'lunch_dining', top: '16%', left: '4%', size: 30, speed: 0.35, dur: 6, delay: 0 },     // burger
+  { icon: 'local_pizza', top: '68%', left: '9%', size: 26, speed: 0.2, dur: 7, delay: 1.1 },
+  { icon: 'ramen_dining', top: '24%', right: '6%', size: 28, speed: 0.5, dur: 6.5, delay: 0.5 },
+  { icon: 'local_cafe', top: '74%', right: '13%', size: 24, speed: 0.28, dur: 5.5, delay: 1.6 },
+];
+function FloatingFoodIcons() {
+  return (
+    <>
+      {FOOD_ICONS.map((it, i) => (
+        <Box key={i} data-parallax={it.speed}
+          sx={{ position: 'absolute', top: it.top, left: it.left, right: it.right, zIndex: 1, pointerEvents: 'none' }}>
+          <motion.div
+            animate={{ y: [0, -14, 0], rotate: [-6, 8, -6] }}
+            transition={{ duration: it.dur, repeat: Infinity, ease: 'easeInOut', delay: it.delay }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: it.size, color: MF.primary, opacity: 0.15 }}>{it.icon}</span>
+          </motion.div>
+        </Box>
+      ))}
+    </>
+  );
+}
+
 /* ═══════════════════════════════════════════
    DATA — India localised
 ═══════════════════════════════════════════ */
 const FEATURES = [
-  { icon: 'qr_code_2',           title: 'Smart QR Menus',        desc: 'Branded QR codes that update live. No reprinting costs. Works on any smartphone.', color: MF.primary },
-  { icon: 'restaurant_menu',     title: 'Visual Menu Builder',    desc: 'Drag-and-drop editor with rich media support. Beautiful food photography layouts built in.', color: '#7c3aed' },
-  { icon: 'point_of_sale',       title: 'Live Order Dashboard',   desc: 'Orders hit your kitchen display in real time. No more paper chits or shouting.', color: '#059669' },
-  { icon: 'insights',            title: 'Sales Analytics',        desc: 'Track peak hours, bestsellers, and revenue — from a single real-time dashboard.', color: '#d97706' },
-  { icon: 'payments',            title: 'UPI & Card Payments',    desc: 'GPay, PhonePe, UPI, Razorpay — all covered. Auto-reconcile with zero manual effort.', color: '#dc2626' },
-  { icon: 'translate',           title: 'Multi-language Menus',   desc: 'Serve menus in Hindi, Tamil, Telugu, and 10+ regional languages. One click to switch.', color: '#0891b2' },
+  { icon: 'qr_code_2', title: 'Smart QR Menus', desc: 'Branded QR codes that update live. No reprinting costs. Works on any smartphone.', color: MF.primary },
+  { icon: 'restaurant_menu', title: 'Visual Menu Builder', desc: 'Drag-and-drop editor with rich media support. Beautiful food photography layouts built in.', color: '#7c3aed' },
+  { icon: 'point_of_sale', title: 'Live Order Dashboard', desc: 'Orders hit your kitchen display in real time. No more paper chits or shouting.', color: '#059669' },
+  { icon: 'insights', title: 'Sales Analytics', desc: 'Track peak hours, bestsellers, and revenue — from a single real-time dashboard.', color: '#d97706' },
+  { icon: 'payments', title: 'UPI & Card Payments', desc: 'GPay, PhonePe, UPI, Razorpay — all covered. Auto-reconcile with zero manual effort.', color: '#dc2626' },
+  { icon: 'translate', title: 'Multi-language Menus', desc: 'Serve menus in Hindi, Tamil, Telugu, and 10+ regional languages. One click to switch.', color: '#0891b2' },
 ];
 
 const STEPS = [
-  { n: '01', title: 'Create Your Profile',  desc: 'Enter restaurant details, upload your logo, and set brand colours in under 5 minutes.', color: MF.primary },
-  { n: '02', title: 'Build Your Menu',      desc: 'Add dishes, descriptions, prices, and photos using our simple visual editor.', color: '#ea580c' },
-  { n: '03', title: 'Generate QR Codes',    desc: 'Download print-ready QR codes for every table or scan point. No design skills needed.', color: '#059669' },
-  { n: '04', title: 'Go Live & Grow',       desc: 'Guests scan, browse, and order. Watch real-time orders and grow with smart analytics.', color: '#d97706' },
+  { n: '01', title: 'Create Your Profile', desc: 'Enter restaurant details, upload your logo, and set brand colours in under 5 minutes.', color: MF.primary },
+  { n: '02', title: 'Build Your Menu', desc: 'Add dishes, descriptions, prices, and photos using our simple visual editor.', color: '#ea580c' },
+  { n: '03', title: 'Generate QR Codes', desc: 'Download print-ready QR codes for every table or scan point. No design skills needed.', color: '#059669' },
+  { n: '04', title: 'Go Live & Grow', desc: 'Guests scan, browse, and order. Watch real-time orders and grow with smart analytics.', color: '#d97706' },
 ];
 
 const METRICS = [
-  { to: 2000,  suffix: '+',   label: 'Restaurants' },
-  { to: 40000, suffix: '+',   label: 'Daily Orders' },
-  { to: 99,    suffix: '.9%', label: 'Uptime' },
-  { to: 4,     suffix: '.8★', label: 'Avg Rating' },
-];
-
-const PRICING = [
-  {
-    name: 'Starter', price: 999,
-    features: ['Digital QR Menu', 'Upto 200 orders/month', 'Basic Analytics', 'Email Support'],
-    featured: false,
-  },
-  {
-    name: 'Growth', price: 2499,
-    features: ['Full Order Management', 'Unlimited Orders', 'UPI & Card Payments', 'Priority Support', 'Advanced Analytics'],
-    featured: true,
-  },
-  {
-    name: 'Enterprise', price: null,
-    features: ['Multi-location', 'Custom API Access', 'White-label', 'Dedicated Manager', 'SLA Guarantee'],
-    featured: false,
-  },
+  { to: 20, suffix: '+', label: 'Restaurants', desc: 'Trusted by top dining rooms, cafés, and hotels across India to power their digital guest experience.' },
+  { to: 1000, suffix: '+', label: 'Daily Orders', desc: 'Processed seamlessly from tables, rooms, and counters with zero delay.' },
+  { to: 99, suffix: '.9%', label: 'Uptime Guarantee', desc: 'Highly redundant server architecture guarantees constant availability for your business.' },
+  { to: 4, suffix: '.8★', label: 'Partner Rating', desc: 'Highly rated by hospitality operators for ease of use, instant setup, and reliable payouts.' }
 ];
 
 const MARQUEE_ITEMS = ['QR Ordering', '•', 'UPI Payments', '•', 'Kitchen Display', '•', 'Analytics', '•', 'Hindi Support', '•', 'Multi-location', '•', 'Table Management', '•', 'Menu Builder', '•'];
@@ -250,10 +339,15 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { ref: tiltRef, rotateX, rotateY, handlers: tiltHandlers } = useTilt(10);
 
-  /* Cursor spotlight — motion values only, zero React re-renders */
-  const heroRef  = useRef(null);
-  const spotX    = useMotionValue(-400);
-  const spotY    = useMotionValue(-400);
+  const pageRef = useRef(null);
+  const heroRef = useRef(null);
+  const gridRefA = useRef(null);
+  const gridRefB = useRef(null);
+  const marqueeRef = useRef(null);
+  const stepCircleRefs = useRef([]);
+
+  const spotX = useMotionValue(-400);
+  const spotY = useMotionValue(-400);
   const spotXPos = useTransform(spotX, v => v - 300);
   const spotYPos = useTransform(spotY, v => v - 300);
 
@@ -265,8 +359,71 @@ export default function LandingPage() {
   };
   const onHeroLeave = () => { spotX.set(-400); spotY.set(-400); };
 
+  /* ── The big GSAP layer: parallax, curtain, split-text headings,
+     velocity-reactive marquee, pulsing step markers — all scoped and
+     cleaned up on unmount, all additive to the existing UI. ── */
+  useEffect(() => {
+    console.log('[gsap] ScrollTrigger mounted on LandingPage', gsap.version);
+
+    const ctx = gsap.context(() => {
+      // 1) Parallax — hero orbs, food icons, device mockup
+      gsap.utils.toArray('[data-parallax]').forEach((el) => {
+        const speed = parseFloat(el.getAttribute('data-parallax')) || 0.2;
+        gsap.to(el, {
+          yPercent: speed * 100,
+          ease: 'none',
+          scrollTrigger: { trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: 0.6 },
+        });
+      });
+
+      // 2) Curtain — hero shrinks/dims/blurs as the next section slides over it
+      gsap.to(heroRef.current, {
+        scale: 0.92, opacity: 0.35, filter: 'blur(2px)', transformOrigin: 'center top', ease: 'none',
+        scrollTrigger: { trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: true },
+      });
+
+      // 3) Drifting grid textures
+      [gridRefA.current, gridRefB.current].filter(Boolean).forEach((el) => {
+        gsap.to(el, {
+          backgroundPosition: '80px 80px', ease: 'none',
+          scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 1 },
+        });
+      });
+
+      // 4) Velocity-reactive marquee — speeds up / reverses feel with scroll speed & direction
+      if (marqueeRef.current) {
+        const marqueeTween = gsap.to(marqueeRef.current, { xPercent: -50, duration: 22, ease: 'none', repeat: -1 });
+        ScrollTrigger.create({
+          trigger: marqueeRef.current,
+          start: 'top bottom',
+          end: 'bottom top',
+          onUpdate: (self) => {
+            const boost = gsap.utils.clamp(-5, 5, (self.getVelocity() / 1000) * self.direction * 0.025);
+            gsap.to(marqueeTween, { timeScale: 1 + boost, duration: 0.3, overwrite: true });
+          },
+          onLeave: () => gsap.to(marqueeTween, { timeScale: 1, duration: 0.6 }),
+          onLeaveBack: () => gsap.to(marqueeTween, { timeScale: 1, duration: 0.6 }),
+        });
+      }
+
+      // 5) Pulsing "how it works" step markers as they cross the viewport center
+      stepCircleRefs.current.forEach((el) => {
+        if (!el) return;
+        ScrollTrigger.create({
+          trigger: el, start: 'top center', end: 'bottom center',
+          onEnter: () => gsap.to(el, { scale: 1.18, duration: 0.4, ease: 'back.out(2)' }),
+          onLeave: () => gsap.to(el, { scale: 1, duration: 0.4 }),
+          onEnterBack: () => gsap.to(el, { scale: 1.18, duration: 0.4, ease: 'back.out(2)' }),
+          onLeaveBack: () => gsap.to(el, { scale: 1, duration: 0.4 }),
+        });
+      });
+    }, pageRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <Box sx={{ bgcolor: MF.bg, minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: MF.text, overflowX: 'hidden' }}>
+    <Box ref={pageRef} sx={{ bgcolor: MF.bg, minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: MF.text, overflowX: 'hidden' }}>
       <style>{`
         @keyframes lp-orb1  { 0%,100%{transform:translate(0,0)} 50%{transform:translate(50px,-40px)} }
         @keyframes lp-orb2  { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-45px,55px)} }
@@ -274,6 +431,7 @@ export default function LandingPage() {
         @keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
       `}</style>
 
+      <CursorBlob />
       <ScrollProgress />
       <MenuFlowNav />
 
@@ -292,29 +450,28 @@ export default function LandingPage() {
           pt: '75px',
         }}
       >
-        {/* Spotlight — motion div, no state update on move */}
         <motion.div style={{
           position: 'absolute', width: 600, height: 600, borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 70%)',
           x: spotXPos, y: spotYPos, pointerEvents: 'none', zIndex: 1,
         }} />
 
-        {/* Ambient orbs (CSS animation, GPU transform only) */}
         {[
-          { top: '-10%', left: '-5%',  w: 580, bg: `radial-gradient(circle, ${MF.primary}18 0%, transparent 70%)`, anim: 'lp-orb1 22s ease-in-out infinite' },
-          { bottom:'-8%',right: '-5%', w: 460, bg: 'radial-gradient(circle, #fb923c12 0%, transparent 70%)',        anim: 'lp-orb2 26s ease-in-out infinite 6s' },
+          { top: '-10%', left: '-5%', w: 580, bg: `radial-gradient(circle, ${MF.primary}18 0%, transparent 70%)`, anim: 'lp-orb1 22s ease-in-out infinite', speed: 0.18 },
+          { bottom: '-8%', right: '-5%', w: 460, bg: 'radial-gradient(circle, #fb923c12 0%, transparent 70%)', anim: 'lp-orb2 26s ease-in-out infinite 6s', speed: 0.32 },
         ].map((o, i) => (
-          <Box key={i} sx={{ position: 'absolute', ...o, width: o.w, height: o.w, borderRadius: '50%', background: o.bg, animation: o.anim, pointerEvents: 'none' }} />
+          <Box key={i} data-parallax={o.speed}
+            sx={{ position: 'absolute', top: o.top, left: o.left, bottom: o.bottom, right: o.right, width: o.w, height: o.w, pointerEvents: 'none' }}>
+            <Box sx={{ width: '100%', height: '100%', borderRadius: '50%', background: o.bg, animation: o.anim }} />
+          </Box>
         ))}
 
-        {/* Content */}
+        <FloatingFoodIcons />
+
         <Box sx={{ maxWidth: 1280, mx: 'auto', px: { xs: 3, md: 6 }, width: '100%', zIndex: 2 }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, gap: { xs: 6, lg: 8 }, alignItems: 'center' }}>
 
-            {/* ── Left copy ── */}
             <M initial="hidden" animate="visible" variants={stagger}>
-
-              {/* Live badge */}
               <M variants={fadeUp}>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, bgcolor: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.22)', borderRadius: '100px', px: 2, py: 0.875, mb: 3.5 }}>
                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#4ade80', boxShadow: '0 0 10px #4ade80', animation: 'livePulse 2s ease-in-out infinite' }} />
@@ -324,7 +481,6 @@ export default function LandingPage() {
                 </Box>
               </M>
 
-              {/* Heading */}
               <M variants={fadeUp}>
                 <Typography sx={{ fontSize: { xs: 40, md: 58, lg: 68 }, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.08, mb: 3, color: MF.text, fontFamily: 'Manrope, Inter, sans-serif' }}>
                   Digital Ordering for Every{' '}
@@ -340,43 +496,16 @@ export default function LandingPage() {
                 </Typography>
               </M>
 
-              {/* CTA buttons */}
               <M variants={fadeUp}>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                  <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => navigate('/register')}
-                    style={{
-                      background: 'linear-gradient(135deg, #f97316, #ea580c)',
-                      color: '#fff', padding: '15px 32px', borderRadius: 14,
-                      fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
-                      fontFamily: 'Inter, sans-serif', boxShadow: '0 10px 28px rgba(249,115,22,0.38)',
-                    }}
-                  >
-                    Get Started — Free Trial
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => navigate('/how-it-works')}
-                    style={{
-                      background: '#fff', color: MF.text,
-                      border: '1.5px solid rgba(249,115,22,0.2)',
-                      padding: '15px 32px', borderRadius: 14, fontWeight: 700,
-                      fontSize: 15, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    }}
-                  >
-                    ▶ Watch Demo
-                  </motion.button>
+                  <MagneticButton onClick={() => navigate('/contact')}>Get Started — Free Trial</MagneticButton>
+                  <MagneticButton variant="secondary" onClick={() => navigate('/how-it-works')}>▶ Watch Demo</MagneticButton>
                 </Box>
               </M>
 
-              {/* Trust row */}
               <M variants={fadeUp} sx={{ mt: 5, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box sx={{ display: 'flex' }}>
-                  {['#f97316','#ea580c','#fb923c','#fdba74','#fed7aa'].map((c, i) => (
+                  {['#f97316', '#ea580c', '#fb923c', '#fdba74', '#fed7aa'].map((c, i) => (
                     <Box key={c} sx={{ width: 32, height: 32, borderRadius: '50%', bgcolor: c, border: '2.5px solid #fff', ml: i > 0 ? -1.25 : 0, boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }} />
                   ))}
                 </Box>
@@ -386,87 +515,76 @@ export default function LandingPage() {
               </M>
             </M>
 
-            {/* ── Right: 3D device mockup ── */}
-            <motion.div
-              ref={tiltRef}
-              {...tiltHandlers}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0, transition: { duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] } }}
-              style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: '1200px', position: 'relative', height: 560 }}
-            >
-              {/* Glow */}
-              <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${MF.primary}12 0%, transparent 65%)`, pointerEvents: 'none' }} />
-
-              {/* Tablet back */}
-              <M
-                animate={{ y: [0, -7, 0] }}
-                transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-                sx={{ position: 'absolute', top: 40, right: 0, width: '82%', bgcolor: '#fff', border: '1px solid rgba(249,115,22,0.1)', borderRadius: '18px', p: 1.5, transform: 'rotate(2.5deg)', boxShadow: '0 24px 50px rgba(0,0,0,0.07)' }}
+            <Box data-parallax={0.12} sx={{ position: 'relative' }}>
+              <motion.div
+                ref={tiltRef}
+                {...tiltHandlers}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0, transition: { duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] } }}
+                style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: '1200px', position: 'relative', height: 560 }}
               >
-                <Box component="img"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ_WYnbpOzs7xe7afJl-0Uy3bVZ-vAOlJyoUt1R_greVUzSVxEaw67WQIez36reH4ERUGF0s1SH-SuJv5fCfkbkN7WivLUK7uR5CVKzoMAIHbjGZcoSu24BPYzCKawOwtIGl1g9qXqkWmoi4rE3vIDGguk7K9E_xhnb55obMsIkW9UPxMZCyZSIk693NAbGeTq7lKoQu4idMntRgkz9cIJdY8G6qc0gpCAVE5KoDw8ciioVMZEFPmJYr5qcpU8k453MmTNG5BJzQtb"
-                  sx={{ width: '100%', borderRadius: '10px', display: 'block' }}
-                />
-              </M>
+                <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${MF.primary}12 0%, transparent 65%)`, pointerEvents: 'none' }} />
 
-              {/* Phone */}
-              <M
-                animate={{ y: [0, -16, 0] }}
-                transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
-                sx={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 20, width: { xs: 165, md: 205 }, bgcolor: '#1a0a00', borderRadius: '48px', p: '11px', border: '2px solid rgba(249,115,22,0.18)', boxShadow: '0 32px 64px rgba(0,0,0,0.16), 0 10px 24px rgba(249,115,22,0.1)' }}
-              >
-                <Box sx={{ bgcolor: '#fff', borderRadius: '36px', overflow: 'hidden', aspectRatio: '9/19.5' }}>
+                <M
+                  animate={{ y: [0, -7, 0] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+                  sx={{ position: 'absolute', top: 40, right: 0, width: '82%', bgcolor: '#fff', border: '1px solid rgba(249,115,22,0.1)', borderRadius: '18px', p: 1.5, transform: 'rotate(2.5deg)', boxShadow: '0 24px 50px rgba(0,0,0,0.07)' }}
+                >
                   <Box component="img"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk2Sw6iIz2GjGEoQSx1NI271wanBTfqFa4yld80ldfVulMYdU_1JptfWwSxvpGz39QHl1V3Se_oLrxwLNhA21iMQXEEl4bcJk-hDLP789iaUF4ViB6DRTBl5JorfigecpT6zVqxpwcghYaz6RB3-cmPVkqIRPMpYKfEN-b661bRFPsC5cMc4CEDK1ATL4HM8MKm47AvQS6NSXTDNv7SuOA2MThVBQAP1U_tHcw6pYcYFxDyOefHscRoLug_m6aDrvu33UWeO69_hl5"
-                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ_WYnbpOzs7xe7afJl-0Uy3bVZ-vAOlJyoUt1R_greVUzSVxEaw67WQIez36reH4ERUGF0s1SH-SuJv5fCfkbkN7WivLUK7uR5CVKzoMAIHbjGZcoSu24BPYzCKawOwtIGl1g9qXqkWmoi4rE3vIDGguk7K9E_xhnb55obMsIkW9UPxMZCyZSIk693NAbGeTq7lKoQu4idMntRgkz9cIJdY8G6qc0gpCAVE5KoDw8ciioVMZEFPmJYr5qcpU8k453MmTNG5BJzQtb"
+                    sx={{ width: '100%', borderRadius: '10px', display: 'block' }}
                   />
-                </Box>
-              </M>
+                </M>
 
-              {/* Floating: Today's Sales */}
-              <M
-                animate={{ y: [0, -9, 0] }}
-                transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
-                sx={{ position: 'absolute', top: '10%', right: -14, zIndex: 30, bgcolor: '#fff', border: `1px solid rgba(249,115,22,0.15)`, borderRadius: '16px', p: 2, minWidth: 152, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                  <span className="material-symbols-outlined" style={{ color: MF.primary, fontSize: 15, fontVariationSettings: "'FILL' 1" }}>insights</span>
-                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: MF.textSub }}>Today's Revenue</Typography>
-                </Box>
-                <Typography sx={{ fontSize: 20, fontWeight: 900, color: '#4ade80' }}>+27%</Typography>
-                <Typography sx={{ fontSize: 11, color: MF.outlineVar }}>vs yesterday</Typography>
-              </M>
+                <M
+                  animate={{ y: [0, -16, 0] }}
+                  transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
+                  sx={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 20, width: { xs: 165, md: 205 }, bgcolor: '#1a0a00', borderRadius: '48px', p: '11px', border: '2px solid rgba(249,115,22,0.18)', boxShadow: '0 32px 64px rgba(0,0,0,0.16), 0 10px 24px rgba(249,115,22,0.1)' }}
+                >
+                  <Box sx={{ bgcolor: '#fff', borderRadius: '36px', overflow: 'hidden', aspectRatio: '9/19.5' }}>
+                    <Box component="img"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk2Sw6iIz2GjGEoQSx1NI271wanBTfqFa4yld80ldfVulMYdU_1JptfWwSxvpGz39QHl1V3Se_oLrxwLNhA21iMQXEEl4bcJk-hDLP789iaUF4ViB6DRTBl5JorfigecpT6zVqxpwcghYaz6RB3-cmPVkqIRPMpYKfEN-b661bRFPsC5cMc4CEDK1ATL4HM8MKm47AvQS6NSXTDNv7SuOA2MThVBQAP1U_tHcw6pYcYFxDyOefHscRoLug_m6aDrvu33UWeO69_hl5"
+                      sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </Box>
+                </M>
 
-              {/* Isolated live order component (its re-renders don't affect parent) */}
-              <LiveOrderCard />
-            </motion.div>
+                <M
+                  animate={{ y: [0, -9, 0] }}
+                  transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
+                  sx={{ position: 'absolute', top: '10%', right: -14, zIndex: 30, bgcolor: '#fff', border: `1px solid rgba(249,115,22,0.15)`, borderRadius: '16px', p: 2, minWidth: 152, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                    <span className="material-symbols-outlined" style={{ color: MF.primary, fontSize: 15, fontVariationSettings: "'FILL' 1" }}>insights</span>
+                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: MF.textSub }}>Today's Revenue</Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: 20, fontWeight: 900, color: '#4ade80' }}>+27%</Typography>
+                  <Typography sx={{ fontSize: 11, color: MF.outlineVar }}>vs yesterday</Typography>
+                </M>
+
+                <LiveOrderCard />
+              </motion.div>
+            </Box>
           </Box>
         </Box>
-
-        {/* Scroll caret */}
-        <M animate={{ y: [0, 9, 0] }} transition={{ duration: 2.2, repeat: Infinity }}
-          sx={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, zIndex: 2 }}>
-          <Typography sx={{ fontSize: 10, color: MF.outlineVar, letterSpacing: '0.14em' }}>SCROLL</Typography>
-          <Box sx={{ width: 1.5, height: 40, background: `linear-gradient(to bottom, ${MF.primary}80, transparent)`, borderRadius: 1 }} />
-        </M>
       </Box>
 
-      {/* ── Single animated wave (1 instance only) ── */}
       <HeroWave />
 
       {/* ══════════════════════════════════════
-          MARQUEE
+          MARQUEE — curtains over the shrinking hero, speed reacts to scroll velocity
       ══════════════════════════════════════ */}
-      <Box sx={{ bgcolor: '#fff', py: 3, overflow: 'hidden', borderBottom: `1px solid rgba(249,115,22,0.07)` }}>
-        <M
-          animate={{ x: ['0%', '-50%'] }}
-          transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
-          sx={{ display: 'flex', gap: 6, whiteSpace: 'nowrap', width: 'max-content', willChange: 'transform' }}
-        >
+      <Box sx={{
+        bgcolor: '#fff', py: 3, overflow: 'hidden', borderBottom: `1px solid rgba(249,115,22,0.07)`,
+        position: 'relative', zIndex: 5, mt: { xs: '-24px', md: '-40px' },
+        borderTopLeftRadius: { xs: '24px', md: '36px' }, borderTopRightRadius: { xs: '24px', md: '36px' },
+        boxShadow: '0 -20px 40px rgba(0,0,0,0.06)',
+      }}>
+        <Box ref={marqueeRef} sx={{ display: 'flex', gap: 6, whiteSpace: 'nowrap', width: 'max-content', willChange: 'transform' }}>
           {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((t, i) => (
             <Typography key={i} sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.09em', color: t === '•' ? MF.primary : MF.outlineVar, textTransform: 'uppercase' }}>{t}</Typography>
           ))}
-        </M>
+        </Box>
       </Box>
 
       {/* ══════════════════════════════════════
@@ -476,9 +594,7 @@ export default function LandingPage() {
         <M initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true, amount: 0.15 }}>
           <M variants={fadeUp} sx={{ textAlign: 'center', mb: 9 }}>
             <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MF.primary, mb: 2 }}>Everything in one place</Typography>
-            <Typography sx={{ fontSize: { xs: 30, md: 48 }, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.12, fontFamily: 'Manrope, Inter, sans-serif' }}>
-              One platform for every restaurant
-            </Typography>
+            <SplitHeading text="One platform for every restaurant" sx={{ fontSize: { xs: 30, md: 48 }, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.12, fontFamily: 'Manrope, Inter, sans-serif' }} />
             <Typography sx={{ fontSize: 16, color: MF.textSub, mt: 2, maxWidth: 500, mx: 'auto', lineHeight: 1.72 }}>
               From QR menus to UPI payments and analytics — run your restaurant smarter.
             </Typography>
@@ -490,15 +606,13 @@ export default function LandingPage() {
       </Box>
 
       {/* ══════════════════════════════════════
-          HOW IT WORKS
+          HOW IT WORKS — step markers now pulse as they cross the viewport center
       ══════════════════════════════════════ */}
       <Box component="section" sx={{ bgcolor: MF.surfaceLow, py: { xs: 10, md: 14 }, px: { xs: 3, md: 6 } }}>
         <Box sx={{ maxWidth: 1100, mx: 'auto' }}>
           <M initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
             <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MF.primary, mb: 1.5, textAlign: 'center' }}>How it works</Typography>
-            <Typography sx={{ fontSize: { xs: 30, md: 44 }, fontWeight: 900, letterSpacing: '-0.03em', textAlign: 'center', mb: { xs: 7, md: 10 }, fontFamily: 'Manrope, Inter, sans-serif' }}>
-              Live in under 20 minutes
-            </Typography>
+            <SplitHeading text="Live in under 20 minutes" sx={{ fontSize: { xs: 30, md: 44 }, fontWeight: 900, letterSpacing: '-0.03em', textAlign: 'center', mb: { xs: 7, md: 10 }, fontFamily: 'Manrope, Inter, sans-serif' }} />
           </M>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             {STEPS.map(({ n, title, desc, color }, idx) => (
@@ -517,11 +631,9 @@ export default function LandingPage() {
                         <Typography sx={{ fontSize: 15, color: MF.textSub, lineHeight: 1.75, maxWidth: 380 }}>{desc}</Typography>
                       </Box>
                       <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
-                        <motion.div whileHover={{ scale: 1.12 }} transition={{ type: 'spring', stiffness: 280 }}>
-                          <Box sx={{ width: 64, height: 64, borderRadius: '50%', background: `linear-gradient(135deg, ${color}20, ${color}40)`, border: `2px solid ${color}45`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 24px ${color}18` }}>
-                            <Typography sx={{ fontSize: 22, fontWeight: 900, color }}>{n}</Typography>
-                          </Box>
-                        </motion.div>
+                        <Box ref={el => stepCircleRefs.current[idx] = el} sx={{ width: 64, height: 64, borderRadius: '50%', background: `linear-gradient(135deg, ${color}20, ${color}40)`, border: `2px solid ${color}45`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 24px ${color}18` }}>
+                          <Typography sx={{ fontSize: 22, fontWeight: 900, color }}>{n}</Typography>
+                        </Box>
                       </Box>
                       <Box sx={{ display: { xs: 'none', md: 'block' } }} />
                     </>
@@ -529,11 +641,9 @@ export default function LandingPage() {
                     <>
                       <Box sx={{ display: { xs: 'none', md: 'block' } }} />
                       <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
-                        <motion.div whileHover={{ scale: 1.12 }} transition={{ type: 'spring', stiffness: 280 }}>
-                          <Box sx={{ width: 64, height: 64, borderRadius: '50%', background: `linear-gradient(135deg, ${color}20, ${color}40)`, border: `2px solid ${color}45`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 24px ${color}18` }}>
-                            <Typography sx={{ fontSize: 22, fontWeight: 900, color }}>{n}</Typography>
-                          </Box>
-                        </motion.div>
+                        <Box ref={el => stepCircleRefs.current[idx] = el} sx={{ width: 64, height: 64, borderRadius: '50%', background: `linear-gradient(135deg, ${color}20, ${color}40)`, border: `2px solid ${color}45`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 24px ${color}18` }}>
+                          <Typography sx={{ fontSize: 22, fontWeight: 900, color }}>{n}</Typography>
+                        </Box>
                       </Box>
                       <Box sx={{ gridColumn: { xs: '1/-1', md: 'auto' } }}>
                         <Typography sx={{ fontSize: 12, color, mb: 1.25, fontWeight: 700, letterSpacing: '0.05em' }}>STEP {n}</Typography>
@@ -550,16 +660,14 @@ export default function LandingPage() {
       </Box>
 
       {/* ══════════════════════════════════════
-          TESTIMONIALS — static grid (no marquee lag)
+          TESTIMONIALS
       ══════════════════════════════════════ */}
       <Box component="section" sx={{ py: { xs: 10, md: 14 }, px: { xs: 3, md: 6 }, bgcolor: '#fff' }}>
         <Box sx={{ maxWidth: 1280, mx: 'auto' }}>
           <M initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
             <Box sx={{ textAlign: 'center', mb: 8 }}>
               <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MF.primary, mb: 1.5 }}>From restaurant owners</Typography>
-              <Typography sx={{ fontSize: { xs: 28, md: 42 }, fontWeight: 900, letterSpacing: '-0.03em', fontFamily: 'Manrope, Inter, sans-serif' }}>
-                Loved by restaurant owners
-              </Typography>
+              <SplitHeading text="Loved by restaurant owners" sx={{ fontSize: { xs: 28, md: 42 }, fontWeight: 900, letterSpacing: '-0.03em', fontFamily: 'Manrope, Inter, sans-serif' }} />
             </Box>
           </M>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(3,1fr)' }, gap: 3 }}>
@@ -572,7 +680,7 @@ export default function LandingPage() {
               >
                 <Box sx={{ bgcolor: MF.surfaceLow, borderRadius: '20px', p: 3.5, height: '100%', border: `1px solid rgba(249,115,22,0.09)` }}>
                   <Box sx={{ display: 'flex', gap: 0.3, mb: 2.5 }}>
-                    {[1,2,3,4,5].map(s => <Box key={s} component="span" sx={{ color: '#fbbf24', fontSize: 14 }}>★</Box>)}
+                    {[1, 2, 3, 4, 5].map(s => <Box key={s} component="span" sx={{ color: '#fbbf24', fontSize: 14 }}>★</Box>)}
                   </Box>
                   <Typography sx={{ fontSize: 14, color: MF.textSub, lineHeight: 1.72, mb: 3, fontStyle: 'italic' }}>"{t.quote}"</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -594,100 +702,66 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════
           METRICS
       ══════════════════════════════════════ */}
-      <Box component="section" sx={{ py: { xs: 10, md: 12 }, px: { xs: 3, md: 6 }, background: MF.gradient, position: 'relative', overflow: 'hidden' }}>
-        <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '44px 44px', pointerEvents: 'none' }} />
-        <Box sx={{ maxWidth: 1280, mx: 'auto', display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4,1fr)' }, gap: 4, textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          {METRICS.map(({ to, suffix, label }) => (
-            <M key={label} initial="hidden" whileInView="visible" variants={scaleIn} viewport={{ once: true }}>
-              <Typography sx={{ fontSize: { xs: 44, md: 58 }, fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                <Counter to={to} suffix={suffix} />
-              </Typography>
-              <Typography sx={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.72)', textTransform: 'uppercase', letterSpacing: '0.1em', mt: 1.25 }}>{label}</Typography>
-            </M>
-          ))}
+      <Box component="section" sx={{ py: { xs: 8, md: 12 }, px: { xs: 2.5, md: 6 }, bgcolor: '#ffffff' }}>
+        <Box
+          sx={{
+            maxWidth: 1280, mx: 'auto',
+            background: 'linear-gradient(135deg, #ea580c 0%, #f97316 50%, #eab308 100%)',
+            borderRadius: { xs: '24px', md: '36px' }, p: { xs: 4, sm: 6, md: 8 },
+            position: 'relative', overflow: 'hidden', boxShadow: '0 20px 50px rgba(249,115,22,0.18)'
+          }}
+        >
+          <Box ref={gridRefA} sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '40px 40px', pointerEvents: 'none' }} />
+
+          <Box sx={{ position: 'relative', zIndex: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'flex-end' }, gap: 4, mb: { xs: 6, md: 10 }, pb: 5, borderBottom: '1px solid rgba(255, 255, 255, 0.15)' }}>
+              <Box sx={{ maxWidth: { xs: '100%', md: '60%' } }}>
+                <SplitHeading text="We only deliver results." sx={{ fontSize: { xs: 32, md: 46 }, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', lineHeight: 1.15, fontFamily: 'Manrope, Inter, sans-serif' }} />
+                <Typography sx={{ fontSize: { xs: 15, md: 17 }, color: 'rgba(255, 255, 255, 0.85)', mt: 1.5, lineHeight: 1.6, fontWeight: 500 }}>
+                  No excuses, no unnecessary complexity. Just absolute reliability, lightning-fast order processing, and growth statistics that speak for themselves.
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
+                <motion.button
+                  whileHover={{ scale: 1.04, background: 'rgba(255,255,255,0.15)' }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => navigate('/how-it-works')}
+                  style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff', border: '1.5px solid rgba(255, 255, 255, 0.4)', padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>play_circle</span>
+                  Watch Demo
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.04, boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => navigate('/contact')}
+                  style={{ background: '#ffffff', color: '#ea580c', border: 'none', padding: '12px 24px', borderRadius: 12, fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
+                >
+                  Get Started
+                </motion.button>
+              </Box>
+            </Box>
+
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4, 1fr)' }, gap: { xs: 4, md: 5 } }}>
+              {METRICS.map(({ to, suffix, label, desc }) => (
+                <M key={label} initial="hidden" whileInView="visible" variants={scaleIn} viewport={{ once: true }} sx={{ textAlign: 'left', position: 'relative' }}>
+                  <Typography sx={{ fontSize: { xs: 40, md: 54 }, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.04em', lineHeight: 1, mb: 1.5, fontFamily: 'Manrope, Inter, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                    <Counter to={to} suffix={suffix} />
+                  </Typography>
+                  <Typography sx={{ fontSize: 15, fontWeight: 800, color: '#fef08a', letterSpacing: '-0.01em', mb: 1.25 }}>{label}</Typography>
+                  <Typography sx={{ fontSize: 13.5, color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.6, fontWeight: 400 }}>{desc}</Typography>
+                </M>
+              ))}
+            </Box>
+          </Box>
         </Box>
       </Box>
 
       {/* ══════════════════════════════════════
           PRICING
       ══════════════════════════════════════ */}
-      <Box component="section" sx={{ py: { xs: 10, md: 14 }, px: { xs: 3, md: 6 }, bgcolor: MF.bg }}>
-        <Box sx={{ maxWidth: 1280, mx: 'auto' }}>
-          <M initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
-            <Box sx={{ textAlign: 'center', mb: 9 }}>
-              <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: MF.primary, mb: 1.5 }}>Simple pricing</Typography>
-              <Typography sx={{ fontSize: { xs: 30, md: 46 }, fontWeight: 900, letterSpacing: '-0.03em', fontFamily: 'Manrope, Inter, sans-serif' }}>Pick your plan</Typography>
-              <Typography sx={{ fontSize: 16, color: MF.textSub, mt: 2, maxWidth: 440, mx: 'auto' }}>No hidden charges. Cancel anytime. First 30 days free.</Typography>
-            </Box>
-          </M>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3,1fr)' }, gap: 3, alignItems: 'center' }}>
-            {PRICING.map(({ name, price, features, featured }, i) => (
-              <motion.div key={name}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -8, transition: { duration: 0.28 } }}
-                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                viewport={{ once: true }}
-                style={{ cursor: 'pointer' }}
-              >
-                <Box sx={{
-                  background: '#fff', borderRadius: '24px', p: { xs: 4, md: 5 }, position: 'relative',
-                  border: featured ? `2px solid ${MF.primary}55` : '1px solid rgba(232,213,196,0.6)',
-                  boxShadow: featured ? `0 16px 50px ${MF.primary}16` : '0 6px 20px rgba(0,0,0,0.05)',
-                  ...(featured && { transform: 'scale(1.04)', zIndex: 1 }),
-                }}>
-                  {featured && (
-                    <Box sx={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: MF.gradient, color: '#fff', px: 3, py: 0.625, borderRadius: '100px', fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                      Most Popular
-                    </Box>
-                  )}
-                  <Typography sx={{ fontSize: 19, fontWeight: 700, mb: 1.5 }}>{name}</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mb: 4.5 }}>
-                    {price ? (
-                      <>
-                        <Typography sx={{ fontSize: 14, fontWeight: 700, color: MF.textSub, mt: 0.5 }}>₹</Typography>
-                        <Typography sx={{ fontSize: 48, fontWeight: 900, color: featured ? MF.primary : MF.text, letterSpacing: '-0.04em', lineHeight: 1 }}>{price.toLocaleString('en-IN')}</Typography>
-                        <Typography sx={{ color: MF.outlineVar, fontSize: 14 }}>/mo</Typography>
-                      </>
-                    ) : (
-                      <Typography sx={{ fontSize: 34, fontWeight: 900 }}>Custom</Typography>
-                    )}
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75, mb: 5 }}>
-                    {features.map(f => (
-                      <Box key={f} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Box sx={{ width: 20, height: 20, borderRadius: '50%', bgcolor: `${MF.primary}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span className="material-symbols-outlined" style={{ color: MF.primary, fontSize: 12 }}>check</span>
-                        </Box>
-                        <Typography sx={{ fontSize: 13.5, color: MF.textSub }}>{f}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => navigate(price ? '/register' : '/contact')}
-                    style={{
-                      width: '100%', padding: '14px', borderRadius: 12, fontWeight: 700, fontSize: 14,
-                      cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                      ...(featured
-                        ? { background: 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff', border: 'none', boxShadow: '0 8px 24px rgba(249,115,22,0.32)' }
-                        : { background: 'transparent', border: `1.5px solid ${MF.outlineVar}`, color: MF.text }
-                      ),
-                    }}
-                  >
-                    {featured ? 'Get Started — Free Trial' : price ? 'Get Started' : 'Contact Sales'}
-                  </motion.button>
-                </Box>
-              </motion.div>
-            ))}
-          </Box>
-          <M initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} sx={{ textAlign: 'center', mt: 4 }}>
-            <Typography sx={{ fontSize: 13, color: MF.textSub }}>
-              GST extra as applicable ·{' '}
-              <Box component="span" sx={{ color: MF.primary, fontWeight: 700 }}>Cancel anytime</Box>
-            </Typography>
-          </M>
-        </Box>
-      </Box>
+      <PricingSection locale="IN" />
 
       {/* ══════════════════════════════════════
           CTA
@@ -696,27 +770,23 @@ export default function LandingPage() {
         <M initial="hidden" whileInView="visible" variants={scaleIn} viewport={{ once: true, amount: 0.3 }}
           sx={{ maxWidth: 960, mx: 'auto', background: MF.gradient, borderRadius: '36px', p: { xs: 6, md: 10 }, textAlign: 'center', color: '#fff', position: 'relative', overflow: 'hidden', boxShadow: `0 20px 60px rgba(249,115,22,0.28)` }}
         >
-          {/* Static decorative circles — no animation, no repaint */}
           <Box sx={{ position: 'absolute', top: -60, right: -60, width: 240, height: 240, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none' }} />
           <Box sx={{ position: 'absolute', bottom: -50, left: -50, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
-          <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '40px 40px', pointerEvents: 'none' }} />
+          <Box ref={gridRefB} sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '40px 40px', pointerEvents: 'none' }} />
 
           <Box sx={{ position: 'relative', zIndex: 1 }}>
             <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.25, bgcolor: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '100px', px: 2, py: 0.625, mb: 3 }}>
               <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#4ade80', boxShadow: '0 0 8px #4ade80', animation: 'livePulse 2s ease-in-out infinite' }} />
               <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.05em' }}>2,000+ restaurants live across India</Typography>
             </Box>
-            <Typography sx={{ fontSize: { xs: 30, md: 50 }, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, mb: 2.5, fontFamily: 'Manrope, Inter, sans-serif' }}>
-              Take your restaurant<br />digital today
-            </Typography>
+            <SplitHeading text="Take your restaurant digital today" sx={{ fontSize: { xs: 30, md: 50 }, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, mb: 2.5, fontFamily: 'Manrope, Inter, sans-serif' }} />
             <Typography sx={{ fontSize: 16, color: 'rgba(255,255,255,0.82)', mb: 6, maxWidth: 440, mx: 'auto', lineHeight: 1.75 }}>
               Setup in under 20 minutes. Accept UPI from day one. First 30 days completely free.
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/register')}
-                style={{ background: '#fff', color: MF.primary, padding: '16px 40px', borderRadius: 14, fontWeight: 800, fontSize: 16, border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 10px 30px rgba(0,0,0,0.14)' }}>
+              <MagneticButton onClick={() => navigate('/contact')} style={{ background: '#fff', color: MF.primary, boxShadow: '0 10px 30px rgba(0,0,0,0.14)' }}>
                 Start Free Trial
-              </motion.button>
+              </MagneticButton>
               <motion.button whileHover={{ scale: 1.03, background: 'rgba(255,255,255,0.2)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/contact')}
                 style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.3)', padding: '16px 40px', borderRadius: 14, fontWeight: 700, fontSize: 16, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                 Book a Demo

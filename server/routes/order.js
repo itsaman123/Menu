@@ -5,13 +5,14 @@ const MenuItem = require('../models/MenuItem');
 const Restaurant = require('../models/Restaurant');
 const { protectCustomer } = require('../middleware/customerAuth');
 const { protect, requireFeature } = require('../middleware/authMiddleware');
+const Invoice = require('../models/Invoice');
 
 // @route   POST /api/orders/create
 // @desc    Create a new order (after OTP verification)
 // @access  Customer (OTP verified)
 router.post('/create', protectCustomer, async (req, res) => {
   try {
-    const { restaurantSlug, items, tableNumber } = req.body;
+    const { restaurantSlug, items, tableNumber, notes } = req.body;
     
     if (!restaurantSlug || !items || items.length === 0) {
       return res.status(400).json({ message: 'Restaurant slug and items are required' });
@@ -41,22 +42,49 @@ router.post('/create', protectCustomer, async (req, res) => {
          menuItemId: menuItem._id,
          name: menuItem.name,
          price: menuItem.price,
-         quantity: item.quantity
+         quantity: item.quantity,
+         notes: (item.notes || '').slice(0, 300)
        });
     }
 
-    // Add 5% GST
-    const finalAmount = totalAmount * 1.05;
+    // GST is only added if the restaurant has it enabled, at their configured rate
+    const gstEnabled = restaurant.gstEnabled !== false;
+    const gstRatePct = gstEnabled ? (restaurant.gstRate ?? 5) : 0;
+    const gstAmount = gstEnabled ? +(totalAmount * (gstRatePct / 100)).toFixed(2) : 0;
+    const finalAmount = totalAmount + gstAmount;
 
     const order = new Order({
       restaurantId: restaurant._id,
       items: orderItems,
+      subtotal: totalAmount,
+      gstAmount,
+      gstRatePct,
       totalAmount: finalAmount,
       tableNumber: tableNumber,
+      notes: (notes || '').slice(0, 500),
       customerPhone: req.customer.phone
     });
 
     const createdOrder = await order.save();
+
+    // Auto-generate invoice for the QR order so it appears in the billing table
+    const invoiceNumber = await Invoice.generateInvoiceNumber(restaurant._id);
+    const invoice = new Invoice({
+      restaurantId: restaurant._id,
+      invoiceNumber: invoiceNumber,
+      orderId: createdOrder._id,
+      customerName: `QR Customer - ${req.customer.phone}`,
+      customerPhone: req.customer.phone,
+      tableNumber: tableNumber || '',
+      items: orderItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, notes: i.notes })),
+      subtotal: totalAmount,
+      gstRatePct: gstRatePct,
+      gstAmount: gstAmount,
+      totalAmount: finalAmount,
+      status: 'pending'
+    });
+    await invoice.save();
+
     res.status(201).json(createdOrder);
 
   } catch (error) {
@@ -70,7 +98,9 @@ router.post('/create', protectCustomer, async (req, res) => {
 // @access  Customer (OTP verified)
 router.get('/my-orders', protectCustomer, async (req, res) => {
   try {
-    const orders = await Order.find({ customerPhone: req.customer.phone }).sort('-createdAt');
+    const orders = await Order.find({ customerPhone: req.customer.phone })
+      .populate('restaurantId', 'name slug')
+      .sort('-createdAt');
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: 'Server error getting orders' });
@@ -109,6 +139,15 @@ router.put('/:id/status', protect, requireFeature('orders'), async (req, res) =>
     if (order) {
       order.status = status;
       const updatedOrder = await order.save();
+
+      // If order is cancelled, also cancel the linked invoice
+      if (status === 'cancelled') {
+        await Invoice.findOneAndUpdate(
+          { orderId: order._id },
+          { status: 'cancelled' }
+        );
+      }
+
       res.json(updatedOrder);
     } else {
       res.status(404).json({ message: 'Order not found' });
@@ -120,12 +159,14 @@ router.put('/:id/status', protect, requireFeature('orders'), async (req, res) =>
 
 // @route   GET /api/orders/:id
 // @desc    Get single order details (for customer order tracking page)
-// @access  Public (order ID is hard to guess, serves as an access token)
-// NOTE:    In production, add proper auth (customer OTP token) for this endpoint
-router.get('/:id', async (req, res) => {
+// @access  Customer (OTP verified) — must be the phone that placed the order
+router.get('/:id', protectCustomer, async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate('restaurantId', 'name slug');
+    const order = await Order.findById(req.params.id).populate('restaurantId', 'name slug estimatedPrepTime');
     if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (order.customerPhone !== req.customer.phone) {
+      return res.status(403).json({ message: 'Not authorized to view this order' });
+    }
     
     res.json(order);
   } catch (error) {

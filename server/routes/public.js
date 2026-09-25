@@ -37,6 +37,10 @@ router.get('/menu/:slug', async (req, res) => {
         name: restaurant.name,
         slug: restaurant.slug,
         gaTrackingId: restaurant.gaTrackingId || '',
+        gstEnabled: restaurant.gstEnabled !== false,
+        gstRate: restaurant.gstRate ?? 5,
+        estimatedPrepTime: restaurant.estimatedPrepTime || '15-20 mins',
+        coverImage: restaurant.coverImage || '',
       },
       menu: structuredMenu
     });

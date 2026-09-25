@@ -80,7 +80,13 @@ router.get('/restaurant-settings', protect, async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.admin.restaurantId);
     if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
-    res.json({ gaTrackingId: restaurant.gaTrackingId || '' });
+    res.json({
+      gaTrackingId: restaurant.gaTrackingId || '',
+      gstEnabled: restaurant.gstEnabled !== false,
+      gstRate: restaurant.gstRate ?? 5,
+      estimatedPrepTime: restaurant.estimatedPrepTime || '15-20 mins',
+      coverImage: restaurant.coverImage || '',
+    });
   } catch {
     res.status(500).json({ message: 'Server error' });
   }
@@ -94,16 +100,32 @@ const GA_ID_RE = /^(G-|UA-|AW-)[A-Z0-9-]+$/i;
 // @access  Protected
 router.put('/restaurant-settings', protect, async (req, res) => {
   try {
-    const { gaTrackingId } = req.body;
+    const { gaTrackingId, gstEnabled, gstRate, estimatedPrepTime, coverImage } = req.body;
     if (gaTrackingId && !GA_ID_RE.test(gaTrackingId)) {
       return res.status(400).json({ message: 'Invalid Google Analytics ID. Expected format: G-XXXXXXXX' });
     }
+    if (gstRate !== undefined && (isNaN(gstRate) || gstRate < 0 || gstRate > 100)) {
+      return res.status(400).json({ message: 'GST rate must be a number between 0 and 100' });
+    }
+    const update = {};
+    if (gaTrackingId !== undefined) update.gaTrackingId = gaTrackingId || '';
+    if (gstEnabled !== undefined) update.gstEnabled = !!gstEnabled;
+    if (gstRate !== undefined) update.gstRate = Number(gstRate);
+    if (estimatedPrepTime !== undefined) update.estimatedPrepTime = estimatedPrepTime.trim().slice(0, 40) || '15-20 mins';
+    if (coverImage !== undefined) update.coverImage = coverImage || '';
+
     const restaurant = await Restaurant.findByIdAndUpdate(
       req.admin.restaurantId,
-      { gaTrackingId: gaTrackingId || '' },
+      update,
       { new: true }
     );
-    res.json({ gaTrackingId: restaurant.gaTrackingId });
+    res.json({
+      gaTrackingId: restaurant.gaTrackingId,
+      gstEnabled: restaurant.gstEnabled !== false,
+      gstRate: restaurant.gstRate ?? 5,
+      estimatedPrepTime: restaurant.estimatedPrepTime || '15-20 mins',
+      coverImage: restaurant.coverImage || '',
+    });
   } catch {
     res.status(500).json({ message: 'Server error' });
   }

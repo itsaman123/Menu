@@ -22,6 +22,8 @@ export default function PublicMenu() {
   const [error, setError]             = useState('');
   const [activeCategory, setActiveCategory] = useState('All Items');
   const [cart, setCart]               = useState({});   // { itemId: qty }
+  const [search, setSearch]           = useState('');
+  const [vegFilter, setVegFilter]     = useState('all'); // 'all' | 'veg' | 'nonveg'
 
   // Fetch real menu from backend
   useEffect(() => {
@@ -64,9 +66,17 @@ export default function PublicMenu() {
   const itemMap  = Object.fromEntries(allItems.map(i => [i._id, i]));
 
   const categories   = ['All Items', ...menu.map(c => c.name)];
-  const displayedCats = activeCategory === 'All Items'
-    ? menu
-    : menu.filter(c => c.name === activeCategory);
+
+  const matchesFilters = item => {
+    const matchSearch = !search.trim() || item.name.toLowerCase().includes(search.trim().toLowerCase());
+    const matchVeg = vegFilter === 'all' || (vegFilter === 'veg' ? item.isVeg !== false : item.isVeg === false);
+    return matchSearch && matchVeg;
+  };
+
+  const displayedCats = (activeCategory === 'All Items' ? menu : menu.filter(c => c.name === activeCategory))
+    .map(c => ({ ...c, items: c.items.filter(matchesFilters) }));
+
+  const hasResults = displayedCats.some(c => c.items.length > 0);
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
   const cartTotal = Object.entries(cart).reduce((sum, [id, qty]) => sum + (itemMap[id]?.price || 0) * qty, 0);
@@ -81,10 +91,13 @@ export default function PublicMenu() {
       name: itemMap[id]?.name || '',
       price: itemMap[id]?.price || 0,
       quantity: qty,
+      isVeg: itemMap[id]?.isVeg !== false,
     }));
     localStorage.setItem('pendingCart', JSON.stringify({
       restaurantSlug: slug,
       items: cartItems,
+      gstEnabled: restaurant?.gstEnabled !== false,
+      gstRate: restaurant?.gstRate ?? 5,
     }));
     navigate(`/checkout/${slug}`);
   };
@@ -125,6 +138,15 @@ export default function PublicMenu() {
             </Box>
             <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.05em', color: T.text }}>{restaurantName}</Typography>
           </Box>
+          <Box component="button" onClick={() => navigate('/my-orders')} title="My Orders" sx={{
+            display: 'flex', alignItems: 'center', gap: 0.75, px: 2, py: 1, borderRadius: '9999px',
+            bgcolor: T.surfaceAlt, border: 'none', cursor: 'pointer', color: T.textSub,
+            fontFamily: 'Inter, sans-serif', fontSize: '0.8rem', fontWeight: 700,
+            '&:hover': { bgcolor: T.surfaceHigh, color: T.text }, transition: 'all 0.15s',
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>receipt_long</span>
+            My Orders
+          </Box>
         </Box>
       </M>
 
@@ -134,7 +156,7 @@ export default function PublicMenu() {
         <M variants={fadeUp} initial="hidden" animate="visible" component="section" sx={{ px: 3, mb: 4 }}>
           <Box sx={{ position: 'relative', height: 192, borderRadius: '0.5rem', overflow: 'hidden' }}>
             <Box component="img"
-              src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80"
+              src={restaurant?.coverImage || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80'}
               alt={restaurantName}
               sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.7s', '&:hover': { transform: 'scale(1.05)' } }}
             />
@@ -142,6 +164,36 @@ export default function PublicMenu() {
               <Typography sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', mb: 0.5 }}>Welcome to</Typography>
               <Typography variant="h1" sx={{ color: '#fff', fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.025em' }}>{restaurantName}</Typography>
             </Box>
+          </Box>
+        </M>
+
+        {/* Search + Veg Filter */}
+        <M variants={fadeUp} initial="hidden" animate="visible" component="section" sx={{ px: 3, mb: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <Box sx={{ position: 'relative' }}>
+            <span className="material-symbols-outlined" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: T.textMuted, fontSize: 20 }}>search</span>
+            <Box component="input" placeholder="Search dishes…" value={search} onChange={e => setSearch(e.target.value)}
+              sx={{ width: '100%', bgcolor: T.surface, border: `1px solid ${T.surfaceHigh}`, height: 48, pl: '46px', pr: 3, borderRadius: '9999px', outline: 'none', color: T.text, fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', boxSizing: 'border-box', boxShadow: T.shadow, '&:focus': { boxShadow: '0 0 0 2px rgba(249,115,22,0.25)' } }} />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {[
+              { id: 'all', label: 'All' },
+              { id: 'veg', label: 'Veg', color: '#006c49' },
+              { id: 'nonveg', label: 'Non-Veg', color: '#ba1a1a' },
+            ].map(f => (
+              <Box key={f.id} component="button" onClick={() => setVegFilter(f.id)} sx={{
+                display: 'flex', alignItems: 'center', gap: 0.75, px: 2.5, py: 1, borderRadius: '9999px', border: 'none', cursor: 'pointer',
+                fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.2s',
+                bgcolor: vegFilter === f.id ? (f.color || '#f97316') : T.surfaceAlt,
+                color: vegFilter === f.id ? '#fff' : T.textSub,
+              }}>
+                {f.color && (
+                  <Box sx={{ width: 9, height: 9, borderRadius: '2px', border: `2px solid ${vegFilter === f.id ? '#fff' : f.color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: vegFilter === f.id ? '#fff' : f.color }} />
+                  </Box>
+                )}
+                {f.label}
+              </Box>
+            ))}
           </Box>
         </M>
 
@@ -172,6 +224,12 @@ export default function PublicMenu() {
             <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '1.125rem' }}>Menu coming soon</Typography>
             <Typography sx={{ color: T.textSub, mt: 0.5 }}>No items have been added yet.</Typography>
           </Box>
+        ) : !hasResults ? (
+          <Box sx={{ textAlign: 'center', py: 12, px: 3 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 56, color: T.textMuted, display: 'block', marginBottom: 16 }}>search_off</span>
+            <Typography sx={{ fontWeight: 700, color: T.text, fontSize: '1.125rem' }}>No dishes found</Typography>
+            <Typography sx={{ color: T.textSub, mt: 0.5 }}>Try a different search or filter.</Typography>
+          </Box>
         ) : (
           <Box component="section" sx={{ px: 3, mt: 2, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {displayedCats.map((category) => (
@@ -187,7 +245,12 @@ export default function PublicMenu() {
                       '&:hover': { transform: 'scale(1.02)', bgcolor: T.surfaceAlt },
                     }}>
                       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Typography variant="h3" sx={{ fontWeight: 700, fontSize: '1.0625rem', lineHeight: 1.25, color: T.text }}>{item.name}</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                          <Box sx={{ width: 11, height: 11, borderRadius: '2px', flexShrink: 0, border: `2px solid ${item.isVeg !== false ? '#006c49' : '#ba1a1a'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: item.isVeg !== false ? '#006c49' : '#ba1a1a' }} />
+                          </Box>
+                          <Typography variant="h3" sx={{ fontWeight: 700, fontSize: '1.0625rem', lineHeight: 1.25, color: T.text }}>{item.name}</Typography>
+                        </Box>
                         {item.description && (
                           <Typography sx={{ color: T.textSub, fontSize: '0.875rem', lineHeight: 1.625, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {item.description}

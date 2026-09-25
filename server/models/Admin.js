@@ -5,7 +5,7 @@ const adminSchema = new mongoose.Schema({
   password: { type: String, required: true },
   restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
   isActive: { type: Boolean, default: true },
-  disabledFeatures: [{ type: String }] // Can store keys like 'menu', 'analytics', 'qr'
+  disabledFeatures: [{ type: String }] // Can store keys like 'menu', 'analytics', 'qr', 'inventory'
 }, { timestamps: true });
 
 module.exports = mongoose.model('Admin', adminSchema);

@@ -32,12 +32,17 @@ function QRCard({ label, url, logo, T, onDownloadSinglePdf, onRemove }) {
   }, [label]);
 
   return (
-    <Box sx={{ bgcolor: T.surface, borderRadius: '1rem', p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, boxShadow: T.shadow, transition: 'all 0.2s', position: 'relative', '&:hover': { transform: 'translateY(-2px)', boxShadow: T.shadowHov }, '&:hover .qr-remove': { opacity: 1 } }}>
+    <Box sx={{ bgcolor: T.surface, borderRadius: '1rem', p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5, boxShadow: T.shadow, transition: 'all 0.2s', position: 'relative', '&:hover': { transform: 'translateY(-2px)', boxShadow: T.shadowHov }, '&:hover .qr-remove': { opacity: 1 } }}>
       {/* Remove button */}
       <Box className="qr-remove" component="button" onClick={onRemove}
         sx={{ position: 'absolute', top: 10, right: 10, opacity: 0, transition: 'opacity 0.15s', width: 24, height: 24, bgcolor: '#ba1a1a', color: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
         <span className="material-symbols-outlined" style={{ fontSize: 13 }}>close</span>
       </Box>
+
+      {/* Top instruction */}
+      <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#f97316', textAlign: 'center', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+        Scan to view menu
+      </Typography>
 
       <Box ref={canvasRef} sx={{ p: 2, bgcolor: '#fff', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <QRCodeCanvas
@@ -50,9 +55,16 @@ function QRCard({ label, url, logo, T, onDownloadSinglePdf, onRemove }) {
           imageSettings={logo ? { src: logo, height: 32, width: 32, excavate: true } : undefined}
         />
       </Box>
+
       <Typography sx={{ fontSize: '0.875rem', fontWeight: 800, color: T.text, letterSpacing: '-0.01em' }}>{label}</Typography>
       <Typography sx={{ fontSize: '10px', color: T.textMuted, textAlign: 'center', maxWidth: 160, wordBreak: 'break-all', lineHeight: 1.4 }}>{url}</Typography>
-      <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+
+      {/* Very bottom branding */}
+      <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: T.textSub, textAlign: 'center', mt: 0.5 }}>
+        QR by <Box component="a" href="https://scanit.nestsphere.in/" target="_blank" rel="noopener noreferrer" sx={{ color: '#f97316', textDecoration: 'none', fontWeight: 800, '&:hover': { textDecoration: 'underline' } }}>https://scanit.nestsphere.in/</Box>
+      </Typography>
+
+      <Box sx={{ display: 'flex', gap: 1, width: '100%', mt: 0.5 }}>
         <Box component="button" onClick={downloadPng}
           sx={{ flex: 1, py: 1, bgcolor: T.surfaceAlt, border: 'none', borderRadius: '0.5rem', color: T.textSub, fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, transition: 'all 0.15s', '&:hover': { bgcolor: T.surfaceHigh } }}>
           <span className="material-symbols-outlined" style={{ fontSize: 14 }}>image</span>PNG
@@ -84,25 +96,43 @@ async function buildPdf(qrList, pdfCanvases, restaurantName, slug, single = fals
 
     pdf.setFillColor(255, 250, 246);
     pdf.rect(0, 0, pageW, pageH, 'F');
+
+    // 1. Top instruction
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(11);
+    pdf.setTextColor(249, 115, 22);
+    pdf.text('SCAN TO VIEW MENU', cx, qrY - 14, { align: 'center' });
+
+    // 2. Restaurant Name
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(9);
     pdf.setTextColor(130, 130, 130);
-    pdf.text(restaurantName.toUpperCase(), cx, qrY - 9, { align: 'center' });
+    pdf.text(restaurantName.toUpperCase(), cx, qrY - 7, { align: 'center' });
+
+    // 3. QR box & image
     pdf.setFillColor(255, 255, 255);
     pdf.setDrawColor(220, 220, 230);
     pdf.roundedRect(qrX - 6, qrY - 6, qrMM + 12, qrMM + 12, 4, 4, 'FD');
     pdf.addImage(imgData, 'PNG', qrX, qrY, qrMM, qrMM, undefined, 'NONE');
+
+    // 4. Label
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(22);
     pdf.setTextColor(26, 26, 46);
-    pdf.text(label, cx, qrY + qrMM + 12, { align: 'center' });
+    pdf.text(label, cx, qrY + qrMM + 16, { align: 'center' });
+
+    // 5. URL
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(7);
     pdf.setTextColor(160, 160, 160);
-    pdf.text(url, cx, qrY + qrMM + 19, { align: 'center', maxWidth: 160 });
+    pdf.text(url, cx, qrY + qrMM + 23, { align: 'center', maxWidth: 160 });
+
+    // 6. Very bottom branding
+    pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(9);
     pdf.setTextColor(249, 115, 22);
-    pdf.text('Scan with your phone camera to view the menu', cx, qrY + qrMM + 26, { align: 'center' });
+    pdf.text('QR by https://scanit.nestsphere.in/', cx, qrY + qrMM + 30, { align: 'center' });
+
     pdf.save(`qr-${label.toLowerCase().replace(/\s+/g, '-')}.pdf`);
     return;
   }
@@ -128,27 +158,42 @@ async function buildPdf(qrList, pdfCanvases, restaurantName, slug, single = fals
     pdf.setFillColor(255, 255, 255);
     pdf.setDrawColor(220, 220, 230);
     pdf.roundedRect(margin + col * cellW + pad, topY, cellW - pad * 2, cellH - pad * 2, 3, 3, 'FD');
+
+    // 1. Top instruction
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.setTextColor(249, 115, 22);
+    pdf.text('SCAN TO VIEW MENU', cxCell, topY + 7, { align: 'center' });
+
+    // 2. Restaurant Name
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(6.5);
     pdf.setTextColor(150, 150, 150);
-    pdf.text(restaurantName.toUpperCase(), cxCell, topY + 9, { align: 'center' });
+    pdf.text(restaurantName.toUpperCase(), cxCell, topY + 12, { align: 'center' });
 
-    const qrY = topY + 13;
+    // 3. QR Image
+    const qrY = topY + 15;
     const qrX = cxCell - qrMM / 2;
     const canvas = pdfCanvases[idx];
     if (canvas) pdf.addImage(canvas.toDataURL('image/png'), 'PNG', qrX, qrY, qrMM, qrMM, undefined, 'NONE');
 
+    // 4. Label
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(14);
     pdf.setTextColor(26, 26, 46);
-    pdf.text(label, cxCell, qrY + qrMM + 8, { align: 'center' });
+    pdf.text(label, cxCell, qrY + qrMM + 11, { align: 'center' });
+
+    // 5. URL
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(5.5);
     pdf.setTextColor(160, 160, 160);
-    pdf.text(url, cxCell, qrY + qrMM + 14, { align: 'center', maxWidth: cellW - 16 });
+    pdf.text(url, cxCell, qrY + qrMM + 16, { align: 'center', maxWidth: cellW - 16 });
+
+    // 6. Very bottom branding
+    pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(7);
     pdf.setTextColor(249, 115, 22);
-    pdf.text('Scan to view menu', cxCell, qrY + qrMM + 20, { align: 'center' });
+    pdf.text('QR by https://scanit.nestsphere.in/', cxCell, qrY + qrMM + 21, { align: 'center' });
   });
 
   pdf.save(`qr-codes-${slug}.pdf`);

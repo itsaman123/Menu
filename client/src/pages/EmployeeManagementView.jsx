@@ -1,7 +1,8 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { useTokens } from '../ThemeContext';
 import api from '../api';
+import { StatCard } from '../components/StatCard';
 
 const ROLES = ['manager', 'waiter', 'chef', 'cashier', 'delivery', 'other'];
 
@@ -52,32 +53,6 @@ function Field({ label, value, onChange, type = 'text', placeholder = '' }) {
   );
 }
 
-/* ─── Stat card ─── */
-function StatCard({ label, value, gradient = false, valueColor }) {
-  const T = useTokens();
-  return (
-    <Box sx={{
-      p: 3, borderRadius: '0.75rem', boxShadow: T.shadow,
-      ...(gradient
-        ? { background: 'linear-gradient(135deg,#f97316,#ea580c)' }
-        : { bgcolor: T.surface }),
-    }}>
-      <Typography sx={{
-        fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase',
-        letterSpacing: '0.1em', mb: 1,
-        color: gradient ? 'rgba(255,237,213,0.8)' : T.textSub,
-      }}>
-        {label}
-      </Typography>
-      <Typography sx={{
-        fontSize: '1.875rem', fontWeight: 900,
-        color: gradient ? '#fff' : (valueColor || T.text),
-      }}>
-        {value}
-      </Typography>
-    </Box>
-  );
-}
 
 export default function EmployeeManagementView() {
   const T = useTokens();
@@ -300,11 +275,28 @@ export default function EmployeeManagementView() {
       {/* ═══════════════ STAFF TAB ═══════════════ */}
       {tab === 'Staff' && (
         <Box>
-          {/* Stats */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(3, 1fr)' }, gap: 3, mb: 5 }}>
-            <StatCard label="Total Staff"    value={employees.length} />
-            <StatCard label="Active"         value={activeCount}      valueColor="#006c49" />
-            <StatCard label="Monthly Payroll" value={`₹${payroll.toLocaleString('en-IN')}`} gradient />
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: { xs: 2, md: 3 }, mb: 5 }}>
+            <StatCard 
+              label="Total Staff" 
+              value={employees.length} 
+              icon="groups" 
+              color="#f97316" 
+              T={T} 
+            />
+            <StatCard 
+              label="Active" 
+              value={activeCount} 
+              icon="verified" 
+              color="#006c49" 
+              T={T} 
+            />
+            <StatCard 
+              label="Monthly Payroll" 
+              value={`₹${payroll.toLocaleString('en-IN')}`} 
+              icon="payments" 
+              color="#ea580c" 
+              T={T} 
+            />
           </Box>
 
           {loadingEmps ? (
@@ -578,11 +570,35 @@ export default function EmployeeManagementView() {
           ) : (
             <Box>
               {/* Summary stats */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3, mb: 5 }}>
-                <StatCard label="Total Payable"     value={`₹${totalSalPayable.toLocaleString('en-IN')}`} gradient />
-                <StatCard label="Employees"         value={salSummary.length} />
-                <StatCard label="Total Absent Days" value={salSummary.reduce((s, r) => s + r.absentDays, 0)} valueColor="#ba1a1a" />
-                <StatCard label="Total Leave Days"  value={salSummary.reduce((s, r) => s + r.leaveDays, 0)}  valueColor="#f97316" />
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 3 }, mb: 5 }}>
+                <StatCard 
+                  label="Total Payable" 
+                  value={`₹${totalSalPayable.toLocaleString('en-IN')}`} 
+                  icon="payments" 
+                  color="#ea580c" 
+                  T={T} 
+                />
+                <StatCard 
+                  label="Employees" 
+                  value={salSummary.length} 
+                  icon="groups" 
+                  color="#f97316" 
+                  T={T} 
+                />
+                <StatCard 
+                  label="Total Absent Days" 
+                  value={salSummary.reduce((s, r) => s + r.absentDays, 0)} 
+                  icon="person_cancel" 
+                  color="#ba1a1a" 
+                  T={T} 
+                />
+                <StatCard 
+                  label="Total Leave Days" 
+                  value={salSummary.reduce((s, r) => s + r.leaveDays, 0)} 
+                  icon="date_range" 
+                  color="#f97316" 
+                  T={T} 
+                />
               </Box>
 
               {/* Salary table — scrollable on mobile */}
