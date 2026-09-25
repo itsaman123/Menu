@@ -1,194 +1,237 @@
-# CulinaryCanvas — QR Menu & Ordering SaaS Platform
+# ScanIt — QR Menu & Restaurant SaaS
 
-A production-ready, multi-tenant SaaS platform that enables restaurants to create digital QR menus, accept contactless orders, and manage operations through a real-time admin dashboard.
+Multi-tenant platform where restaurants publish a QR menu, take OTP-verified orders, and run operations (orders, billing, inventory, staff) from one admin dashboard. Each restaurant's data is isolated by `restaurantId`, and modules (orders, billing, inventory…) are enabled per restaurant by the Super Admin.
+
+## Tech Stack
+
+| Layer    | Stack |
+|----------|-------|
+| Frontend | React 19, Vite, MUI 7, React Router 7, TanStack Query, Axios |
+| Backend  | Node.js, Express 5, MongoDB + Mongoose, JWT, Helmet, rate limiting |
+| Services | Cloudinary (images), apitxt.com (OTP SMS), Resend (emails) |
+
+## Roles
+
+| Role        | Entry point        | Can do |
+|-------------|--------------------|--------|
+| Super Admin | `/superadmin-login` | Onboard restaurants, manage admins & enabled modules, view platform stats, inquiries |
+| Admin (restaurant) | `/login` | Menu, QR codes, live orders, billing, inventory, employees & attendance |
+| Customer    | Scan table QR → `/menu/:slug` | Browse, order with OTP, track order, view past orders |
 
 ---
 
-## 🎯 Overview
+## User Flows
 
-CulinaryCanvas allows restaurant owners to:
-- **Register** their restaurant and build a digital menu
-- **Generate QR codes** that link customers directly to the menu
-- **Accept orders** via OTP-verified mobile checkout
-- **Track orders** in real-time with status updates
-- **Manage everything** from a sidebar-driven admin dashboard
+### 1. Restaurant onboarding
 
-Customers can:
-- **Scan a QR code** → view the menu → add items to cart → checkout with OTP → track their order live
+Self-registration is disabled; restaurants are created by the Super Admin.
+
+```mermaid
+flowchart LR
+    SA[Super Admin logs in] --> CR[Create restaurant + admin]
+    CR --> MOD[Enable modules<br/>orders · billing · inventory…]
+    MOD --> MAIL[Send credentials by email]
+    MAIL --> AL[Admin logs in at /login]
+    AL --> MENU[Add categories & menu items<br/>images → Cloudinary]
+    MENU --> QR[Generate & print table QR codes]
+    QR --> LIVE([Restaurant is live])
+```
+
+### 2. Customer ordering
+
+```mermaid
+flowchart TD
+    A[Scan table QR] --> B["Menu page /menu/:slug"]
+    B --> C[Browse categories, add to cart]
+    C --> D["Checkout /checkout/:slug"]
+    D --> E[Enter phone number]
+    E --> F[Receive 6-digit OTP by SMS]
+    F --> G{OTP valid?}
+    G -- No --> E
+    G -- Yes --> H[Order placed]
+    H --> I["Tracking page /order-success/:id<br/>auto-refresh every 5s"]
+    I --> J["Past orders /my-orders"]
+```
+
+### 3. Order lifecycle (Admin)
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending: Customer places order
+    pending --> confirmed: Admin accepts
+    confirmed --> preparing: Kitchen starts
+    preparing --> completed: Served
+    pending --> cancelled
+    confirmed --> cancelled
+    completed --> Invoiced: Admin creates invoice (Billing)
+    completed --> [*]
+    cancelled --> [*]
+```
+
+### 4. End-to-end request sequence
+
+```mermaid
+sequenceDiagram
+    actor Customer
+    participant App as Frontend
+    participant API as Backend
+    participant SMS as apitxt SMS
+    actor Admin
+
+    Customer->>App: Scan QR
+    App->>API: GET /public/menu/:slug
+    API-->>App: Restaurant + menu
+    Customer->>App: Cart → checkout, enter phone
+    App->>API: POST /api/otp/send
+    API->>SMS: Send OTP
+    SMS-->>Customer: SMS with OTP
+    Customer->>App: Enter OTP
+    App->>API: POST /api/otp/verify
+    API-->>App: orderToken (customer JWT)
+    App->>API: POST /api/orders/create
+    API-->>App: Order (status: pending)
+    loop Every 30s
+        Admin->>API: GET /api/orders/restaurant
+    end
+    Admin->>API: PUT /api/orders/:id/status
+    loop Every 5s until completed/cancelled
+        App->>API: GET /api/orders/:id
+    end
+    Admin->>API: POST /api/billing/invoices
+```
 
 ---
 
-## 🛠 Tech Stack
+## Architecture
 
 ### Frontend
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| React | 19.x | UI framework |
-| Vite | 8.x | Build tool & dev server |
-| MUI (Material UI) | 7.x | Component library |
-| TanStack React Query | 5.x | Data fetching & caching |
-| React Router | 7.x | Client-side routing |
-| Axios | 1.x | HTTP client |
-| qrcode.react | 4.x | QR code generation |
+
+```mermaid
+flowchart LR
+    subgraph Public
+        L[Landing · Features · Pricing · About · Contact]
+        D["/demo"]
+    end
+    subgraph Customer
+        M["/menu/:slug"] --> C["/checkout/:slug"] --> S["/order-success/:id"]
+        MO["/my-orders"]
+    end
+    subgraph Admin["/admin/*"]
+        AD[Dashboard] --> LO[Live Orders]
+        AD --> MM[Menu]
+        AD --> QR[QR Generator]
+        AD --> BI[Billing & Invoices]
+        AD --> INV[Inventory]
+        AD --> EMP[Employees & Attendance]
+    end
+    SA["/superadmin/*"]
+
+    L --> LG["/login"] --> AD
+    Public & Customer & Admin & SA -->|Axios + React Query| API[(REST API)]
+```
 
 ### Backend
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Node.js | 18+ | Runtime |
-| Express | 5.x | HTTP framework |
-| MongoDB + Mongoose | 9.x | Database & ODM |
-| JWT (jsonwebtoken) | 9.x | Authentication |
-| bcryptjs | 3.x | Password hashing |
-| Cloudinary + Multer | — | Image upload & storage |
 
-### Design System
-| Token | Value |
-|-------|-------|
-| Primary Color | `#5341cd` → `#6C5CE7` (gradient) |
-| Headline Font | Manrope (800 weight) |
-| Body Font | Inter (400–600 weight) |
-| Border Strategy | No 1px borders — tonal surface nesting only |
-| Shadow System | Ambient: `0px 20px 50px rgba(25,28,30,0.06)` |
+```mermaid
+flowchart LR
+    FE[React Client] --> SEC[CORS · Helmet · Rate limit]
+    SEC --> P["Public<br/>/auth/login · /public/menu/:slug<br/>/api/otp · POST /api/contact"]
+    SEC --> AUTH{JWT middleware}
+    AUTH -->|customer orderToken| O["/api/orders/create · /:id · /my-orders"]
+    AUTH -->|admin + module check| A["/api/categories · menu-items · upload<br/>/api/orders/restaurant · billing<br/>/api/inventory/* · employees · attendance"]
+    AUTH -->|super admin| SUP["/api/superadmin/*"]
 
----
-
-## 📁 Project Structure
-
-```
-QR-Menu/
-├── client/                     # React Frontend (Vite)
-│   ├── src/
-│   │   ├── api.js              # Axios instance with auth interceptors
-│   │   ├── demoData.js         # Static demo menu for pitching
-│   │   ├── main.jsx            # MUI theme + providers
-│   │   ├── App.jsx             # Route definitions
-│   │   ├── index.css           # CulinaryCanvas design tokens
-│   │   ├── components/
-│   │   │   └── ProtectedRoute.jsx
-│   │   ├── hooks/
-│   │   │   └── useCart.js      # Cart state (localStorage)
-│   │   └── pages/
-│   │       ├── LandingPage.jsx    # Marketing / pricing
-│   │       ├── Login.jsx          # Admin login
-│   │       ├── Register.jsx       # Admin + restaurant registration
-│   │       ├── PublicMenu.jsx     # Customer-facing menu
-│   │       ├── Checkout.jsx       # Cart + OTP checkout
-│   │       ├── OrderSuccess.jsx   # Order tracking + timer
-│   │       └── AdminDashboard.jsx # Full admin panel
-│   └── package.json
-│
-├── server/                     # Node.js Backend (Express)
-│   ├── server.js               # App entry point
-│   ├── .env                    # Environment variables
-│   ├── config/
-│   │   └── cloudinary.js       # Cloudinary + Multer config
-│   ├── middleware/
-│   │   ├── authMiddleware.js   # Admin JWT + X-Restaurant-Id validation
-│   │   └── customerAuth.js     # Customer OTP token validation
-│   ├── models/
-│   │   ├── Admin.js            # Admin user model
-│   │   ├── Restaurant.js       # Restaurant model
-│   │   ├── Category.js         # Menu category model
-│   │   ├── MenuItem.js         # Menu item model
-│   │   ├── Order.js            # Order model
-│   │   └── Otp.js              # OTP model (5min TTL)
-│   ├── routes/
-│   │   ├── auth.js             # Register + Login
-│   │   ├── category.js         # CRUD categories
-│   │   ├── menuItem.js         # CRUD menu items
-│   │   ├── order.js            # Order create + manage
-│   │   ├── otp.js              # Send + Verify OTP
-│   │   ├── public.js           # Public menu endpoint
-│   │   └── upload.js           # Image upload
-│   └── package.json
-│
-└── docs/                       # Documentation
-    ├── API.md                  # Full API reference
-    ├── FRONTEND.md             # Frontend architecture
-    └── USER_FLOWS.md           # User flow diagrams
+    P & O & A & SUP --> DB[(MongoDB)]
+    A --> CL[Cloudinary]
+    P --> SMS[apitxt SMS]
+    SUP --> RS[Resend email]
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### Prerequisites
-- Node.js 18+
-- MongoDB (local or Atlas)
-- Cloudinary account (for image uploads)
+**Prerequisites:** Node.js 18+, a MongoDB database (local or Atlas), and Cloudinary / apitxt / Resend accounts.
 
-### 1. Clone & Install
+### 1. Backend
 
 ```bash
-git clone <repo-url>
-cd QR-Menu
-
-# Install backend
 cd server
 npm install
-
-# Install frontend
-cd ../client
-npm install
 ```
-
-### 2. Configure Environment
 
 Create `server/.env`:
+
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/qr-menu
-JWT_SECRET=your_jwt_secret_here
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+MONGODB_URI=mongodb://localhost:27017/scanit
+JWT_SECRET=change-me
+CORS_ORIGIN=http://localhost:5173
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+API_TXT_API_KEY=            # OTP SMS
+RESEND_API_KEY=             # emails
+RESEND_FROM_EMAIL=
+INQUIRY_TO_EMAIL=           # where contact-form inquiries go
+
+SA_EMAIL=admin@example.com  # Super Admin created by the seed script
+SA_PASSWORD=change-me
 ```
 
-### 3. Run
+Create the Super Admin, then start the API:
 
 ```bash
-# Terminal 1 — Backend
-cd server
-node server.js
-
-# Terminal 2 — Frontend
-cd client
-npm run dev
+npm run seed        # add -- --reset to overwrite the password
+npm start           # http://localhost:5000
 ```
 
-The app will be available at `http://localhost:5173`
+### 2. Frontend
 
----
+```bash
+cd client
+npm install
+```
 
-## 📚 Documentation
+Create `client/.env`:
 
-| Document | Description |
-|----------|-------------|
-| [API Reference](docs/API.md) | All backend routes, request/response formats |
-| [Frontend Architecture](docs/FRONTEND.md) | Pages, components, state management, design system |
-| [User Flows](docs/USER_FLOWS.md) | End-to-end user journey diagrams |
+> **API URL:** the base URL is set in `client/src/environment.js`. It currently points to production (`https://api-scanit.nestsphere.in`). To use your local backend, switch it to the commented `VITE_API_URL` / `localhost:5000` line.
 
----
+```env
+VITE_API_URL=http://localhost:5000
+# Firebase / analytics
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
 
-## 🔒 Multi-Tenant Security
+```bash
+npm run dev         # http://localhost:5173
+npm run build       # production build → client/dist
+```
 
-Every admin API call is scoped by **two security layers**:
+### 3. First run
 
-1. **JWT Token** — embeds `adminId` + `restaurantId`
-2. **X-Restaurant-Id Header** — frontend sends, backend validates against DB
+1. Open `http://localhost:5173/superadmin-login` and log in with `SA_EMAIL` / `SA_PASSWORD`.
+2. Create a restaurant and its admin, and enable the modules it needs.
+3. Log in at `/login` as that admin, add a menu, and generate QR codes.
+4. Open `/menu/<restaurant-slug>` (or scan the QR) to place a test order.
 
-This ensures Restaurant A's admin can **never** access Restaurant B's data.
+## Project Structure
 
----
-
-## 🇮🇳 Localization
-
-- Currency: Indian Rupee (₹)
-- Tax label: GST (5%)
-- Demo menu items: Indian cuisine (Harvest Grain Bowl, Wild Mushroom Pizza, etc.)
-
----
-
-## 📄 License
-
-Private — All rights reserved.
+```text
+client/src/
+  pages/        Public, customer, admin, super-admin screens
+  components/   Shared UI
+server/
+  routes/       REST endpoints (auth, orders, billing, inventory…)
+  models/       Mongoose schemas
+  middleware/   Admin / super-admin / customer JWT guards
+  config/       Cloudinary, SMS provider
+  seed.js       Super Admin bootstrap
+```
